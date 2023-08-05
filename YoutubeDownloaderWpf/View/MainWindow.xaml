@@ -24,11 +24,13 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="50"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" HorizontalAlignment="Center">Name</TextBlock>
-            <TextBlock Grid.Column="1" HorizontalAlignment="Center">Size in MB</TextBlock>
-            <TextBlock Grid.Column="2" HorizontalAlignment="Center">Status</TextBlock>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center">Progress</TextBlock>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Center">Size in MB</TextBlock>
+            <TextBlock Grid.Column="3" HorizontalAlignment="Center">Status</TextBlock>
         </Grid>
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="10,0,10,0">
             <ItemsControl ItemsSource="{Binding DownloadStatuses}" >

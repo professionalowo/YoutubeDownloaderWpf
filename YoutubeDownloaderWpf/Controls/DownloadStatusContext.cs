@@ -16,12 +16,13 @@ namespace YoutubeDownloaderWpf.Controls
         private double _sizeInMb = 0;
         private bool _isCompleted = false;
         private Brush _background = Brushes.White;
+        private double _progress = 0;
 
         public string Name { get { return _name; } set { _name = value; OnPropertyChanged(); } }
         public double Size { get { return _sizeInMb; } set { _sizeInMb = value; OnPropertyChanged(); } }
         public bool IsCompleted { get { return _isCompleted; } set { _isCompleted = value; OnPropertyChanged(); } }
-
         public Brush Background {get { return _background; } set {_background = value; OnPropertyChanged(); } } 
+        public double Progress {get { return _progress; } set { _progress = value; OnPropertyChanged(); } }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -32,7 +33,7 @@ namespace YoutubeDownloaderWpf.Controls
         public event EventHandler<bool> DownloadFinished;
         public DownloadStatusContext(string name, double sizeInMb)
         {
-
+            
             Name = name;
             Size = Math.Round(sizeInMb,2);
             DownloadFinished += OnDownloadFinished;

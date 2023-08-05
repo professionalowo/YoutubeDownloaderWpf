@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Text.RegularExpressions;
 using YoutubeDownloaderWpf.Controls;
+using System.IO;
 
 namespace YoutubeDownloaderWpf.Services
 {
@@ -23,7 +24,7 @@ namespace YoutubeDownloaderWpf.Services
         public string Name { get { return _name; } set { _name = value; OnPropertyChanged(); } }
 
         private string _url = string.Empty;
-        public string Url { get { return _url; } set { _url = value; OnPropertyChanged();} }
+        public string Url { get { return _url; } set { _url = value; OnPropertyChanged(); } }
 
         public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = new();
 
@@ -46,15 +47,14 @@ namespace YoutubeDownloaderWpf.Services
 
         private void DownloadAction(string url)
         {
-            DispatchToUI(DownloadStatuses.Clear);      
+            DispatchToUI(DownloadStatuses.Clear);
             bool isVideo;
             string[] urlSplit = url.Split('/');
             isVideo = urlSplit.Last().StartsWith("w");
             Trace.WriteLine(isVideo);
             if (isVideo)
             {
-
-                DownloadVideo(url,$"{DDIR}/{DownloadFolderName}",Name);
+                DownloadVideo(url, $"{DDIR}/{DownloadFolderName}", Name);
             }
             else
             {
@@ -69,17 +69,23 @@ namespace YoutubeDownloaderWpf.Services
             if (string.IsNullOrEmpty(name))
             {
                 name = Guid.NewGuid().ToString();
-            }             
+            }
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetMuxedStreams().Where(s => s.Container == Container.Mp4).GetWithHighestBitrate();
-            DownloadStatus? status = null; 
-            DispatchToUI(() => { 
+            DownloadStatus? status = null;
+            DispatchToUI(() =>
+            {
                 status = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-                DownloadStatuses.Add(status); 
+                DownloadStatuses.Add(status);
             });
-            Task t = client.Videos.Streams.DownloadAsync(streamInfo, $"{path}/{name}.{streamInfo.Container}").AsTask();
-            await t;
-            await t.ContinueWith(t => status?.Context.OnDownloadFinished(this,true));
+            var filePath = $"{path}/{name}.{streamInfo.Container}";
+            var progressHandler = new Progress<double>(p => status.Context.Progress = p*100);
+            ValueTask t = client.Videos.Streams.DownloadAsync(streamInfo, filePath, progressHandler);
+
+            await t.AsTask().ContinueWith(t =>
+            {
+                status?.Context.OnDownloadFinished(this, true);
+            });
             Trace.WriteLine($"Finished downloading from {url}");
         }
 
@@ -89,12 +95,12 @@ namespace YoutubeDownloaderWpf.Services
             System.IO.Directory.CreateDirectory($"{DDIR}/{DownloadFolderName}/{playlist.Title}");
             await foreach (var batch in client.Playlists.GetVideoBatchesAsync(url))
             {
-                foreach(var video in batch.Items)
+                foreach (var video in batch.Items)
                 {
                     Trace.WriteLine($"Downloading from {video.Url}");
-                    DownloadVideo(video.Url, $"{DDIR}/{DownloadFolderName}", $"{playlist.Title.Trim('/')}/{video.Title}");
+                    DownloadVideo(video.Url, $"{DDIR}/{DownloadFolderName}/{playlist.Title.Trim('/')}", $"{video.Title}");
                     Trace.WriteLine($"Finished downloading from {url}");
-                }         
+                }
             }
         }
 
