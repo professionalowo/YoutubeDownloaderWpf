@@ -1,0 +1,42 @@
+﻿<Window x:Class="YoutubeDownloaderWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:YoutubeDownloaderWpf"
+        mc:Ignorable="d"
+        Title="Downloader" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <Label>Url:</Label>
+            <TextBox Name="UrlTextBox" Width="250" Text="{Binding Url,Mode=TwoWay}"></TextBox>
+            <Label>Name:</Label>
+            <TextBox Name="NameTxtBox" Width="150" Text="{Binding Name,Mode=TwoWay}"></TextBox>
+            <Button Click="Button_Click">Download</Button>
+        </DockPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" HorizontalAlignment="Center">Name</TextBlock>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center">Size in MB</TextBlock>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Center">Status</TextBlock>
+        </Grid>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding DownloadStatuses}" >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Window>
