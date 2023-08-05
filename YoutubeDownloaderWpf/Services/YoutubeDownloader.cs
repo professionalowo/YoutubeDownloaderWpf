@@ -87,12 +87,15 @@ namespace YoutubeDownloaderWpf.Services
         {
             var playlist = client.Playlists.GetAsync(url).Result;
             System.IO.Directory.CreateDirectory($"{DDIR}/{DownloadFolderName}/{playlist.Title}");
-            await foreach (var video in client.Playlists.GetVideosAsync(url))
+            await foreach (var batch in client.Playlists.GetVideoBatchesAsync(url))
             {
-                Trace.WriteLine($"Downloading from {video.Url}");
-                DownloadVideo(video.Url, $"{DDIR}/{DownloadFolderName}", $"{playlist.Title.Trim('/')}/{video.Title}");
+                foreach(var video in batch.Items)
+                {
+                    Trace.WriteLine($"Downloading from {video.Url}");
+                    DownloadVideo(video.Url, $"{DDIR}/{DownloadFolderName}", $"{playlist.Title.Trim('/')}/{video.Title}");
+                    Trace.WriteLine($"Finished downloading from {url}");
+                }         
             }
-            Trace.WriteLine($"Finished downloading from {url}");
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
