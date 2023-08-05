@@ -10,7 +10,6 @@ namespace YoutubeDownloaderWpf.Services
 {
     public interface IDownloader
     {
-        string Name { get; }
         string Url { get; }
         ObservableCollection<DownloadStatus> DownloadStatuses { get; }
         Task Download();

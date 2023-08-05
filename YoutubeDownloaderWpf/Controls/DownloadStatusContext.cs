@@ -38,8 +38,9 @@ namespace YoutubeDownloaderWpf.Controls
             Size = Math.Round(sizeInMb,2);
             DownloadFinished += OnDownloadFinished;
         }
-            
-        public void OnDownloadFinished(object? sender, bool e)
+        public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
+
+        private void OnDownloadFinished(object? sender, bool e)
         {
             IsCompleted = e;
             Background = Brushes.LightGreen;

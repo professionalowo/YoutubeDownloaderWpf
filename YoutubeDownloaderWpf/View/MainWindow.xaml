@@ -15,9 +15,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center" Width="auto">
             <Label>Url:</Label>
-            <TextBox Name="UrlTextBox" Width="250" Text="{Binding Url,Mode=TwoWay}"/>
-            <Label>Name:</Label>
-            <TextBox Name="NameTxtBox" Width="150" Text="{Binding Name,Mode=TwoWay}"/>
+            <TextBox Name="UrlTextBox" Width="450" Text="{Binding Url,Mode=TwoWay}"/>
             <Button Click="Button_Click" Width="150">Download</Button>
         </DockPanel>
         <Grid Grid.Row="1" Margin="10,0,10,0">
