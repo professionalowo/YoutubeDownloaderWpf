@@ -5,21 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YoutubeDownloaderWpf"
         mc:Ignorable="d"
-        Title="Downloader" Height="450" Width="800">
+        Title="Downloader" Height="450" Width="800" MinHeight="200" MinWidth="550">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="5*"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0">
+        <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center" Width="auto">
             <Label>Url:</Label>
-            <TextBox Name="UrlTextBox" Width="250" Text="{Binding Url,Mode=TwoWay}"></TextBox>
+            <TextBox Name="UrlTextBox" Width="250" Text="{Binding Url,Mode=TwoWay}"/>
             <Label>Name:</Label>
-            <TextBox Name="NameTxtBox" Width="150" Text="{Binding Name,Mode=TwoWay}"></TextBox>
-            <Button Click="Button_Click">Download</Button>
+            <TextBox Name="NameTxtBox" Width="150" Text="{Binding Name,Mode=TwoWay}"/>
+            <Button Click="Button_Click" Width="150">Download</Button>
         </DockPanel>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
@@ -29,7 +30,7 @@
             <TextBlock Grid.Column="1" HorizontalAlignment="Center">Size in MB</TextBlock>
             <TextBlock Grid.Column="2" HorizontalAlignment="Center">Status</TextBlock>
         </Grid>
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="10,0,10,0">
             <ItemsControl ItemsSource="{Binding DownloadStatuses}" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -38,5 +39,10 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </ScrollViewer>
+        <DockPanel Grid.Row="3">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">
+                Youtube Downloader by Martin Brandl
+            </TextBlock>
+        </DockPanel>
     </Grid>
 </Window>

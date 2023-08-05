@@ -15,13 +15,13 @@ namespace YoutubeDownloaderWpf
     /// </summary>
     public partial class App : Application
     {
-        ServiceProvider services;
+        private readonly ServiceProvider services;
         public App()
         {
             services = InitializeServices();
         }
 
-        private ServiceProvider InitializeServices()
+        private static ServiceProvider InitializeServices()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IDownloader,YoutubeDownloader>();

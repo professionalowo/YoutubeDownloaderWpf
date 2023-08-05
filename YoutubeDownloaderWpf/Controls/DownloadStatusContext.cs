@@ -12,9 +12,9 @@ namespace YoutubeDownloaderWpf.Controls
 {
     public class DownloadStatusContext : INotifyPropertyChanged
     {
-        private string _name;
-        private double _sizeInMb;
-        private bool _isCompleted;
+        private string _name = string.Empty;
+        private double _sizeInMb = 0;
+        private bool _isCompleted = false;
         private Brush _background = Brushes.White;
 
         public string Name { get { return _name; } set { _name = value; OnPropertyChanged(); } }
@@ -23,7 +23,7 @@ namespace YoutubeDownloaderWpf.Controls
 
         public Brush Background {get { return _background; } set {_background = value; OnPropertyChanged(); } } 
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
@@ -35,7 +35,6 @@ namespace YoutubeDownloaderWpf.Controls
 
             Name = name;
             Size = Math.Round(sizeInMb,2);
-            IsCompleted = false;
             DownloadFinished += OnDownloadFinished;
         }
             

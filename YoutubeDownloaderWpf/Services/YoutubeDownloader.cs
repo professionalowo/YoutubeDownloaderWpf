@@ -25,9 +25,9 @@ namespace YoutubeDownloaderWpf.Services
         private string _url = string.Empty;
         public string Url { get { return _url; } set { _url = value; OnPropertyChanged();} }
 
-        public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = new ObservableCollection<DownloadStatus>();
+        public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = new();
 
-        private static readonly YoutubeClient client = new YoutubeClient();
+        private static readonly YoutubeClient client = new();
         private string DDIR { get; set; } = System.IO.Directory.GetCurrentDirectory();
         private static string DownloadFolderName { get; } = "Downloads";
         public YoutubeDownloader()
@@ -95,7 +95,7 @@ namespace YoutubeDownloaderWpf.Services
             Trace.WriteLine($"Finished downloading from {url}");
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
