@@ -85,7 +85,7 @@ namespace YoutubeDownloaderWpf.Services
 
         private async void DownloadPlaylist(string url)
         {
-            var playlist = client.Playlists.GetAsync(url).Result;
+            var playlist = await client.Playlists.GetAsync(url);
             System.IO.Directory.CreateDirectory($"{DDIR}/{DownloadFolderName}/{playlist.Title}");
             await foreach (var batch in client.Playlists.GetVideoBatchesAsync(url))
             {
