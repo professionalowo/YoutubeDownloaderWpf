@@ -18,7 +18,7 @@ using System.IO;
 
 namespace YoutubeDownloaderWpf.Services
 {
-    public partial class YoutubeDownloader : IDownloader, INotifyPropertyChanged
+    public class YoutubeDownloader : IDownloader, INotifyPropertyChanged
     {
         private string _url = string.Empty;
         public string Url { get { return _url; } set { _url = value; OnPropertyChanged(); } }
@@ -48,7 +48,6 @@ namespace YoutubeDownloaderWpf.Services
             bool isVideo;
             string[] urlSplit = url.Split('/');
             isVideo = urlSplit.Last().StartsWith("w");
-            Trace.WriteLine(isVideo);
             if (isVideo)
             {
                 DownloadVideo(url, $"{DDIR}/{DownloadFolderName}");
@@ -71,13 +70,13 @@ namespace YoutubeDownloaderWpf.Services
             {
                 status = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
                 DownloadStatuses.Add(status);
-            });          
+            });
             var filePath = $"{path}/{name}.{streamInfo.Container}";
-            var progressHandler = new Progress<double>(p => status!.Context.Progress = p*100);
+            var progressHandler = status!.Context.ProgressHandler;
             ValueTask t = client.Videos.Streams.DownloadAsync(streamInfo, filePath, progressHandler);
             await t.AsTask().ContinueWith(t =>
             {
-                status?.Context.InvokeDownloadFinished(this,true);
+                status?.Context.InvokeDownloadFinished(this, true);
             });
             Trace.WriteLine($"Finished downloading from {url}");
         }

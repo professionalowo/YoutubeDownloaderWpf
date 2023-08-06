@@ -22,6 +22,8 @@ namespace YoutubeDownloaderWpf.Controls
         public Brush Background { get { return _background; } set { _background = value; OnPropertyChanged(); } }
         public double Progress { get { return _progress; } set { _progress = value; OnPropertyChanged(); } }
 
+        public Progress<double> ProgressHandler { get; init; }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -33,6 +35,7 @@ namespace YoutubeDownloaderWpf.Controls
         {
             Name = name;
             Size = Math.Round(sizeInMb, 2);
+            ProgressHandler = new Progress<double>(p => Progress = p * 100);
             DownloadFinished += OnDownloadFinished;
         }
         public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
