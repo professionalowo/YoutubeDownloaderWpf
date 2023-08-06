@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="View\folder.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="YouTube.ico" />
   </ItemGroup>
 
@@ -18,6 +22,12 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="YoutubeExplode" Version="6.3.1" />
     <PackageReference Include="YoutubeExplode.Converter" Version="6.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\folder.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

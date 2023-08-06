@@ -12,6 +12,7 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center" Width="auto">
             <Label>Url:</Label>
@@ -37,7 +38,16 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </ScrollViewer>
-        <DockPanel Grid.Row="3">
+        <DockPanel HorizontalAlignment="Center" Grid.Row="3">
+            <Button Background="White" Click="Button_Click_Open_Downloads">
+                <Span BaselineAlignment="Center">
+                    <Image Source="folder.jpg"/>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Downloads</TextBlock>
+                </Span>
+                
+            </Button>
+        </DockPanel>
+        <DockPanel Grid.Row="4">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">
                 Youtube Downloader by Martin Brandl
             </TextBlock>
