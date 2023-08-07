@@ -65,18 +65,17 @@ namespace YoutubeDownloaderWpf.Services
             string name = video.Title;
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetMuxedStreams().Where(s => s.Container == Container.Mp4).GetWithHighestBitrate();
-            DownloadStatus? status = null;
+            DownloadStatusContext? statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
             DispatchToUI(() =>
             {
-                status = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-                DownloadStatuses.Add(status);
+                DownloadStatuses.Add(statusContext.AsStatus);
             });
             var filePath = $"{path}/{name}.{streamInfo.Container}";
-            var progressHandler = status!.Context.ProgressHandler;
+            var progressHandler = statusContext.ProgressHandler;
             ValueTask t = client.Videos.Streams.DownloadAsync(streamInfo, filePath, progressHandler);
             await t.AsTask().ContinueWith(t =>
             {
-                status?.Context.InvokeDownloadFinished(this, true);
+                statusContext.InvokeDownloadFinished(this, true);
             });
             Trace.WriteLine($"Finished downloading from {url}");
         }

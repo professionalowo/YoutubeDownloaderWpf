@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace YoutubeDownloaderWpf.Controls
 {
@@ -21,10 +22,11 @@ namespace YoutubeDownloaderWpf.Controls
     public partial class DownloadStatus : UserControl
     {
         public DownloadStatusContext Context { get; init; }
-        public DownloadStatus(string name, double sizeInMb)
+        public DownloadStatus(string name, double sizeInMb) : this(new DownloadStatusContext(name, sizeInMb)) { }
+        public DownloadStatus(DownloadStatusContext context)
         {
-            Context = new DownloadStatusContext(name, sizeInMb);
-            this.DataContext= Context;
+            Context = context;
+            this.DataContext = Context;
             InitializeComponent();
         }
     }

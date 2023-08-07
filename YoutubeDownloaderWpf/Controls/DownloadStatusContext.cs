@@ -16,7 +16,7 @@ namespace YoutubeDownloaderWpf.Controls
         private double _sizeInMb = 0;
         private Brush _background = Brushes.White;
         private double _progress = 0;
-
+        public DownloadStatus AsStatus => new(this);
         public string Name { get { return _name; } set { _name = value; OnPropertyChanged(); } }
         public double Size { get { return _sizeInMb; } set { _sizeInMb = value; OnPropertyChanged(); } }
         public Brush Background { get { return _background; } set { _background = value; OnPropertyChanged(); } }
