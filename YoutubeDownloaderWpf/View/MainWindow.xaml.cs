@@ -32,5 +32,7 @@ namespace YoutubeDownloaderWpf
 
         private void Button_Click(object sender, RoutedEventArgs e) => Downloader.Download();
 
+        private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => Process.Start("explorer.exe", Downloader.DownloadDirectoryPath);
+
     }
 }

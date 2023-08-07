@@ -28,6 +28,8 @@ namespace YoutubeDownloaderWpf.Services
         private static readonly YoutubeClient client = new();
         private string DDIR { get; set; } = Directory.GetCurrentDirectory();
         private static string DownloadFolderName { get; } = "Downloads";
+
+        public string DownloadDirectoryPath { get => DownloadFolderName; }
         public YoutubeDownloader()
         {
             Init();
@@ -101,6 +103,8 @@ namespace YoutubeDownloaderWpf.Services
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        
 
         public static void DispatchToUI(Action action)
         {
