@@ -39,9 +39,9 @@ namespace YoutubeDownloaderWpf.Services
             => Task.Factory.StartNew(() => DownloadAction(Url));
 
 
-        private void DownloadAction(string url)
+        private async void DownloadAction(string url)
         {
-            DispatchToUI(DownloadStatuses.Clear);
+            await DispatchToUI(DownloadStatuses.Clear);
             bool isVideo;
             string[] urlSplit = url.Split('/');
             isVideo = urlSplit.Last().StartsWith("w");
