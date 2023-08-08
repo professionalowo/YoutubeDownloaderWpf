@@ -18,6 +18,8 @@
             <Label VerticalAlignment="Center">Url:</Label>
             <TextBox Name="UrlTextBox" Width="450" Text="{Binding Url,Mode=TwoWay}" VerticalContentAlignment="Center"/>
             <Button Click="Button_Click" Width="150">Download</Button>
+            <Label VerticalAlignment="Center">Force Mp3:</Label>
+            <CheckBox IsChecked="{Binding ForceMp3,Mode=TwoWay}" VerticalAlignment="Center"/>
         </DockPanel>
         <Grid Grid.Row="1" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
@@ -46,6 +48,7 @@
                 </Span>
                 
             </Button>
+            <Button Click="Button_Click_1">Cancel All</Button>
         </DockPanel>
         <DockPanel Grid.Row="4">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">

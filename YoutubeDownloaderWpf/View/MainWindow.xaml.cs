@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YoutubeDownloaderWpf.Services;
+using YoutubeDownloaderWpf.Services.Downloader;
 
 namespace YoutubeDownloaderWpf
 {
@@ -34,5 +34,9 @@ namespace YoutubeDownloaderWpf
 
         private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => Process.Start("explorer.exe", Downloader.DownloadDirectoryPath);
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Downloader.CancellationSources.ToList().ForEach(s => s.Cancel(false));
+        }
     }
 }

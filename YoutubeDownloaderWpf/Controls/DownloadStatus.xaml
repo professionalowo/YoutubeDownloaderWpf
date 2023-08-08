@@ -13,7 +13,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="0" Text="{Binding Name}" HorizontalAlignment="Left" VerticalAlignment="Center"></TextBlock>
-        <ProgressBar Grid.Column="1" Margin="5" Value="{Binding Progress}" Background="White" Foreground="#FF41C127"/>
+        <ProgressBar Grid.Column="1" Margin="5" Value="{Binding ProgressValue}" Background="White" Foreground="#FF41C127"/>
         <TextBlock Grid.Column="2" Text="{Binding Size}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
     </Grid>
 </UserControl>

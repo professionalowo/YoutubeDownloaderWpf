@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using YoutubeDownloaderWpf.Services;
+using YoutubeDownloaderWpf.Services.Downloader;
 
 namespace YoutubeDownloaderWpf
 {

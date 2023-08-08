@@ -15,15 +15,52 @@ using System.Windows;
 using YoutubeDownloaderWpf.Controls;
 using System.IO;
 using System.Windows.Threading;
+using YoutubeDownloaderWpf.Services.Converter;
+<<<<<<< HEAD
+<<<<<<< HEAD
+using System.Threading;
+=======
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
+=======
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
 
-namespace YoutubeDownloaderWpf.Services
+namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader : IDownloader, INotifyPropertyChanged
     {
         private string _url = string.Empty;
         public string Url { get { return _url; } set { _url = value; OnPropertyChanged(); } }
 
+        private bool _forceMp3 = false;
+        public bool ForceMp3
+        {
+<<<<<<< HEAD
+<<<<<<< HEAD
+            get => _forceMp3;
+=======
+            get => _forceMp3; 
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
+=======
+            get => _forceMp3; 
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
+            set
+            {
+                _forceMp3 = value;
+                OnPropertyChanged();
+            }
+        }
+<<<<<<< HEAD
+<<<<<<< HEAD
+        private Mp3Converter Mp3Converter { get; } = new();
+=======
+        private IConverter Mp3Converter { get; } = new Mp3Converter();
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
+=======
+        private IConverter Mp3Converter { get; } = new Mp3Converter();
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
         public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = new();
+
+        public IEnumerable<CancellationTokenSource> CancellationSources => DownloadStatuses.Select(ds => ds.Context.Cancellation);
 
         private static readonly YoutubeClient client = new();
         private string DDIR { get; set; } = Directory.GetCurrentDirectory();
@@ -36,7 +73,9 @@ namespace YoutubeDownloaderWpf.Services
             => Directory.CreateDirectory(DownloadFolderName);
 
         public Task Download()
-            => Task.Factory.StartNew(() => DownloadAction(Url));
+        {
+            return Task.Factory.StartNew(() => DownloadAction(Url));
+        }
 
 
         private async void DownloadAction(string url)
@@ -45,15 +84,22 @@ namespace YoutubeDownloaderWpf.Services
             bool isVideo;
             string[] urlSplit = url.Split('/');
             isVideo = urlSplit.Last().StartsWith("w");
-            if (isVideo)
+            try
             {
-                DownloadVideo(url, $"{DDIR}/{DownloadFolderName}");
+                if (isVideo)
+                {
+                    DownloadVideo(url, $"{DDIR}/{DownloadFolderName}");
+                }
+                else
+                {
+                    DownloadPlaylist(url);
+                }
             }
-            else
+            catch (Exception ex) when (ex is OperationCanceledException)
             {
-                DownloadPlaylist(url);
-            }
 
+            }
+            catch (AggregateException ex) when (ex.InnerException is TaskCanceledException) { }
         }
 
         private async void DownloadVideo(string url, string path)
@@ -66,9 +112,37 @@ namespace YoutubeDownloaderWpf.Services
             await DispatchToUI(() => DownloadStatuses.Add(statusContext.AsStatus));
             var filePath = $"{path}/{name}.{streamInfo.Container}";
             var progressHandler = statusContext.ProgressHandler;
+<<<<<<< HEAD
+            if (File.Exists(filePath))
+            {
+                statusContext.InvokeDownloadFinished(this, true);
+                return;
+            }
+            ValueTask t = client.Videos.Streams.DownloadAsync(streamInfo, filePath, progressHandler,statusContext.Cancellation.Token);
+            Trace.WriteLine(ForceMp3);
+
+            await t.AsTask().ContinueWith(t =>
+            {
+                if (ForceMp3)
+                {
+                    Mp3Converter.RunConversion(filePath, statusContext, statusContext.Cancellation.Token);
+                }
+
+            }, statusContext.Cancellation.Token).ContinueWith(t => statusContext.InvokeDownloadFinished(this, true), statusContext.Cancellation.Token);
+
+=======
             ValueTask t = client.Videos.Streams.DownloadAsync(streamInfo, filePath, progressHandler);
-            await t.AsTask().ContinueWith(t => statusContext.InvokeDownloadFinished(this, true));
+            Trace.WriteLine(ForceMp3);
+            await t.AsTask().ContinueWith(async(t) =>
+            {
+                
+                if (ForceMp3)
+                {
+                    await Mp3Converter.RunConversion(filePath, statusContext);
+                }
+            }).ContinueWith(t => statusContext.InvokeDownloadFinished(this, true));
             Trace.WriteLine($"Finished downloading from {url}");
+>>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
         }
 
         private async void DownloadPlaylist(string url)
