@@ -38,15 +38,7 @@ namespace YoutubeDownloaderWpf.Controls
         {
             Name = name;
             Size = Math.Round(sizeInMb, 2);
-<<<<<<< HEAD
-<<<<<<< HEAD
             ProgressHandler = new(p => ProgressValue = p * 100);
-=======
-            ProgressHandler = new(p => Progress = p * 100);
->>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
-=======
-            ProgressHandler = new(p => Progress = p * 100);
->>>>>>> 8ce1c53 (added option to force files to mp3, converting them from the source)
             DownloadFinished += OnDownloadFinished;
         }
         public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
