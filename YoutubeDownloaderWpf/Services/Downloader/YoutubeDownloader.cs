@@ -24,7 +24,11 @@ namespace YoutubeDownloaderWpf.Services.Downloader
     public class YoutubeDownloader : IDownloader, INotifyPropertyChanged
     {
         private string _url = string.Empty;
-        public string Url { get { return _url; } set { _url = value; OnPropertyChanged(); } }
+        public string Url
+        {
+            get => _url;
+            set { _url = value; OnPropertyChanged(); }
+        }
 
         private bool _forceMp3 = true;
         public bool ForceMp3
@@ -37,9 +41,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
                 OnPropertyChanged();
             }
         }
-        private IConverter Mp3Converter { get; } = new Mp3Converter();
+        private Mp3Converter Mp3Converter { get; } = new ();
 
-        public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = new();
+        public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = [];
 
         public IEnumerable<CancellationTokenSource> CancellationSources => DownloadStatuses.Select(ds => ds.Context.Cancellation);
 
@@ -62,7 +66,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         {
             await DispatchToUI(DownloadStatuses.Clear);
             string[] urlSplit = url.Split('/');
-            bool isVideo = urlSplit.Last().StartsWith("w");
+            bool isVideo = urlSplit.Last().StartsWith('w');
             try
             {
                 if (isVideo)
@@ -89,7 +93,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-            await DispatchToUI(() => DownloadStatuses.Add(statusContext.AsStatus));
+            DispatchToUISync(() => DownloadStatuses.Add(statusContext.AsStatus));
             var filePath = $"{path}/{name}.{streamInfo.Container}";
             var progressHandler = statusContext.ProgressHandler;
 
@@ -128,5 +132,6 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public static DispatcherOperation DispatchToUI(Action action) => Application.Current.Dispatcher.BeginInvoke(action);
+        public static void DispatchToUISync(Action action) => Application.Current.Dispatcher.BeginInvoke(action);
     }
 }
