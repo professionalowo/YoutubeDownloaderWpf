@@ -22,15 +22,15 @@ namespace YoutubeDownloaderWpf
     /// </summary>
     public partial class MainWindow : Window
     {
-        public IDownloader Downloader { get; private set; }
-        public MainWindow(IDownloader downloader)
+        public YoutubeDownloader Downloader { get; private set; }
+        public MainWindow(YoutubeDownloader downloader)
         {
             this.Downloader = downloader;
             this.DataContext = Downloader;
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) => Downloader.Download();
+        private async void Button_Click(object sender, RoutedEventArgs e) => await Downloader.Download();
 
         private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => Process.Start("explorer.exe", Downloader.DownloadDirectoryPath);
 

@@ -17,12 +17,15 @@ using System.IO;
 using System.Windows.Threading;
 using YoutubeDownloaderWpf.Services.Converter;
 using System.Threading;
+using System.CodeDom;
+using Microsoft.Extensions.Logging;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader : IDownloader, INotifyPropertyChanged
     {
+        private readonly ILogger<YoutubeDownloader> _logger;
         private string _url = string.Empty;
         public string Url
         {
@@ -41,7 +44,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
                 OnPropertyChanged();
             }
         }
-        private Mp3Converter Mp3Converter { get; } = new ();
+        private Mp3Converter Mp3Converter { get; } = new();
 
         public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = [];
 
@@ -51,8 +54,11 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         private string DDIR { get; set; } = Directory.GetCurrentDirectory();
         private static string DownloadFolderName { get; } = "Downloads";
         public string DownloadDirectoryPath => DownloadFolderName;
-        public YoutubeDownloader()
-           => Init();
+        public YoutubeDownloader(ILogger<YoutubeDownloader> logger)
+        {
+            _logger = logger;
+            Init();
+        }
 
         private static void Init()
             => Directory.CreateDirectory(DownloadFolderName);
@@ -83,6 +89,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
             catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
             {
+            }
+            catch(Exception e) {
+                _logger.LogError(e.ToString());
             }
         }
 

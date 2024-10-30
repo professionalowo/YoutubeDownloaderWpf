@@ -10,8 +10,6 @@ namespace YoutubeDownloaderWpf.Services.Logging
 {
     public class FileLoggerProvider(string fileName) : ILoggerProvider
     {
-        private readonly FileStream _logFileStream = CreateOrOpenLogFile(fileName);
-
         private static FileStream CreateOrOpenLogFile(string fileName)
         {
             string cwd = Environment.CurrentDirectory ?? throw new IOException("Couldn't get CWD");
@@ -22,12 +20,11 @@ namespace YoutubeDownloaderWpf.Services.Logging
         }
 
         public ILogger CreateLogger(string categoryName)
-        => new SimpleStreamLogger(categoryName, _logFileStream, LogLevel.Warning);
+        => new SimpleStreamLogger(categoryName, new BufferedStream(CreateOrOpenLogFile(fileName)));
 
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            _logFileStream.Dispose();
         }
     }
 }

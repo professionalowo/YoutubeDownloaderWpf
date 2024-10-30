@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace YoutubeDownloaderWpf.Services.Logging
 {
-    public class SimpleStreamLogger(string loggerName, Stream outStream, LogLevel minLogLevel) : ILogger, IDisposable
+    public class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, IDisposable
     {
         private readonly string _loggerName = loggerName;
-        private readonly LogLevel _minLogLevel = minLogLevel;
-        private readonly StreamWriter _writer = new(outStream);
+        private readonly StreamWriter _writer = new(outStream) { AutoFlush = true };
 
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         {
@@ -26,11 +26,12 @@ namespace YoutubeDownloaderWpf.Services.Logging
         }
 
         public bool IsEnabled(LogLevel logLevel)
-        => logLevel >= _minLogLevel && logLevel != LogLevel.None;
+        => true;
 
-        public async void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            await _writer.WriteLineAsync($"[{_loggerName}]({logLevel}): {formatter(state, exception)}");
+            string formatted = $"[{_loggerName}]({logLevel}): {formatter(state, exception)}";
+            _writer.WriteLine(formatted);
         }
     }
 }
