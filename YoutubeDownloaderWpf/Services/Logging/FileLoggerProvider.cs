@@ -12,7 +12,7 @@ namespace YoutubeDownloaderWpf.Services.Logging
     {
         private static FileStream CreateOrOpenLogFile(string fileName)
         {
-            string cwd = Environment.CurrentDirectory ?? throw new IOException("Couldn't get CWD");
+            string cwd = Directory.GetCurrentDirectory() ?? throw new IOException("Couldn't get CWD");
             string fullPath = Path.GetFullPath(Path.Combine(cwd, "logs", fileName)) ?? throw new IOException($"Couldn't get path to log file {fileName}");
             string dirName = Path.GetDirectoryName(fullPath) ?? throw new IOException($"Couldn't get path to log file folder");
             Directory.CreateDirectory(dirName);

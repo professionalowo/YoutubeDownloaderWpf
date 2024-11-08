@@ -91,7 +91,8 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
             {
             }
-            catch(Exception e) {
+            catch (Exception e)
+            {
                 _logger.LogError(e.ToString());
             }
         }
@@ -105,14 +106,12 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
             DispatchToUISync(() => DownloadStatuses.Add(statusContext));
             var filePath = $"{path}/{name}.{streamInfo.Container}";
-            var progressHandler = statusContext.ProgressHandler;
-
             if (File.Exists(filePath))
             {
                 statusContext.InvokeDownloadFinished(this, true);
                 return;
             }
-            await client.Videos.Streams.DownloadAsync(streamInfo, filePath, progressHandler, statusContext.Cancellation.Token);
+            await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
             if (ForceMp3)
             {
                 await Mp3Converter.RunConversion(filePath, statusContext, default);
