@@ -19,7 +19,7 @@ using YoutubeDownloaderWpf.Services.Converter;
 using System.Threading;
 using System.CodeDom;
 using Microsoft.Extensions.Logging;
-using YoutubeDownloaderWpf.Util;
+using YoutubeDownloaderWpf.Util.Extensions;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
@@ -100,7 +100,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         private async Task DownloadVideo(string url, string path)
         {
             var video = await client.Videos.GetAsync(url);
-            string name = PathUtil.ReplaceIllegalCharacters(video.Title);
+            string name = video.Title.ReplaceIllegalCharacters();
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
