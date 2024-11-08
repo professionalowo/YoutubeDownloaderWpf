@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using YoutubeDownloaderWpf.Services.AutoUpdater;
 using YoutubeDownloaderWpf.Services.Downloader;
 using YoutubeDownloaderWpf.Services.Logging;
 
@@ -35,6 +37,9 @@ namespace YoutubeDownloaderWpf
         private static ServiceProvider InitializeServices()
         {
             var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<HttpClientHandler>();
+            serviceCollection.AddScoped<HttpClient>();
+            serviceCollection.AddScoped<Updater>();
             serviceCollection.AddTransient<YoutubeDownloader>();
             serviceCollection.AddTransient<MainWindow>();
             serviceCollection.AddLogging(builder =>
@@ -44,8 +49,13 @@ namespace YoutubeDownloaderWpf
             return serviceCollection.BuildServiceProvider();
         }
 
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private async void Application_Startup(object sender, StartupEventArgs e)
         {
+            var updater = services.GetService<Updater>()!;
+            bool isNewVersion = await updater.IsNewVersionAvailable();
+            if (isNewVersion) {
+                await updater.UpdateVersion();
+            }
             _mainWindow = services.GetService<MainWindow>();
             _mainWindow?.Show();
         }
