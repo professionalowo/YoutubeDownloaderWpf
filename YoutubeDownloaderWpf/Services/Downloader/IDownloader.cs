@@ -14,7 +14,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         string Url { get; }
         string DownloadDirectoryPath { get; }
         public IEnumerable<CancellationTokenSource> CancellationSources { get; }
-        ObservableCollection<DownloadStatus> DownloadStatuses { get; }
+        ObservableCollection<DownloadStatusContext> DownloadStatuses { get; }
         Task Download();
     }
 }

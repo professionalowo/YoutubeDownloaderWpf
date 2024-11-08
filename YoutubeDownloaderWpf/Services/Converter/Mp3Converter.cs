@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
 using YoutubeDownloaderWpf.Controls;
+using YoutubeDownloaderWpf.Services.Downloader;
 
 namespace YoutubeDownloaderWpf.Services.Converter
 {
@@ -29,7 +29,7 @@ namespace YoutubeDownloaderWpf.Services.Converter
             conversion.OnProgress += (sender, args) =>
             {
                 var percent = (int)(Math.Round(args.Duration.TotalSeconds / args.TotalLength.TotalSeconds, 2) * 100);
-                Downloader.YoutubeDownloader.DispatchToUISync(() => context.ProgressValue = percent);
+                YoutubeDownloader.DispatchToUISync(() => context.ProgressValue = percent);
             };
             Trace.WriteLine("Converting");
             await conversion.Start(token).ContinueWith(t => File.Delete(fileInfo.FullName), token);

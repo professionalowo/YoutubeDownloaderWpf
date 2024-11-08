@@ -19,6 +19,7 @@ using YoutubeDownloaderWpf.Services.Converter;
 using System.Threading;
 using System.CodeDom;
 using Microsoft.Extensions.Logging;
+using YoutubeDownloaderWpf.Util;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
@@ -46,9 +47,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         }
         private Mp3Converter Mp3Converter { get; } = new();
 
-        public ObservableCollection<DownloadStatus> DownloadStatuses { get; } = [];
+        public ObservableCollection<DownloadStatusContext> DownloadStatuses { get; } = [];
 
-        public IEnumerable<CancellationTokenSource> CancellationSources => DownloadStatuses.Select(ds => ds.Context.Cancellation);
+        public IEnumerable<CancellationTokenSource> CancellationSources => DownloadStatuses.Select(ds => ds.Cancellation);
 
         private static readonly YoutubeClient client = new();
         private string DDIR { get; set; } = Directory.GetCurrentDirectory();
@@ -98,11 +99,11 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         private async Task DownloadVideo(string url, string path)
         {
             var video = await client.Videos.GetAsync(url);
-            string name = video.Title;
+            string name = PathUtil.ReplaceIllegalCharacters(video.Title);
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-            DispatchToUISync(() => DownloadStatuses.Add(statusContext.AsStatus));
+            DispatchToUISync(() => DownloadStatuses.Add(statusContext));
             var filePath = $"{path}/{name}.{streamInfo.Container}";
             var progressHandler = statusContext.ProgressHandler;
 
