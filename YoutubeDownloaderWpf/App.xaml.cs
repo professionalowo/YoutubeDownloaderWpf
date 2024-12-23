@@ -10,8 +10,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using YoutubeDownloaderWpf.Services.AutoUpdater;
+using YoutubeDownloaderWpf.Services.Converter;
 using YoutubeDownloaderWpf.Services.Downloader;
 using YoutubeDownloaderWpf.Services.Logging;
+using YoutubeExplode;
 
 namespace YoutubeDownloaderWpf
 {
@@ -37,11 +39,10 @@ namespace YoutubeDownloaderWpf
         private static ServiceProvider InitializeServices()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<HttpClientHandler>();
-            serviceCollection.AddScoped<HttpClient>();
-            serviceCollection.AddScoped<Updater>();
-            serviceCollection.AddTransient<YoutubeDownloader>();
+            serviceCollection.AddHttp();
+            serviceCollection.AddDownloadServices();
             serviceCollection.AddTransient<MainWindow>();
+            serviceCollection.AddScoped<Updater>();
             serviceCollection.AddLogging(builder =>
                     builder.AddProvider(new FileLoggerProvider("logs.txt"))
                     .SetMinimumLevel(LogLevel.Warning)
@@ -53,11 +54,28 @@ namespace YoutubeDownloaderWpf
         {
             var updater = services.GetService<Updater>()!;
             bool isNewVersion = await updater.IsNewVersionAvailable();
-            if (isNewVersion) {
+            if (isNewVersion)
+            {
                 await updater.UpdateVersion();
             }
             _mainWindow = services.GetService<MainWindow>();
             _mainWindow?.Show();
+        }
+    }
+
+    static class ServiceCollectionExtensions {
+        public static IServiceCollection AddHttp(this IServiceCollection serviceCollection) {
+            serviceCollection.AddSingleton<HttpClientHandler>();
+            serviceCollection.AddScoped<HttpClient>();
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<YoutubeDownloader>();
+            serviceCollection.AddTransient<YoutubeClient>();
+            serviceCollection.AddTransient<Mp3Converter>();
+            return serviceCollection;
         }
     }
 }
