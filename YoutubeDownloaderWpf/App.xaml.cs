@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using YoutubeDownloaderWpf.Services.AutoUpdater;
 using YoutubeDownloaderWpf.Services.Converter;
 using YoutubeDownloaderWpf.Services.Downloader;
+using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Services.Logging;
 using YoutubeExplode;
 
@@ -73,8 +74,9 @@ namespace YoutubeDownloaderWpf
         public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<YoutubeDownloader>();
+            serviceCollection.AddSingleton<IDirectory,DownloadDirectory>();
             serviceCollection.AddTransient<YoutubeClient>();
-            serviceCollection.AddTransient<Mp3Converter>();
+            serviceCollection.AddTransient<IConverter,Mp3Converter>();
             return serviceCollection;
         }
     }

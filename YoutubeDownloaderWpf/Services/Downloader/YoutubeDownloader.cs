@@ -20,13 +20,19 @@ using System.Threading;
 using System.CodeDom;
 using Microsoft.Extensions.Logging;
 using YoutubeDownloaderWpf.Util.Extensions;
+using YoutubeDownloaderWpf.Services.InternalDirectory;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
-    public class YoutubeDownloader : IDownloader, INotifyPropertyChanged
+    public class YoutubeDownloader(
+        ILogger<YoutubeDownloader> logger,
+        YoutubeClient client,
+        IConverter converter,
+        IDirectory downlaods
+        ) : IDownloader, INotifyPropertyChanged
     {
-        private readonly ILogger<YoutubeDownloader> _logger;
+
         private string _url = string.Empty;
         public string Url
         {
@@ -48,26 +54,13 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         public ObservableCollection<DownloadStatusContext> DownloadStatuses { get; } = [];
         public IEnumerable<CancellationTokenSource> CancellationSources => DownloadStatuses.Select(ds => ds.Cancellation);
 
-        private string DDIR { get; set; } = Directory.GetCurrentDirectory();
-        private static string DownloadFolderName { get; } = "Downloads";
-        public string DownloadDirectoryPath => DownloadFolderName;
+        public string DownloadDirectoryPath => downlaods.FullPath;
 
-        private readonly YoutubeClient _client;
-
-        private readonly Mp3Converter _mp3Converter;
-        public YoutubeDownloader(ILogger<YoutubeDownloader> logger, YoutubeClient client, Mp3Converter converter)
-        {
-            _mp3Converter = converter;
-            _client = client;
-            _logger = logger;
-            Init();
-        }
-
-        private static void Init()
-            => Directory.CreateDirectory(DownloadFolderName);
 
         public async Task Download()
-        => await DownloadAction(Url);
+        {
+            await DownloadAction(Url);
+        }
 
 
 
@@ -80,7 +73,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             {
                 if (isVideo)
                 {
-                    await DownloadVideo(url, $"{DDIR}/{DownloadFolderName}");
+                    await DownloadVideo(url, downlaods.FullPath);
                 }
                 else
                 {
@@ -95,28 +88,28 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
             catch (Exception e)
             {
-                _logger.LogError(e.ToString());
+                logger.LogError(e.ToString());
             }
         }
 
         private async Task DownloadVideo(string url, string path)
         {
-            var video = await _client.Videos.GetAsync(url);
+            var video = await client.Videos.GetAsync(url);
             string name = video.Title.ReplaceIllegalCharacters();
-            var streamManifest = await _client.Videos.Streams.GetManifestAsync(url);
+            var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
             DispatchToUISync(() => DownloadStatuses.Add(statusContext));
-            var filePath = $"{path}/{name}.{streamInfo.Container}";
+            var filePath =  downlaods.SaveFileName(path,$"{name}.{streamInfo.Container}");
             if (File.Exists(filePath))
             {
                 statusContext.InvokeDownloadFinished(this, true);
                 return;
             }
-            await _client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
+            await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
             if (ForceMp3)
             {
-                await _mp3Converter.RunConversion(filePath, statusContext, default);
+                await converter.RunConversion(filePath, statusContext, default);
             }
             statusContext.InvokeDownloadFinished(this, true);
 
@@ -124,15 +117,15 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         private async Task DownloadPlaylist(string url)
         {
-            var playlist = await _client.Playlists.GetAsync(url);
-            Directory.CreateDirectory($"{DDIR}/{DownloadFolderName}/{playlist.Title}");
+            var playlist = await client.Playlists.GetAsync(url);
+            downlaods.CreateSubDirectory(playlist.Title);
 
-            await foreach (var batch in _client.Playlists.GetVideoBatchesAsync(url))
+            await foreach (var batch in client.Playlists.GetVideoBatchesAsync(url))
             {
                 Task.WaitAll(batch.Items.AsParallel().Select((video) => Task.Factory.StartNew(async () =>
                 {
                     Trace.WriteLine($"Downloading from {video.Url}");
-                    await DownloadVideo(video.Url, $"{DDIR}/{DownloadFolderName}/{playlist.Title.Trim('/')}");
+                    await DownloadVideo(video.Url, downlaods.SaveFileName(playlist.Title.Trim('/')));
                     Trace.WriteLine($"Finished downloading from {url}");
                 })).ToArray());
             }

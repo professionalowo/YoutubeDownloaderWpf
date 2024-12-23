@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using YoutubeDownloaderWpf.Services.Downloader;
+using YoutubeDownloaderWpf.Services.InternalDirectory;
 
 namespace YoutubeDownloaderWpf
 {
@@ -23,8 +24,10 @@ namespace YoutubeDownloaderWpf
     public partial class MainWindow : Window
     {
         public YoutubeDownloader Downloader { get; private set; }
-        public MainWindow(YoutubeDownloader downloader)
+        private readonly IDirectory downloads;
+        public MainWindow(YoutubeDownloader downloader, IDirectory downloads)
         {
+            this.downloads = downloads;
             this.Downloader = downloader;
             this.DataContext = Downloader;
             InitializeComponent();
@@ -32,7 +35,7 @@ namespace YoutubeDownloaderWpf
 
         private async void Button_Click(object sender, RoutedEventArgs e) => await Downloader.Download();
 
-        private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => Process.Start("explorer.exe", Downloader.DownloadDirectoryPath);
+        private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => downloads.Open();
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
