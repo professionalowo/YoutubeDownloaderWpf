@@ -21,16 +21,16 @@ using System.CodeDom;
 using Microsoft.Extensions.Logging;
 using YoutubeDownloaderWpf.Util.Extensions;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
+using YoutubeDownloaderWpf.Services.Downloader.Download;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader(
         ILogger<YoutubeDownloader> logger,
-        YoutubeClient client,
+        DownloadFactory downloadFactory,
         IConverter converter,
-        IDirectory downlaods
-        ) : IDownloader, INotifyPropertyChanged
+        IDirectory downlaods) : IDownloader, INotifyPropertyChanged
     {
 
         private string _url = string.Empty;
@@ -59,6 +59,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         public async Task Download()
         {
+            await DispatchToUI(DownloadStatuses.Clear);
             await DownloadAction(Url);
         }
 
@@ -66,18 +67,18 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         private async Task DownloadAction(string url)
         {
-            await DispatchToUI(DownloadStatuses.Clear);
-            string[] urlSplit = url.Split('/');
-            bool isVideo = urlSplit.Last().StartsWith('w');
+
             try
             {
-                if (isVideo)
+                var paths = await downloadFactory.Get(url).Execute(DownloadStatuses);
+                if (ForceMp3)
                 {
-                    await DownloadVideo(url, downlaods.FullPath);
-                }
-                else
-                {
-                    await DownloadPlaylist(url);
+                    List<Task> tasks = [];
+                    foreach (var (path, statusContext) in paths)
+                    {
+                        tasks.Add(converter.RunConversion(path, statusContext, default));
+                    }
+                    await Task.WhenAll(tasks);
                 }
             }
             catch (Exception ex) when (ex is OperationCanceledException)
@@ -89,45 +90,6 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             catch (Exception e)
             {
                 logger.LogError(e.ToString());
-            }
-        }
-
-        private async Task DownloadVideo(string url, string path)
-        {
-            var video = await client.Videos.GetAsync(url);
-            string name = video.Title.ReplaceIllegalCharacters();
-            var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
-            var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
-            DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-            DispatchToUISync(() => DownloadStatuses.Add(statusContext));
-            var filePath =  downlaods.SaveFileName(path,$"{name}.{streamInfo.Container}");
-            if (File.Exists(filePath))
-            {
-                statusContext.InvokeDownloadFinished(this, true);
-                return;
-            }
-            await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
-            if (ForceMp3)
-            {
-                await converter.RunConversion(filePath, statusContext, default);
-            }
-            statusContext.InvokeDownloadFinished(this, true);
-
-        }
-
-        private async Task DownloadPlaylist(string url)
-        {
-            var playlist = await client.Playlists.GetAsync(url);
-            downlaods.CreateSubDirectory(playlist.Title);
-
-            await foreach (var batch in client.Playlists.GetVideoBatchesAsync(url))
-            {
-                Task.WaitAll(batch.Items.AsParallel().Select((video) => Task.Factory.StartNew(async () =>
-                {
-                    Trace.WriteLine($"Downloading from {video.Url}");
-                    await DownloadVideo(video.Url, downlaods.SaveFileName(playlist.Title.Trim('/')));
-                    Trace.WriteLine($"Finished downloading from {url}");
-                })).ToArray());
             }
         }
 
