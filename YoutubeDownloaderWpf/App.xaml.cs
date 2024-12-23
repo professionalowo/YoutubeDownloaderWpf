@@ -64,8 +64,10 @@ namespace YoutubeDownloaderWpf
         }
     }
 
-    static class ServiceCollectionExtensions {
-        public static IServiceCollection AddHttp(this IServiceCollection serviceCollection) {
+    static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
+        {
             serviceCollection.AddSingleton<HttpClientHandler>();
             serviceCollection.AddScoped<HttpClient>();
             return serviceCollection;
@@ -74,9 +76,9 @@ namespace YoutubeDownloaderWpf
         public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<YoutubeDownloader>();
-            serviceCollection.AddSingleton<IDirectory,DownloadDirectory>();
+            serviceCollection.AddSingleton<IDirectory>(_ => new CwdDirectory("Downloads"));
             serviceCollection.AddTransient<YoutubeClient>();
-            serviceCollection.AddTransient<IConverter,Mp3Converter>();
+            serviceCollection.AddTransient<IConverter, Mp3Converter>();
             return serviceCollection;
         }
     }

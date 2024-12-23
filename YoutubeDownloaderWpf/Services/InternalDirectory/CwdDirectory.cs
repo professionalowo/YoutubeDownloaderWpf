@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace YoutubeDownloaderWpf.Services.InternalDirectory
 {
-    public class DownloadDirectory : IDirectory
+    public class CwdDirectory : IDirectory
     {
-        public DownloadDirectory() {
+        public CwdDirectory(string name)
+        {
+            FullPath = Path.Combine(Directory.GetCurrentDirectory(), name);
             Directory.CreateDirectory(FullPath);
         }
-        public string FullPath => Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+        public string FullPath { get; init; }
     }
 }
