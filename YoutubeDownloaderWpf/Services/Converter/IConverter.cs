@@ -9,7 +9,7 @@ using YoutubeDownloaderWpf.Controls;
 
 namespace YoutubeDownloaderWpf.Services.Converter
 {
-    internal interface IConverter
+    public interface IConverter
     {
         Task RunConversion(string filePath,DownloadStatusContext context, CancellationToken token);
     }

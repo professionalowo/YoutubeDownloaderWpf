@@ -25,6 +25,8 @@ namespace YoutubeDownloaderWpf.Services.Converter
             string outputFileName = Path.ChangeExtension(fileInfo.FullName, ".mp3");
             Trace.WriteLine(fileInfo.FullName);
             var conversion = await FFmpeg.Conversions.FromSnippet.Convert(fileInfo.FullName, outputFileName);
+            conversion.AddParameter("-map_metadata 0");
+            conversion.AddParameter("-map_metadata 0:s:0");
             conversion.SetAudioBitrate(96000);
             conversion.OnProgress += (sender, args) =>
             {
