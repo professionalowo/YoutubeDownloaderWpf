@@ -10,14 +10,11 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
 {
     public class DownloadFactory(YoutubeClient client, IDirectory downloads)
     {
-        public IDownload Get(string url)
+        public IDownload Get(string url) => url.Split('/').Last().First() switch
         {
-            string[] urlSplit = url.Split('/');
-            return urlSplit.Last().First() switch
-            {
-                'w' => new VideoDownload(client, url, downloads),
-                _ => new PlaylistDownload(client, url, downloads)
-            };
-        }
+            'w' => new VideoDownload(client, url, downloads),
+            _ => new PlaylistDownload(client, url, downloads)
+        };
+
     }
 }
