@@ -10,6 +10,8 @@ namespace YoutubeDownloaderWpf.Data
 {
     public readonly struct DownloadData(string path,DownloadStatusContext context)
     {
+        public readonly string Path => path;
+        public readonly DownloadStatusContext Context => context;
         internal void Deconstruct(out string p,out DownloadStatusContext c)
         {
             p = path;

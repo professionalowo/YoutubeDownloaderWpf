@@ -22,6 +22,7 @@ using Microsoft.Extensions.Logging;
 using YoutubeDownloaderWpf.Util.Extensions;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Services.Downloader.Download;
+using System.Windows.Shapes;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
@@ -72,12 +73,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
                 var paths = await Task.WhenAll(downloadFactory.Get(url).ExecuteAsync(DownloadStatuses));
                 if (ForceMp3)
                 {
-                    List<Task> tasks = [];
-                    foreach (var (path, statusContext) in paths)
-                    {
-                        tasks.Add(converter.RunConversion(path, statusContext, default));
-                    }
-                    await Task.WhenAll(tasks);
+                    IEnumerable<Task> conversionTasks = paths.Select(
+                            (context) => Task.Run(async () => await converter.RunConversion(context.Path, context.Context, default)));
+                    await Task.WhenAll(conversionTasks);
                 }
             }
             catch (Exception ex) when (ex is OperationCanceledException)
