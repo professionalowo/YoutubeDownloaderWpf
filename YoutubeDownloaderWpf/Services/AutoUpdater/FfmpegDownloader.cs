@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
@@ -32,19 +28,17 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
             using var response = await client.GetAsync(Config.Source);
             using var readStream = await response.Content.ReadAsStreamAsync();
 
-            using ScopedResource.File zipSourceFile = new(config.FfmpegFolder.SaveFileName("source.zip"));
-            string zipSource = zipSourceFile.FullPath;
-            using ScopedResource.Directory sourceUnzippedDir = new(config.FfmpegFolder.SaveFileName(Path.GetFileNameWithoutExtension(zipSource)));
-            string sourceUnzipped = sourceUnzippedDir.FullPath;
+            using ScopedResource.File zipSource = new(config.FfmpegFolder.SaveFileName("source.zip"));
+            using ScopedResource.Directory sourceUnzipped = new(config.FfmpegFolder.SaveFileName(Path.GetFileNameWithoutExtension(zipSource.FullPath)));
 
-            using (var fileStream = new FileStream(zipSource, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+            using (var fileStream = new FileStream(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
             {
                 readStream.CopyTo(fileStream);
             }
 
 
-            ZipFile.ExtractToDirectory(zipSource, sourceUnzipped);
-            string[] executables = Directory.GetFiles(sourceUnzipped, "*.exe", SearchOption.AllDirectories);
+            ZipFile.ExtractToDirectory(zipSource.FullPath, sourceUnzipped.FullPath);
+            string[] executables = Directory.GetFiles(sourceUnzipped.FullPath, "*.exe", SearchOption.AllDirectories);
 
 
 
