@@ -8,15 +8,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
 using YoutubeDownloaderWpf.Controls;
+using YoutubeDownloaderWpf.Services.AutoUpdater;
 using YoutubeDownloaderWpf.Services.Downloader;
 
 namespace YoutubeDownloaderWpf.Services.Converter
 {
     public class Mp3Converter : IConverter
     {
-        public Mp3Converter()
+        public Mp3Converter(FfmpegDownloader.Config config)
         {
-            FFmpeg.SetExecutablesPath("./ffmpeg");
+            FFmpeg.SetExecutablesPath(config.Folder, config.FfmpegExeName, config.FfprobeExeName);
         }
 
         public async Task RunConversion(string filePath, DownloadStatusContext context, CancellationToken token = default)

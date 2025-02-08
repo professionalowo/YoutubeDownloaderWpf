@@ -45,6 +45,8 @@ namespace YoutubeDownloaderWpf
             serviceCollection.AddDownloadServices();
             serviceCollection.AddTransient<MainWindow>();
             serviceCollection.AddScoped<Updater>();
+            serviceCollection.AddScoped<FfmpegDownloader.Config>();
+            serviceCollection.AddScoped<FfmpegDownloader>();
             serviceCollection.AddLogging(builder =>
                     builder.AddProvider(new FileLoggerProvider("logs.txt"))
                     .SetMinimumLevel(LogLevel.Warning)
@@ -56,6 +58,8 @@ namespace YoutubeDownloaderWpf
         {
             var updater = services.GetService<Updater>()!;
             bool isNewVersion = await updater.IsNewVersionAvailable();
+            var ffmpeg = services.GetService<FfmpegDownloader>()!;
+            await ffmpeg.DownloadFfmpeg();
             if (isNewVersion)
             {
                 await updater.UpdateVersion();
