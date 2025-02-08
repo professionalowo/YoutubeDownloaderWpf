@@ -67,10 +67,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         private async Task DownloadAction(string url)
         {
-
             try
             {
-                var paths = await downloadFactory.Get(url).Execute(DownloadStatuses);
+                var paths = await Task.WhenAll(downloadFactory.Get(url).ExecuteAsync(DownloadStatuses));
                 if (ForceMp3)
                 {
                     List<Task> tasks = [];

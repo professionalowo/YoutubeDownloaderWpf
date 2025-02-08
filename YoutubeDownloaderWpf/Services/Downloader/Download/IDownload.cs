@@ -10,6 +10,6 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
 {
     public interface IDownload
     {
-        public Task<IEnumerable<(string, DownloadStatusContext)>> Execute(ObservableCollection<DownloadStatusContext> downloadStatuses);
+        public IEnumerable<Task<(string, DownloadStatusContext)>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses);
     }
 }
