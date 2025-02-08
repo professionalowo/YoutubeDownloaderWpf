@@ -45,10 +45,10 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
                 ZipFile.ExtractToDirectory(zipSource, sourceUnzipped);
                 string[] executables = Directory.GetFiles(sourceUnzipped, "*.exe", SearchOption.AllDirectories);
 
-                static string exeAppender(string path) => path + ".exe";
 
-                string ffmpegExe = exeAppender(config.FfmpegExeName);
-                string ffprobeExe = exeAppender(config.FfprobeExeName);
+
+                string ffmpegExe = AppendExe(config.FfmpegExeName);
+                string ffprobeExe = AppendExe(config.FfprobeExeName);
 
                 string ffmpegPathSource = executables.Where(path => path.EndsWith(ffmpegExe)).First();
                 string ffprobePathSource = executables.Where(path => path.EndsWith(ffprobeExe)).First();
@@ -66,14 +66,14 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
             }
             return true;
         }
-
+        private static string AppendExe(string path) => path + ".exe";
         private static bool DoesFfmpegExist(Config config)
         {
             var directory = config.FfmpegFolder;
             var fullPath = config.FfmpegFolder.FullPath;
             return Path.Exists(fullPath)
-                && directory.ContainsFile($"{config.FfprobeExeName}.exe")
-                && directory.ContainsFile($"{config.FfmpegExeName}.exe");
+                && directory.ContainsFile(AppendExe(config.FfprobeExeName))
+                && directory.ContainsFile(AppendExe(config.FfmpegExeName));
         }
 
 
