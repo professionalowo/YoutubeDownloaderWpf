@@ -10,6 +10,7 @@ using Xabe.FFmpeg;
 using YoutubeDownloaderWpf.Controls;
 using YoutubeDownloaderWpf.Services.AutoUpdater;
 using YoutubeDownloaderWpf.Services.Downloader;
+using YoutubeDownloaderWpf.Util.ScopedResource;
 
 namespace YoutubeDownloaderWpf.Services.Converter
 {
@@ -22,7 +23,9 @@ namespace YoutubeDownloaderWpf.Services.Converter
 
         public async Task RunConversion(string filePath, DownloadStatusContext context, CancellationToken token = default)
         {
-            FileInfo fileInfo = new(filePath);
+            using ScopedResource.File mp4File = new(filePath);
+            FileInfo fileInfo = new(mp4File.FullPath);
+            
             string outputFileName = Path.ChangeExtension(fileInfo.FullName, ".mp3");
             Trace.WriteLine(fileInfo.FullName);
             var conversion = await FFmpeg.Conversions.FromSnippet.Convert(fileInfo.FullName, outputFileName);
@@ -35,7 +38,7 @@ namespace YoutubeDownloaderWpf.Services.Converter
                 _ = YoutubeDownloader.DispatchToUI(() => context.ProgressValue = percent);
             };
             Trace.WriteLine("Converting");
-            await conversion.Start(token).ContinueWith(t => File.Delete(fileInfo.FullName), token);
+            await conversion.Start(token);
             await YoutubeDownloader.DispatchToUI(() => context.ProgressValue = 100);
         }
     }
