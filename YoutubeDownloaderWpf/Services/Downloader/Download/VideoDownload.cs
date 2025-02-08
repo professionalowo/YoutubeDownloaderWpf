@@ -27,15 +27,12 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-            YoutubeDownloader.DispatchToUISync(() => downloadStatuses.Add(statusContext));
+            await YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
             var filePath = downloads.SaveFileName(path, $"{name}.{streamInfo.Container}");
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
-                statusContext.InvokeDownloadFinished(this, true);
-                return new(filePath, statusContext);
+                await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
             }
-            await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
-
             statusContext.InvokeDownloadFinished(this, true);
             return new(filePath, statusContext);
 
