@@ -23,8 +23,8 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         public async Task<DownloadData> DownloadTo(ObservableCollection<DownloadStatusContext> downloadStatuses, string path = "")
         {
             var video = await client.Videos.GetAsync(url);
-            string name = video.Title.ReplaceIllegalCharacters();
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
+            string name = video.Title.ReplaceIllegalCharacters();
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
             await YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
