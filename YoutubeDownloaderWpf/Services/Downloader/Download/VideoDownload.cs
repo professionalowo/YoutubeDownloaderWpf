@@ -20,14 +20,14 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         string url,
         IDirectory downloads) : IDownload
     {
-        public async Task<DownloadData> DownloadTo(ObservableCollection<DownloadStatusContext> downloadStatuses, string path = "")
+        public async ValueTask<DownloadData> DownloadTo(ObservableCollection<DownloadStatusContext> downloadStatuses, string path = "")
         {
             var video = await client.Videos.GetAsync(url);
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
             string name = video.Title.ReplaceIllegalCharacters();
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-            await YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
+            _ = YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
             var filePath = downloads.SaveFileName(path, $"{name}.{streamInfo.Container}");
             if (!File.Exists(filePath))
             {
@@ -40,7 +40,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         public IEnumerable<Task<DownloadData>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
         {
 
-            return [DownloadTo(downloadStatuses)];
+            return [DownloadTo(downloadStatuses).AsTask()];
         }
     }
 }

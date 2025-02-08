@@ -16,5 +16,7 @@ namespace YoutubeDownloaderWpf.Services.InternalDirectory
 
         string SaveFileName(params string[] fileNames) => Path.Combine([FullPath, .. fileNames.Where(s => !string.IsNullOrEmpty(s))]);
         DirectoryInfo CreateSubDirectory(params string[] segments) => Directory.CreateDirectory(Path.Combine([FullPath, .. segments.Where(s => !string.IsNullOrEmpty(s))]));
+
+        Task<DirectoryInfo> CreateSubDirectoryAsync(params string[] segments) => Task.Run(() => CreateSubDirectory(segments));
     }
 }

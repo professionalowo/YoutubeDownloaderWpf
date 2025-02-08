@@ -59,7 +59,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         public async Task Download()
         {
-            await DispatchToUI(DownloadStatuses.Clear);
+            _=DispatchToUI(DownloadStatuses.Clear);
             await DownloadAction(Url);
         }
 

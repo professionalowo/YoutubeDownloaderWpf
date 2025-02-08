@@ -21,11 +21,10 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         string url,
         IDirectory downloads) : IDownload
     {
-        private async Task<IEnumerable<Task<DownloadData>>> ExecuteAsyncInternal(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        private async ValueTask<IEnumerable<Task<DownloadData>>> ExecuteAsyncInternal(ObservableCollection<DownloadStatusContext> downloadStatuses)
         {
             var playlist = await client.Playlists.GetAsync(url);
-            downloads.CreateSubDirectory(playlist.Title);
-            List<PlaylistVideo> videos = [];
+            await downloads.CreateSubDirectoryAsync(playlist.Title);
             List<Task<DownloadData>> pendingDownlaods = [];
             await foreach (var video in client.Playlists.GetVideosAsync(url))
             {

@@ -31,10 +31,11 @@ namespace YoutubeDownloaderWpf.Services.Converter
             conversion.OnProgress += (sender, args) =>
             {
                 var percent = (int)(Math.Round(args.Duration.TotalSeconds / args.TotalLength.TotalSeconds, 2) * 100);
-                YoutubeDownloader.DispatchToUISync(() => context.ProgressValue = percent);
+                _ = YoutubeDownloader.DispatchToUI(() => context.ProgressValue = percent);
             };
             Trace.WriteLine("Converting");
             await conversion.Start(token).ContinueWith(t => File.Delete(fileInfo.FullName), token);
+            await YoutubeDownloader.DispatchToUI(() => context.ProgressValue = 100);
         }
     }
 }
