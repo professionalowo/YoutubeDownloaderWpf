@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Controls;
+using YoutubeDownloaderWpf.Data;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeExplode;
 using YoutubeExplode.Playlists;
@@ -20,21 +21,13 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         string url,
         IDirectory downloads) : IDownload
     {
-        private async Task<IEnumerable<Task<(string, DownloadStatusContext)>>> ExecuteAsyncInternal(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        private async Task<IEnumerable<Task<DownloadData>>> ExecuteAsyncInternal(ObservableCollection<DownloadStatusContext> downloadStatuses)
         {
-            using var semaphore = new SemaphoreSlim(0, 1);
             var playlist = await client.Playlists.GetAsync(url);
             downloads.CreateSubDirectory(playlist.Title);
             List<PlaylistVideo> videos = [];
-            List<Task<(string, DownloadStatusContext)>> pendingDownlaods = [];
-            await foreach (var batch in client.Playlists.GetVideoBatchesAsync(url))
-            {
-                foreach (var video in batch.Items)
-                {
-                    videos.Add(video);
-                }
-            }
-            foreach (var video in videos)
+            List<Task<DownloadData>> pendingDownlaods = [];
+            await foreach (var video in client.Playlists.GetVideosAsync(url))
             {
                 var download = new VideoDownload(client, video.Url, downloads).DownloadTo(downloadStatuses, downloads.SaveFileName(playlist.Title.Trim('/')));
                 pendingDownlaods.Add(Task.Run(async () => await download));
@@ -42,7 +35,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             return pendingDownlaods;
         }
 
-        public IEnumerable<Task<(string, DownloadStatusContext)>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        public IEnumerable<Task<DownloadData>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
         {
             var task = Task.Run(async () => await ExecuteAsyncInternal(downloadStatuses));
             task.Wait();

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Controls;
+using YoutubeDownloaderWpf.Data;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Util.Extensions;
 using YoutubeExplode;
@@ -19,7 +20,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         string url,
         IDirectory downloads) : IDownload
     {
-        public async Task<(string, DownloadStatusContext)> DownloadTo(ObservableCollection<DownloadStatusContext> downloadStatuses, string path = "")
+        public async Task<DownloadData> DownloadTo(ObservableCollection<DownloadStatusContext> downloadStatuses, string path = "")
         {
             var video = await client.Videos.GetAsync(url);
             string name = video.Title.ReplaceIllegalCharacters();
@@ -31,15 +32,15 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             if (File.Exists(filePath))
             {
                 statusContext.InvokeDownloadFinished(this, true);
-                return (filePath, statusContext);
+                return new(filePath, statusContext);
             }
             await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
 
             statusContext.InvokeDownloadFinished(this, true);
-            return (filePath, statusContext);
+            return new(filePath, statusContext);
 
         }
-        public IEnumerable<Task<(string, DownloadStatusContext)>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        public IEnumerable<Task<DownloadData>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
         {
 
             return [DownloadTo(downloadStatuses)];
