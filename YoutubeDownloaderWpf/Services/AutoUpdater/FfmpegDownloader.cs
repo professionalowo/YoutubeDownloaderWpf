@@ -31,7 +31,7 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
             using ScopedResource.File zipSource = new(config.FfmpegFolder.SaveFileName("source.zip"));
             using ScopedResource.Directory sourceUnzipped = new(config.FfmpegFolder.SaveFileName(Path.GetFileNameWithoutExtension(zipSource.FullPath)));
 
-            using (var fileStream = new FileStream(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+            using (FileStream fileStream = new(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
             {
                 readStream.CopyTo(fileStream);
             }
