@@ -73,6 +73,8 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
             public string FfmpegExeName => ffmpegExeName;
             public string FfprobeExeName => ffprobeExeName;
             public IDirectory FfmpegFolder => new CwdDirectory(Folder);
+
+            public string FfmpegExeFullPath => FfmpegFolder.SaveFileName(FfmpegExeName);
         }
     }
 }
