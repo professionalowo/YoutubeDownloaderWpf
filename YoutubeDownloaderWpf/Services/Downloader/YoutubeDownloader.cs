@@ -27,7 +27,7 @@ using YoutubeDownloaderWpf.Util.Extensions;
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader(
-        FfmpegDownloader.Config config,
+        Mp3Converter converter,
         ILogger<YoutubeDownloader> logger,
         DownloadFactory downloadFactory,
         IDirectory downlaods) : IDownloader, INotifyPropertyChanged
@@ -98,7 +98,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             await Task.WhenAll(pathTasks);
         }
 
-        private async Task DownloadAsMp3(string url,CancellationToken token = default)
+        private async Task DownloadAsMp3(string url, CancellationToken token = default)
         {
             List<Task<DownloadData<(string[], Stream)>>> tasks = [];
 
@@ -110,33 +110,20 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
             var res = await Task.WhenAll(tasks);
             List<Task> conversions = new(res.Length);
-            SemaphoreSlim semaphoreSlim = new (5);
-            foreach (var ((name,stream), context) in res) {
+            SemaphoreSlim semaphoreSlim = new(5);
+            foreach (var ((name, stream), context) in res)
+            {
+                var fileName = downlaods.SaveFileName(name);
                 await semaphoreSlim.WaitAsync(token);
                 var task = Task.Run(async () =>
                 {
-                    var fileName = downlaods.SaveFileName(name);
-                    await using FfmpegMp3Conversion conversion = new(config, fileName);
-                    await stream.CopyToAsyncTracked(conversion.Input, GetProgressWrapper(context), token);
-                    context.InvokeDownloadFinished(this, true);
+                    await converter.ConvertToMp3File(stream, fileName, context, token);
                     semaphoreSlim?.Release();
                 }, token);
             }
             await Task.WhenAll(conversions);
         }
-        private static Progress<long> GetProgressWrapper(DownloadStatusContext context)
-        {
-            Progress<long> downloadProgress = new();
-            downloadProgress.ProgressChanged += (_, e) => {
-                var percentage = Math.Min(e / (context.Size * 1000), 100);
-                if (context.ProgressHandler is IProgress<double> p)
-                {
-                    p.Report(percentage);
-                }
-            };
 
-            return downloadProgress;
-        }
 
 
         public event PropertyChangedEventHandler? PropertyChanged;
