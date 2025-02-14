@@ -4,12 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeExplode;
-using YoutubeExplode.Videos.Streams;
 using System.Web;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Container = YoutubeExplode.Videos.Streams.Container;
 using System.Collections.ObjectModel;
 using System.Windows;
 using YoutubeDownloaderWpf.Controls;
@@ -19,19 +16,20 @@ using YoutubeDownloaderWpf.Services.Converter;
 using System.Threading;
 using System.CodeDom;
 using Microsoft.Extensions.Logging;
-using YoutubeDownloaderWpf.Util.Extensions;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Services.Downloader.Download;
-using System.Windows.Shapes;
 using YoutubeDownloaderWpf.Data;
+using YoutubeDownloaderWpf.Services.AutoUpdater;
+using System.IO.Pipelines;
+using YoutubeDownloaderWpf.Util.Extensions;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader(
+        FfmpegDownloader.Config config,
         ILogger<YoutubeDownloader> logger,
         DownloadFactory downloadFactory,
-        IConverter converter,
         IDirectory downlaods) : IDownloader, INotifyPropertyChanged
     {
 
@@ -100,25 +98,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             await Task.WhenAll(pathTasks);
         }
 
-        private async Task DownloadAsMp3(string url)
+        private async Task DownloadAsMp3(string url,CancellationToken token = default)
         {
-            
-            List<Task<DownloadData<string>>> pathTasks = [];
-            await foreach (var d in downloadFactory.Get(url))
-            {
-                var t = Task.Run(async()=> await d.ExecuteDownloadAsync(DownloadStatuses));
-                pathTasks.Add(t);
-            }
-            var paths = await Task.WhenAll(pathTasks);
-            IEnumerable<Task> conversionTasks = paths.Select(
-                    (context) => Task.Run(async () => await converter.RunConversion(context.Data, context.Context, default)));
-            await Task.WhenAll(conversionTasks);
-
-        }
-
-        private async Task _DownloadAsMp3(string url)
-        {
-            List<Task<DownloadData<(string, Stream)>>> tasks = [];
+            List<Task<DownloadData<(string[], Stream)>>> tasks = [];
 
             await foreach (var d in downloadFactory.Get(url))
             {
@@ -127,9 +109,35 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
 
             var res = await Task.WhenAll(tasks);
-
-            Trace.Write(res);
+            List<Task> conversions = new(res.Length);
+            SemaphoreSlim semaphoreSlim = new (5);
+            foreach (var ((name,stream), context) in res) {
+                await semaphoreSlim.WaitAsync(token);
+                var task = Task.Run(async () =>
+                {
+                    var fileName = downlaods.SaveFileName(name);
+                    await using FfmpegMp3Conversion conversion = new(config, fileName);
+                    await stream.CopyToAsyncTracked(conversion.Input, GetProgressWrapper(context), token);
+                    context.InvokeDownloadFinished(this, true);
+                    semaphoreSlim?.Release();
+                }, token);
+            }
+            await Task.WhenAll(conversions);
         }
+        private static Progress<long> GetProgressWrapper(DownloadStatusContext context)
+        {
+            Progress<long> downloadProgress = new();
+            downloadProgress.ProgressChanged += (_, e) => {
+                var percentage = Math.Min(e / (context.Size * 1000), 100);
+                if (context.ProgressHandler is IProgress<double> p)
+                {
+                    p.Report(percentage);
+                }
+            };
+
+            return downloadProgress;
+        }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

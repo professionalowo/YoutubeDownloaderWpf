@@ -16,6 +16,6 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
         public Task<string> Name { get; }
         public Task<DownloadData<string>> ExecuteDownloadAsync(ObservableCollection<DownloadStatusContext> downloadStatuses);
 
-        public Task<DownloadData<(string, Stream)>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses);
+        public Task<DownloadData<(string[], Stream)>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses);
     }
 }
