@@ -9,9 +9,9 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
         private readonly ILogger<Updater> _logger = logger;
         private readonly HttpClient _httpClient = client;
 
-        public Task<bool> IsNewVersionAvailable()
+        public ValueTask<bool> IsNewVersionAvailable()
         {
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
 
         public Task UpdateVersion() {

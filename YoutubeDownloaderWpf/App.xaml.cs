@@ -15,6 +15,7 @@ using YoutubeDownloaderWpf.Services.Downloader;
 using YoutubeDownloaderWpf.Services.Downloader.Download;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Services.Logging;
+using YoutubeDownloaderWpf.Util;
 using YoutubeExplode;
 
 namespace YoutubeDownloaderWpf
@@ -44,9 +45,6 @@ namespace YoutubeDownloaderWpf
             serviceCollection.AddHttp();
             serviceCollection.AddDownloadServices();
             serviceCollection.AddTransient<MainWindow>();
-            serviceCollection.AddScoped<Updater>();
-            serviceCollection.AddScoped<FfmpegDownloader.Config>();
-            serviceCollection.AddScoped<FfmpegDownloader>();
             serviceCollection.AddLogging(builder =>
                     builder.AddProvider(new FileLoggerProvider("logs.txt"))
                     .SetMinimumLevel(LogLevel.Warning)
@@ -85,6 +83,10 @@ namespace YoutubeDownloaderWpf
             serviceCollection.AddTransient<YoutubeClient>();
             serviceCollection.AddTransient<DownloadFactory>();
             serviceCollection.AddTransient<Mp3Converter>();
+            serviceCollection.AddScoped<Updater>();
+            serviceCollection.AddScoped<FfmpegDownloader.Config>();
+            serviceCollection.AddScoped<FfmpegDownloader>();
+            serviceCollection.AddSingleton<SystemInfo>();
             return serviceCollection;
         }
     }

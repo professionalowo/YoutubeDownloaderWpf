@@ -22,12 +22,15 @@ using YoutubeDownloaderWpf.Data;
 using YoutubeDownloaderWpf.Services.AutoUpdater;
 using System.IO.Pipelines;
 using YoutubeDownloaderWpf.Util.Extensions;
+using YoutubeDownloaderWpf.Util;
+using System.Xml.Linq;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader(
         Mp3Converter converter,
+        SystemInfo info,
         ILogger<YoutubeDownloader> logger,
         DownloadFactory downloadFactory,
         IDirectory downlaods) : IDownloader, INotifyPropertyChanged
@@ -100,31 +103,23 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         private async Task DownloadAsMp3(string url, CancellationToken token = default)
         {
-            List<Task<DownloadData<(string[], Stream)>>> tasks = [];
-
+            List<Task> tasks = [];
+            SemaphoreSlim semaphoreSlim = new(info.Cores);
             await foreach (var d in downloadFactory.Get(url))
             {
                 var t = Task.Run(async () => await d.GetStreamAsync(DownloadStatuses));
-                tasks.Add(t);
-            }
-
-            var res = await Task.WhenAll(tasks);
-            List<Task> conversions = new(res.Length);
-            SemaphoreSlim semaphoreSlim = new(5);
-            foreach (var ((name, stream), context) in res)
-            {
-                var fileName = downlaods.SaveFileName(name);
-                await semaphoreSlim.WaitAsync(token);
-                var task = Task.Run(async () =>
+                var c = t.ContinueWith(async (res) =>
                 {
+                    var ((name, stream), context) = await res;
+                    var fileName = downlaods.SaveFileName(name);
+                    await semaphoreSlim.WaitAsync(token);
                     await converter.ConvertToMp3File(stream, fileName, context, token);
                     semaphoreSlim?.Release();
-                }, token);
+                });
+                tasks.Add(c);
             }
-            await Task.WhenAll(conversions);
+            await Task.WhenAll(tasks);
         }
-
-
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
