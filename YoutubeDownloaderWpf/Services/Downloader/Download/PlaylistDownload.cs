@@ -19,27 +19,16 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
     public class PlaylistDownload(
         YoutubeClient client,
         string url,
-        IDirectory downloads) : IDownload
+        IDirectory downloads) : IAsyncEnumerable<IDownload>
     {
-        private async ValueTask<IEnumerable<Task<DownloadData>>> ExecuteAsyncInternal(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        public async IAsyncEnumerator<IDownload> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            var playlist = await client.Playlists.GetAsync(url);
-            await downloads.CreateSubDirectoryAsync(playlist.Title);
-            List<Task<DownloadData>> pendingDownlaods = [];
-            await foreach (var video in client.Playlists.GetVideosAsync(url))
+            var playlist = await client.Playlists.GetAsync(url, cancellationToken);
+            var dir = await downloads.CreateSubDirectoryAsync(playlist.Title);
+            await foreach (var video in client.Playlists.GetVideosAsync(url, cancellationToken))
             {
-                var download = new VideoDownload(client, video.Url, downloads).DownloadTo(downloadStatuses, downloads.SaveFileName(playlist.Title.Trim('/')));
-                pendingDownlaods.Add(Task.Run(async () => await download));
+                yield return new VideoDownload(client, video.Url, downloads, dir.Name);
             }
-            return pendingDownlaods;
-        }
-
-        public IEnumerable<Task<DownloadData>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
-        {
-            var task = Task.Run(async () => await ExecuteAsyncInternal(downloadStatuses));
-            task.Wait();
-
-            return task.Result;
         }
     }
 }

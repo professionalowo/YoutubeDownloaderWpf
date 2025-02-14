@@ -23,6 +23,7 @@ using YoutubeDownloaderWpf.Util.Extensions;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Services.Downloader.Download;
 using System.Windows.Shapes;
+using YoutubeDownloaderWpf.Data;
 
 
 namespace YoutubeDownloaderWpf.Services.Downloader
@@ -70,13 +71,11 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         {
             try
             {
-                var paths = await Task.WhenAll(downloadFactory.Get(url).ExecuteAsync(DownloadStatuses));
                 if (ForceMp3)
-                {
-                    IEnumerable<Task> conversionTasks = paths.Select(
-                            (context) => Task.Run(async () => await converter.RunConversion(context.Path, context.Context, default)));
-                    await Task.WhenAll(conversionTasks);
-                }
+                    await DownloadAsMp3(url);
+                else
+                    await DownloadAsVideos(url);
+
             }
             catch (Exception ex) when (ex is OperationCanceledException)
             {
@@ -88,6 +87,48 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             {
                 logger.LogError(e.ToString());
             }
+        }
+
+        private async Task DownloadAsVideos(string url)
+        {
+            List<Task<DownloadData<string>>> pathTasks = [];
+            await foreach (var d in downloadFactory.Get(url))
+            {
+                var t = Task.Run(async () => await d.ExecuteDownloadAsync(DownloadStatuses));
+                pathTasks.Add(t);
+            }
+            await Task.WhenAll(pathTasks);
+        }
+
+        private async Task DownloadAsMp3(string url)
+        {
+            
+            List<Task<DownloadData<string>>> pathTasks = [];
+            await foreach (var d in downloadFactory.Get(url))
+            {
+                var t = Task.Run(async()=> await d.ExecuteDownloadAsync(DownloadStatuses));
+                pathTasks.Add(t);
+            }
+            var paths = await Task.WhenAll(pathTasks);
+            IEnumerable<Task> conversionTasks = paths.Select(
+                    (context) => Task.Run(async () => await converter.RunConversion(context.Data, context.Context, default)));
+            await Task.WhenAll(conversionTasks);
+
+        }
+
+        private async Task _DownloadAsMp3(string url)
+        {
+            List<Task<DownloadData<(string, Stream)>>> tasks = [];
+
+            await foreach (var d in downloadFactory.Get(url))
+            {
+                var t = Task.Run(async () => await d.GetStreamAsync(DownloadStatuses));
+                tasks.Add(t);
+            }
+
+            var res = await Task.WhenAll(tasks);
+
+            Trace.Write(res);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

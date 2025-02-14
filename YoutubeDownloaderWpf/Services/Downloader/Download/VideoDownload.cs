@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using YoutubeDownloaderWpf.Controls;
 using YoutubeDownloaderWpf.Data;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
@@ -18,13 +19,22 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
     public class VideoDownload(
         YoutubeClient client,
         string url,
-        IDirectory downloads) : IDownload
+        IDirectory downloads,
+        string path = "") : IDownload
     {
-        public async ValueTask<DownloadData> DownloadTo(ObservableCollection<DownloadStatusContext> downloadStatuses, string path = "")
-        {
+        public string Path => path;
+        public Task<string> Name => _name.Value;
+
+        private readonly Lazy<Task<string>> _name = new(async () => {
             var video = await client.Videos.GetAsync(url);
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
-            string name = video.Title.ReplaceIllegalCharacters();
+            return video.Title.ReplaceIllegalCharacters();
+        });
+
+        public async Task<DownloadData<string>> ExecuteDownloadAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        {
+            var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
+            string name = await _name.Value;
             var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
             _ = YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
@@ -37,10 +47,16 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             return new(filePath, statusContext);
 
         }
-        public IEnumerable<Task<DownloadData>> ExecuteAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
-        {
 
-            return [DownloadTo(downloadStatuses).AsTask()];
+        public async Task<DownloadData<(string, Stream)>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses)
+        {
+            var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
+            string name = await _name.Value;
+            var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
+            DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
+            _ = YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
+            var stream = await client.Videos.Streams.GetAsync(streamInfo);
+            return new((name, stream), statusContext);
         }
     }
 }

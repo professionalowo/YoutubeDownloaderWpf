@@ -10,11 +10,20 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
 {
     public class DownloadFactory(YoutubeClient client, IDirectory downloads)
     {
-        public IDownload Get(string url) => url.Split('/').Last().First() switch
+        public async IAsyncEnumerable<IDownload> Get(string url)
         {
-            'w' => new VideoDownload(client, url, downloads),
-            _ => new PlaylistDownload(client, url, downloads)
-        };
-
+            var last = url.Split('/').Last().First();
+            if (last == 'w')
+            {
+                yield return new VideoDownload(client, url, downloads);
+            }
+            else
+            {
+                await foreach (var download in new PlaylistDownload(client, url, downloads))
+                {
+                    yield return download;
+                }
+            }
+        }
     }
 }

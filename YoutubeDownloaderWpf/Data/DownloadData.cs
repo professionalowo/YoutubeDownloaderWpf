@@ -8,13 +8,13 @@ using YoutubeDownloaderWpf.Controls;
 
 namespace YoutubeDownloaderWpf.Data
 {
-    public readonly struct DownloadData(string path,DownloadStatusContext context)
+    public readonly struct DownloadData<T>(T data,DownloadStatusContext context)
     {
-        public readonly string Path => path;
+        public readonly T Data => data;
         public readonly DownloadStatusContext Context => context;
-        internal void Deconstruct(out string p,out DownloadStatusContext c)
+        internal void Deconstruct(out T d,out DownloadStatusContext c)
         {
-            p = path;
+            d = data;
             c = context;
         }
     }
