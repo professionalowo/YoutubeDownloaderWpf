@@ -93,9 +93,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         private async Task DownloadAsVideos(string url)
         {
             List<Task<DownloadData<string>>> pathTasks = [];
-            await foreach (var d in downloadFactory.Get(url))
+            await foreach (IDownload download in downloadFactory.Get(url))
             {
-                var t = Task.Run(async () => await d.ExecuteDownloadAsync(DownloadStatuses));
+                var t = Task.Run(async () => await download.ExecuteDownloadAsync(DownloadStatuses));
                 pathTasks.Add(t);
             }
             await Task.WhenAll(pathTasks);
@@ -103,20 +103,20 @@ namespace YoutubeDownloaderWpf.Services.Downloader
 
         private async Task DownloadAsMp3(string url, CancellationToken token = default)
         {
-            List<Task> tasks = [];
+            List<Task> tasks = new(20);
             SemaphoreSlim semaphoreSlim = new(info.Cores);
-            await foreach (var d in downloadFactory.Get(url))
+            await foreach (IDownload download in downloadFactory.Get(url))
             {
-                var t = Task.Run(async () => await d.GetStreamAsync(DownloadStatuses));
-                var c = t.ContinueWith(async (res) =>
+                var streamTask = Task.Run(async () => await download.GetStreamAsync(DownloadStatuses));
+                var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
                 {
-                    var ((name, stream), context) = await res;
-                    var fileName = downlaods.SaveFileName(name);
+                    var ((name, stream), context) = await resolveTask;
+                    string fileName = downlaods.SaveFileName(name);
                     await semaphoreSlim.WaitAsync(token);
                     await converter.ConvertToMp3File(stream, fileName, context, token);
                     semaphoreSlim?.Release();
                 });
-                tasks.Add(c);
+                tasks.Add(continuationTask);
             }
             await Task.WhenAll(tasks);
         }
