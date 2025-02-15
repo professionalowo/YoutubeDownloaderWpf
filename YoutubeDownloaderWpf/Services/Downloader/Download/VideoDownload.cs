@@ -50,7 +50,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
 
         }
 
-        public async Task<DownloadData<(string[], Stream)>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default)
+        public async Task<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default)
         {
             var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token);
             string name = await _name.Value;
@@ -58,7 +58,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
             _ = YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
             var stream = await client.Videos.Streams.GetAsync(streamInfo, token);
-            return new(([path, name], stream), statusContext);
+            return new(new(stream,[path,name]), statusContext);
         }
     }
 }

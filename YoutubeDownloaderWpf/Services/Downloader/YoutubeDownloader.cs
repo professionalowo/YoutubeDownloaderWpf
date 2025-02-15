@@ -110,10 +110,11 @@ namespace YoutubeDownloaderWpf.Services.Downloader
                 var streamTask = Task.Run(async () => await download.GetStreamAsync(DownloadStatuses));
                 var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
                 {
-                    var ((name, stream), context) = await resolveTask;
-                    string fileName = downlaods.SaveFileName(name);
+                    var (data, context) = await resolveTask;
+                    string fileName = downlaods.SaveFileName(data.Segments);
                     await semaphoreSlim.WaitAsync(token);
-                    await converter.ConvertToMp3File(stream, fileName, context, token);
+                    await using var mediaStream = data.Stream;
+                    await converter.ConvertToMp3File(mediaStream, fileName, context, token);
                     semaphoreSlim?.Release();
                 });
                 tasks.Add(continuationTask);
