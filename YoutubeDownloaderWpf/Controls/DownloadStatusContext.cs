@@ -31,8 +31,6 @@ namespace YoutubeDownloaderWpf.Controls
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         public event EventHandler<bool> DownloadFinished;
-
-        public CancellationTokenSource Cancellation { get; } = new();
         public DownloadStatusContext(string name, double sizeInMb)
         {
             _name = name;

@@ -43,7 +43,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             var filePath = downloads.SaveFileName(path, $"{name}.{streamInfo.Container}");
             if (!File.Exists(filePath))
             {
-                await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, statusContext.Cancellation.Token);
+                await client.Videos.Streams.DownloadAsync(streamInfo, filePath, statusContext.ProgressHandler, token);
             }
             statusContext.InvokeDownloadFinished(this, true);
             return new(filePath, statusContext);
