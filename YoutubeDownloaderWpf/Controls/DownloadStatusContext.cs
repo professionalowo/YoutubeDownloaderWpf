@@ -45,7 +45,10 @@ namespace YoutubeDownloaderWpf.Controls
         private void OnDownloadFinished(object? sender, bool e)
         {
             ProgressValue = 100;
-            Background = Brushes.LightGreen;
+            if (e)
+                Background = Brushes.LightGreen;
+            else
+                Background = Brushes.OrangeRed;
         }
     }
 }
