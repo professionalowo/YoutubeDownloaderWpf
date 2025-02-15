@@ -35,8 +35,8 @@ namespace YoutubeDownloaderWpf.Controls
         public CancellationTokenSource Cancellation { get; } = new();
         public DownloadStatusContext(string name, double sizeInMb)
         {
-            Name = name;
-            Size = Math.Round(sizeInMb, 2);
+            _name = name;
+            _sizeInMb = Math.Round(sizeInMb, 2);
             ProgressHandler = new(p => ProgressValue = p * 100);
             DownloadFinished += OnDownloadFinished;
         }
