@@ -55,7 +55,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
         }
         public ObservableCollection<DownloadStatusContext> DownloadStatuses { get; } = [];
-        public IEnumerable<CancellationTokenSource> CancellationSources => DownloadStatuses.Select(ds => ds.Cancellation);
+        public CancellationTokenSource CancellationSource { private set; get; } = new();
 
         public string DownloadDirectoryPath => downlaods.FullPath;
 
@@ -72,10 +72,12 @@ namespace YoutubeDownloaderWpf.Services.Downloader
         {
             try
             {
+                CancellationSource = new();
+                CancellationToken cancellationToken = CancellationSource.Token;
                 if (ForceMp3)
-                    await DownloadAsMp3(url);
+                    await DownloadAsMp3(url, cancellationToken);
                 else
-                    await DownloadAsVideos(url);
+                    await DownloadAsVideos(url, cancellationToken);
 
             }
             catch (Exception ex) when (ex is OperationCanceledException)
@@ -90,12 +92,12 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
         }
 
-        private async Task DownloadAsVideos(string url)
+        private async Task DownloadAsVideos(string url, CancellationToken token = default)
         {
             List<Task<DownloadData<string>>> pathTasks = [];
             await foreach (IDownload download in downloadFactory.Get(url))
             {
-                var t = Task.Run(async () => await download.ExecuteDownloadAsync(DownloadStatuses));
+                var t = Task.Run(async () => await download.ExecuteDownloadAsync(DownloadStatuses, token));
                 pathTasks.Add(t);
             }
             await Task.WhenAll(pathTasks);

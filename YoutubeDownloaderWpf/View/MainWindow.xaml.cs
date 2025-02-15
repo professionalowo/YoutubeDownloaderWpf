@@ -39,7 +39,7 @@ namespace YoutubeDownloaderWpf
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Downloader.CancellationSources.ToList().ForEach(s => s.Cancel(false));
+            Downloader.CancellationSource.Cancel();
         }
     }
 }
