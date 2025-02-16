@@ -14,7 +14,7 @@ namespace YoutubeDownloaderWpf.Services.Converter
 {
     public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
     {
-        ValueTask IConverter.Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token)
+        public ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token)
             => ConvertToMp3File(data, outPath, context, token);
 
         public async ValueTask ConvertToMp3File(Stream data, string filePath, DownloadStatusContext context, CancellationToken token = default)
