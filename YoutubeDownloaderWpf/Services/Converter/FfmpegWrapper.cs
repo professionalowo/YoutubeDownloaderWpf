@@ -34,7 +34,15 @@ namespace YoutubeDownloaderWpf.Services.Converter
         private static ICollection<string> GetArguments(string outPath) => ["-i", "pipe:0", "-vn", "-c:a", "libmp3lame", "-preset", "fast", "-threads", "3", "-map_metadata", "0:s:0", "-map_metadata", "0", "-q:a", "2", "-flush_packets", "0", "-y", $"{outPath}.mp3"];
 
         #region IDisposable
-        private bool disposedValue;
+        private bool disposedValue;    
+
+        void IDisposable.Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -54,27 +62,28 @@ namespace YoutubeDownloaderWpf.Services.Converter
             }
         }
 
-        void IDisposable.Dispose()
+        async ValueTask IAsyncDisposable.DisposeAsync()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
+            await DisposeAsync(disposing: true);
             GC.SuppressFinalize(this);
         }
 
-        async ValueTask IAsyncDisposable.DisposeAsync()
+        protected virtual async ValueTask DisposeAsync(bool disposing)
         {
             if (!disposedValue)
             {
-                if (_ffmpegProcess.IsValueCreated)
+                if (disposing)
                 {
-                    var p = _ffmpegProcess.Value;
-                    await Input.FlushAsync();
-                    Input.Close();
-                    await p.WaitForExitAsync();
-                    p.Dispose();
+                    if (_ffmpegProcess.IsValueCreated)
+                    {
+                        var p = _ffmpegProcess.Value;
+                        await Input.FlushAsync();
+                        Input.Close();
+                        await p.WaitForExitAsync();
+                        p.Dispose();
 
-                    disposedValue = true;
-                    GC.SuppressFinalize(this);
+                        disposedValue = true;
+                    }
                 }
             }
 
