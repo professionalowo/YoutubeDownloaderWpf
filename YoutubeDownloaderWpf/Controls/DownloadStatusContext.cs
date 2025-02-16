@@ -7,20 +7,55 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using YoutubeDownloaderWpf.Services;
 
 namespace YoutubeDownloaderWpf.Controls
 {
     public class DownloadStatusContext : INotifyPropertyChanged
     {
+
         private string _name = string.Empty;
-        private double _sizeInMb = 0;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _size = 0;
+        public double Size
+        {
+            get => _size;
+            set
+            {
+                _size = value;
+                OnPropertyChanged();
+            }
+        }
+
         private Brush _background = Brushes.White;
+        public Brush Background
+        {
+            get => _background;
+            set
+            {
+                _background = value;
+                OnPropertyChanged();
+            }
+        }
+
         private double _progress = 0;
-        public string Name { get { return _name; } set { _name = value; OnPropertyChanged(); } }
-        public double Size { get { return _sizeInMb; } set { _sizeInMb = value; OnPropertyChanged(); } }
-        public Brush Background { get { return _background; } set { _background = value; OnPropertyChanged(); } }
-        public double ProgressValue { get { return _progress; } set { _progress = value; OnPropertyChanged(); } }
+        public double ProgressValue
+        {
+            get => _progress;
+            set
+            {
+                _progress = value;
+                OnPropertyChanged();
+            }
+        }
 
         public Progress<double> ProgressHandler { get; init; }
 
@@ -34,7 +69,7 @@ namespace YoutubeDownloaderWpf.Controls
         public DownloadStatusContext(string name, double sizeInMb)
         {
             _name = name;
-            _sizeInMb = Math.Round(sizeInMb, 2);
+            _size = Math.Round(sizeInMb, 2);
             ProgressHandler = new(p => ProgressValue = p * 100);
             DownloadFinished += OnDownloadFinished;
         }
