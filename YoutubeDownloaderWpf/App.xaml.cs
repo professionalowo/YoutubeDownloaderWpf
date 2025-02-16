@@ -82,10 +82,10 @@ namespace YoutubeDownloaderWpf
             serviceCollection.AddSingleton<IDirectory>(_ => new CwdDirectory("Downloads"));
             serviceCollection.AddTransient<YoutubeClient>();
             serviceCollection.AddTransient<DownloadFactory>();
-            serviceCollection.AddTransient<ConverterFactory>();
+            serviceCollection.AddSingleton<ConverterFactory>();
             serviceCollection.AddScoped<Updater>();
-            serviceCollection.AddScoped<FfmpegDownloader.Config>();
-            serviceCollection.AddScoped<FfmpegDownloader>();
+            serviceCollection.AddSingleton<FfmpegDownloader.Config>();
+            serviceCollection.AddSingleton<FfmpegDownloader>();
             serviceCollection.AddSingleton<SystemInfo>();
             return serviceCollection;
         }
