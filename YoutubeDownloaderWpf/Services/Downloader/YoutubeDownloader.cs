@@ -29,7 +29,7 @@ using System.Xml.Linq;
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader(
-        IConverter converter,
+        ConverterFactory converterFactory,
         SystemInfo info,
         ILogger<YoutubeDownloader> logger,
         DownloadFactory downloadFactory,
@@ -73,12 +73,25 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             try
             {
                 CancellationSource = new();
-                CancellationToken cancellationToken = CancellationSource.Token;
-                if (ForceMp3)
-                    await DownloadAsMp3(url, cancellationToken);
-                else
-                    await DownloadAsVideos(url, cancellationToken);
-
+                CancellationToken token = CancellationSource.Token;
+                IConverter converter = converterFactory.GetGonverter(ForceMp3);
+                List<Task> tasks = new(20);
+                SemaphoreSlim semaphoreSlim = new(info.Cores);
+                await foreach (IDownload download in downloadFactory.Get(url))
+                {
+                    var streamTask = Task.Run(async () => await download.GetStreamAsync(DownloadStatuses));
+                    var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
+                    {
+                        var (data, context) = await resolveTask;
+                        string fileName = downlaods.SaveFileName(data.Segments);
+                        await semaphoreSlim.WaitAsync(token);
+                        await using var mediaStream = data.Stream;
+                        await converter.Convert(mediaStream, fileName, context, token);
+                        semaphoreSlim.Release();
+                    });
+                    tasks.Add(continuationTask);
+                }
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex) when (ex is OperationCanceledException)
             {
@@ -92,36 +105,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
         }
 
-        private async Task DownloadAsVideos(string url, CancellationToken token = default)
+        private async Task Download(string url, CancellationToken token = default)
         {
-            List<Task<DownloadData<string>>> pathTasks = [];
-            await foreach (IDownload download in downloadFactory.Get(url))
-            {
-                var t = Task.Run(async () => await download.ExecuteDownloadAsync(DownloadStatuses, token));
-                pathTasks.Add(t);
-            }
-            await Task.WhenAll(pathTasks);
-        }
 
-        private async Task DownloadAsMp3(string url, CancellationToken token = default)
-        {
-            List<Task> tasks = new(20);
-            SemaphoreSlim semaphoreSlim = new(info.Cores);
-            await foreach (IDownload download in downloadFactory.Get(url))
-            {
-                var streamTask = Task.Run(async () => await download.GetStreamAsync(DownloadStatuses));
-                var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
-                {
-                    var (data, context) = await resolveTask;
-                    string fileName = downlaods.SaveFileName(data.Segments);
-                    await semaphoreSlim.WaitAsync(token);
-                    await using var mediaStream = data.Stream;
-                    await converter.Convert(mediaStream, fileName, context, token);
-                    semaphoreSlim.Release();
-                });
-                tasks.Add(continuationTask);
-            }
-            await Task.WhenAll(tasks);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

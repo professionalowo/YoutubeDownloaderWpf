@@ -83,5 +83,20 @@ namespace YoutubeDownloaderWpf.Controls
             else
                 Background = Brushes.OrangeRed;
         }
+
+        public Progress<long> GetProgressWrapper()
+        {
+            Progress<long> downloadProgress = new();
+            downloadProgress.ProgressChanged += (_, e) =>
+            {
+                var percentage = Math.Min(e / (Size * 1000), 100);
+                if (ProgressHandler is IProgress<double> p)
+                {
+                    p.Report(percentage);
+                }
+            };
+
+            return downloadProgress;
+        }
     }
 }

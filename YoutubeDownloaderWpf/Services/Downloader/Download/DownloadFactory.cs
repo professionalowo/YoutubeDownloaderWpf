@@ -15,7 +15,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             var last = url.Split('/').Last().First();
             if (last == 'w')
             {
-                yield return new VideoDownload(client, url, downloads);
+                yield return new VideoDownload(client, url);
             }
             else
             {
