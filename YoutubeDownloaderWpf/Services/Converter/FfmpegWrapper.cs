@@ -31,10 +31,22 @@ namespace YoutubeDownloaderWpf.Services.Converter
             };
         }
 
-        private static ICollection<string> GetArguments(string outPath) => ["-i", "pipe:0", "-vn", "-c:a", "libmp3lame", "-preset", "fast", "-threads", "3", "-map_metadata", "0:s:0", "-map_metadata", "0", "-q:a", "2", "-flush_packets", "0", "-y", $"{outPath}.mp3"];
+        private static ICollection<string> GetArguments(string outPath) => [
+            "-i", "pipe:0",
+            "-vn",
+            "-c:a", "libmp3lame",
+            "-preset", "fast",
+            "-threads", "3",
+            "-map_metadata", "0:s:0",
+            "-map_metadata", "0",
+            "-q:a", "2",
+            "-flush_packets", "0",
+            "-y",
+            $"{outPath}.mp3"
+        ];
 
         #region IDisposable
-        private bool disposedValue;    
+        private bool disposedValue;
 
         void IDisposable.Dispose()
         {
