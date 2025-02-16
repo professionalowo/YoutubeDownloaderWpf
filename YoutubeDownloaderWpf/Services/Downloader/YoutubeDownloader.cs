@@ -29,7 +29,7 @@ using System.Xml.Linq;
 namespace YoutubeDownloaderWpf.Services.Downloader
 {
     public class YoutubeDownloader(
-        Mp3Converter converter,
+        IConverter converter,
         SystemInfo info,
         ILogger<YoutubeDownloader> logger,
         DownloadFactory downloadFactory,
@@ -116,8 +116,8 @@ namespace YoutubeDownloaderWpf.Services.Downloader
                     string fileName = downlaods.SaveFileName(data.Segments);
                     await semaphoreSlim.WaitAsync(token);
                     await using var mediaStream = data.Stream;
-                    await converter.ConvertToMp3File(mediaStream, fileName, context, token);
-                    semaphoreSlim?.Release();
+                    await converter.Convert(mediaStream, fileName, context, token);
+                    semaphoreSlim.Release();
                 });
                 tasks.Add(continuationTask);
             }

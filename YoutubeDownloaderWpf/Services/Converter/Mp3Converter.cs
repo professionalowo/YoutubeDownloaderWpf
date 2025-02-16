@@ -12,8 +12,11 @@ using YoutubeDownloaderWpf.Util.Extensions;
 
 namespace YoutubeDownloaderWpf.Services.Converter
 {
-    public class Mp3Converter(FfmpegDownloader.Config config)
+    public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
     {
+        Task IConverter.Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token)
+            => ConvertToMp3File(data, outPath, context, token);
+
         public async Task ConvertToMp3File(Stream data, string filePath, DownloadStatusContext context, CancellationToken token = default)
         {
             try
