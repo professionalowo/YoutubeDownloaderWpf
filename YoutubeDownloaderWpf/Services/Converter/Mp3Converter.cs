@@ -22,7 +22,7 @@ namespace YoutubeDownloaderWpf.Services.Converter
             try
             {
                 await using FfmpegMp3Conversion conversion = new(config, filePath);
-                await data.CopyToAsyncTracked(conversion.Input, GetProgressWrapper(context), token);
+                await data.CopyToAsyncTracked(conversion.Input, context.GetProgressWrapper(), token);
                 context.InvokeDownloadFinished(this, true);
             }
             catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
@@ -31,19 +31,5 @@ namespace YoutubeDownloaderWpf.Services.Converter
             }
         }
 
-        private static Progress<long> GetProgressWrapper(DownloadStatusContext context)
-        {
-            Progress<long> downloadProgress = new();
-            downloadProgress.ProgressChanged += (_, e) =>
-            {
-                var percentage = Math.Min(e / (context.Size * 1000), 100);
-                if (context.ProgressHandler is IProgress<double> p)
-                {
-                    p.Report(percentage);
-                }
-            };
-
-            return downloadProgress;
-        }
     }
 }

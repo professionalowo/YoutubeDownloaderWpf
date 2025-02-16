@@ -27,7 +27,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download
             var dir = await downloads.CreateSubDirectoryAsync(playlist.Title);
             await foreach (var video in client.Playlists.GetVideosAsync(url, cancellationToken))
             {
-                yield return new VideoDownload(client, video.Url, downloads, dir.Name);
+                yield return new VideoDownload(client, video.Url, dir.Name);
             }
         }
     }
