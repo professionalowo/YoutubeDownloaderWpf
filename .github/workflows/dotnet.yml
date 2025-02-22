@@ -46,7 +46,8 @@ jobs:
 
       - name: Create ZIP Archive with 7-Zip
         run: |
-          & "C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 -r YoutubeDownloader-${{github.ref_name}}.zip publish\*.*
+          Set-Location -Path publish
+          & "C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 ..\YoutubeDownloader-${{github.ref_name}}.zip *
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
