@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeExplode;
 
-namespace YoutubeDownloaderWpf.Services.Downloader.Download
+namespace YoutubeDownloaderWpf.Services.Downloader.Download;
+
+public class DownloadFactory(YoutubeClient client, IDirectory downloads)
 {
-    public class DownloadFactory(YoutubeClient client, IDirectory downloads)
+    public async IAsyncEnumerable<IDownload> Get(string url)
     {
-        public async IAsyncEnumerable<IDownload> Get(string url)
+        var last = url.Split('/').Last().First();
+        if (last == 'w')
         {
-            var last = url.Split('/').Last().First();
-            if (last == 'w')
+            yield return new VideoDownload(client, url);
+        }
+        else
+        {
+            await foreach (var download in new PlaylistDownload(client, url, downloads))
             {
-                yield return new VideoDownload(client, url);
-            }
-            else
-            {
-                await foreach (var download in new PlaylistDownload(client, url, downloads))
-                {
-                    yield return download;
-                }
+                yield return download;
             }
         }
     }

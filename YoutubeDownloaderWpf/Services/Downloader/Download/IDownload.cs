@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Controls;
 using YoutubeDownloaderWpf.Data;
 
-namespace YoutubeDownloaderWpf.Services.Downloader.Download
+namespace YoutubeDownloaderWpf.Services.Downloader.Download;
+
+public interface IDownload
 {
-    public interface IDownload
-    {
-        public string Path { get; }
-        public Task<string> Name { get; }
-        public Task<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default);
-    }
+    public string Path { get; }
+    public Task<string> Name { get; }
+    public Task<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default);
 }

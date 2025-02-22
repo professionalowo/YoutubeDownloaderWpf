@@ -14,20 +14,19 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 
-namespace YoutubeDownloaderWpf.Controls
+namespace YoutubeDownloaderWpf.Controls;
+
+/// <summary>
+/// Interaction logic for DownloadStatus.xaml
+/// </summary>
+public partial class DownloadStatus : UserControl
 {
-    /// <summary>
-    /// Interaction logic for DownloadStatus.xaml
-    /// </summary>
-    public partial class DownloadStatus : UserControl
+    public DownloadStatusContext Context { get; init; }
+    public DownloadStatus(string name, double sizeInMb) : this(new DownloadStatusContext(name, sizeInMb)) { }
+    public DownloadStatus(DownloadStatusContext context)
     {
-        public DownloadStatusContext Context { get; init; }
-        public DownloadStatus(string name, double sizeInMb) : this(new DownloadStatusContext(name, sizeInMb)) { }
-        public DownloadStatus(DownloadStatusContext context)
-        {
-            Context = context;
-            this.DataContext = Context;
-            InitializeComponent();
-        }
+        Context = context;
+        this.DataContext = Context;
+        InitializeComponent();
     }
 }

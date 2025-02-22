@@ -2,20 +2,20 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloaderWpf.Services.AutoUpdater
+namespace YoutubeDownloaderWpf.Services.AutoUpdater;
+
+public class Updater(ILogger<Updater> logger, HttpClient client)
 {
-    public class Updater(ILogger<Updater> logger,HttpClient client)
+    private readonly ILogger<Updater> _logger = logger;
+    private readonly HttpClient _httpClient = client;
+
+    public ValueTask<bool> IsNewVersionAvailable()
     {
-        private readonly ILogger<Updater> _logger = logger;
-        private readonly HttpClient _httpClient = client;
+        return ValueTask.FromResult(false);
+    }
 
-        public ValueTask<bool> IsNewVersionAvailable()
-        {
-            return ValueTask.FromResult(false);
-        }
-
-        public Task UpdateVersion() {
-            return new Task(() => { });
-        }
+    public Task UpdateVersion()
+    {
+        return new Task(() => { });
     }
 }

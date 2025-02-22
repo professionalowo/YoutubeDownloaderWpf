@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloaderWpf.Util.Extensions
+namespace YoutubeDownloaderWpf.Util.Extensions;
+
+public static class PathExtensions
 {
-    public static class PathExtensions
-    {
-        public static string ReplaceIllegalCharacters(this string path, char replacement = '_') => PathUtil.ReplaceIllegalCharacters(path, replacement);
-    }
+    public static string ReplaceIllegalCharacters(this string path, char replacement = '_') => PathUtil.ReplaceIllegalCharacters(path, replacement);
 }

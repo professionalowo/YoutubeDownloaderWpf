@@ -18,76 +18,75 @@ using YoutubeDownloaderWpf.Services.Logging;
 using YoutubeDownloaderWpf.Util;
 using YoutubeExplode;
 
-namespace YoutubeDownloaderWpf
+namespace YoutubeDownloaderWpf;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    private MainWindow? _mainWindow;
+    private readonly ServiceProvider services;
+    public App()
     {
-        private MainWindow? _mainWindow;
-        private readonly ServiceProvider services;
-        public App()
-        {
-            services = InitializeServices();
-            this.DispatcherUnhandledException += OnDispatcherUnhandledException;
-        }
-
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            var logger = services.GetService<ILogger<App>>();
-            logger?.LogError(e.Exception.ToString());
-        }
-
-        private static ServiceProvider InitializeServices()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddHttp();
-            serviceCollection.AddDownloadServices();
-            serviceCollection.AddTransient<MainWindow>();
-            serviceCollection.AddLogging(builder =>
-                    builder.AddProvider(new FileLoggerProvider("logs.txt"))
-                    .SetMinimumLevel(LogLevel.Warning)
-            );
-            return serviceCollection.BuildServiceProvider();
-        }
-
-        private async void Application_Startup(object sender, StartupEventArgs e)
-        {
-            var updater = services.GetService<Updater>()!;
-            bool isNewVersion = await updater.IsNewVersionAvailable();
-            var ffmpeg = services.GetService<FfmpegDownloader>()!;
-            await ffmpeg.DownloadFfmpeg();
-            if (isNewVersion)
-            {
-                await updater.UpdateVersion();
-            }
-            _mainWindow = services.GetService<MainWindow>();
-            _mainWindow?.Show();
-        }
+        services = InitializeServices();
+        this.DispatcherUnhandledException += OnDispatcherUnhandledException;
     }
 
-    static class ServiceCollectionExtensions
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddSingleton<HttpClientHandler>();
-            serviceCollection.AddScoped<HttpClient>();
-            return serviceCollection;
-        }
+        var logger = services.GetService<ILogger<App>>();
+        logger?.LogError(e.Exception.ToString());
+    }
 
-        public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
+    private static ServiceProvider InitializeServices()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddHttp();
+        serviceCollection.AddDownloadServices();
+        serviceCollection.AddTransient<MainWindow>();
+        serviceCollection.AddLogging(builder =>
+                builder.AddProvider(new FileLoggerProvider("logs.txt"))
+                .SetMinimumLevel(LogLevel.Warning)
+        );
+        return serviceCollection.BuildServiceProvider();
+    }
+
+    private async void Application_Startup(object sender, StartupEventArgs e)
+    {
+        var updater = services.GetService<Updater>()!;
+        bool isNewVersion = await updater.IsNewVersionAvailable();
+        var ffmpeg = services.GetService<FfmpegDownloader>()!;
+        await ffmpeg.DownloadFfmpeg();
+        if (isNewVersion)
         {
-            serviceCollection.AddTransient<YoutubeDownloader>();
-            serviceCollection.AddSingleton<IDirectory>(_ => new CwdDirectory("Downloads"));
-            serviceCollection.AddTransient<YoutubeClient>();
-            serviceCollection.AddTransient<DownloadFactory>();
-            serviceCollection.AddSingleton<ConverterFactory>();
-            serviceCollection.AddScoped<Updater>();
-            serviceCollection.AddSingleton<FfmpegDownloader.Config>();
-            serviceCollection.AddSingleton<FfmpegDownloader>();
-            serviceCollection.AddSingleton<SystemInfo>();
-            return serviceCollection;
+            await updater.UpdateVersion();
         }
+        _mainWindow = services.GetService<MainWindow>();
+        _mainWindow?.Show();
+    }
+}
+
+static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<HttpClientHandler>();
+        serviceCollection.AddScoped<HttpClient>();
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<YoutubeDownloader>();
+        serviceCollection.AddSingleton<IDirectory>(_ => new CwdDirectory("Downloads"));
+        serviceCollection.AddTransient<YoutubeClient>();
+        serviceCollection.AddTransient<DownloadFactory>();
+        serviceCollection.AddSingleton<ConverterFactory>();
+        serviceCollection.AddScoped<Updater>();
+        serviceCollection.AddSingleton<FfmpegDownloader.Config>();
+        serviceCollection.AddSingleton<FfmpegDownloader>();
+        serviceCollection.AddSingleton<SystemInfo>();
+        return serviceCollection;
     }
 }

@@ -7,10 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Controls;
 
-namespace YoutubeDownloaderWpf.Services.Converter
+namespace YoutubeDownloaderWpf.Services.Converter;
+
+public interface IConverter
 {
-    public interface IConverter
-    {
-        public ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default);
-    }
+    public ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default);
 }

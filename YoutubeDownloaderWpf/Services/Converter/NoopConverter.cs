@@ -8,23 +8,22 @@ using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Controls;
 using YoutubeDownloaderWpf.Util.Extensions;
 
-namespace YoutubeDownloaderWpf.Services.Converter
+namespace YoutubeDownloaderWpf.Services.Converter;
+
+public class NoopConverter(string extension) : IConverter
 {
-    public class NoopConverter(string extension) : IConverter
+    public async ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
     {
-        public async ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
+        FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
+        try
         {
-            FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
-            try
-            {
-                await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
-                await data.CopyToAsyncTracked(file, context.GetProgressWrapper(), token);
-                context.InvokeDownloadFinished(this, true);
-            }
-            catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
-            {
-                context.InvokeDownloadFinished(this, false);
-            }
+            await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+            await data.CopyToAsyncTracked(file, context.GetProgressWrapper(), token);
+            context.InvokeDownloadFinished(this, true);
+        }
+        catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
+        {
+            context.InvokeDownloadFinished(this, false);
         }
     }
 }
