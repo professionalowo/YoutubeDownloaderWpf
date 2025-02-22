@@ -15,15 +15,19 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
         public async ValueTask<bool> DownloadFfmpeg()
         {
 
-            if (DoesFfmpegExist(config)) return true;
-
-
+            if (DoesFfmpegExist(config))
+            {
+                return true;
+            }
 
             Directory.CreateDirectory(config.FfmpegFolder.FullPath);
 
             var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Downlaod Ffmpeg", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
-            if (res != MessageBoxResult.OK) return false;
+            if (res != MessageBoxResult.OK)
+            {
+                return false;
+            }
 
             using var response = await client.GetAsync(Config.Source);
             using var readStream = await response.Content.ReadAsStreamAsync();
@@ -51,6 +55,8 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
             File.Move(ffmpegPathSource, config.FfmpegFolder.SaveFileName(ffmpegExe));
             File.Move(ffprobePathSource, config.FfmpegFolder.SaveFileName(ffprobeExe));
 
+
+            logger.LogInformation("Installed Ffmpeg");
             return true;
         }
         private static string AppendExe(string path) => path + ".exe";
@@ -65,15 +71,10 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater
 
 
 
-        public class Config(string folder = "ffmpeg", string ffmpegExeName = "ffmpeg", string ffprobeExeName = "ffprobe")
+        public record Config(string Folder = "ffmpeg", string FfmpegExeName = "ffmpeg", string FfprobeExeName = "ffprobe")
         {
             public const string Source = "https://github.com/GyanD/codexffmpeg/releases/download/2025-02-06-git-6da82b4485/ffmpeg-2025-02-06-git-6da82b4485-essentials_build.zip";
-
-            public string Folder => folder;
-            public string FfmpegExeName => ffmpegExeName;
-            public string FfprobeExeName => ffprobeExeName;
             public IDirectory FfmpegFolder => new CwdDirectory(Folder);
-
             public string FfmpegExeFullPath => FfmpegFolder.SaveFileName(FfmpegExeName);
         }
     }
