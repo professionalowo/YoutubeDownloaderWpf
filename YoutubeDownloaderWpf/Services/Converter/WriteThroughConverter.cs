@@ -10,7 +10,7 @@ using YoutubeDownloaderWpf.Util.Extensions;
 
 namespace YoutubeDownloaderWpf.Services.Converter;
 
-public class NoopConverter(string extension) : IConverter
+public class WriteThroughConverter(string extension) : IConverter
 {
     public async ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
     {
