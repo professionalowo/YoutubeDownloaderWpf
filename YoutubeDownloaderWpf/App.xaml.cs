@@ -79,7 +79,12 @@ static class ServiceCollectionExtensions
     public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<YoutubeDownloader>();
-        serviceCollection.AddSingleton<IDirectory>(_ => new CwdDirectory("Downloads"));
+        serviceCollection.AddSingleton(_ =>
+        {
+            IDirectory dir = new CwdDirectory("Downloads");
+            dir.Init();
+            return dir;
+        });
         serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory>();
         serviceCollection.AddSingleton<ConverterFactory>();

@@ -12,9 +12,14 @@ public interface IDirectory
 {
     string FullPath { get; }
 
-    void Open()
+    void Init()
     {
         Directory.CreateDirectory(FullPath);
+    }
+
+    void Open()
+    {
+        Init();
         Process.Start("explorer.exe", FullPath);
     }
 
