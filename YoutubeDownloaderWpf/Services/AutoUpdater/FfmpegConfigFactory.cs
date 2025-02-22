@@ -12,15 +12,13 @@ public class FfmpegConfigFactory
     public static FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
     => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? FfmpegDownloader.Config.Default;
 
-
-
     private static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
     {
+        string replacedExe = Path.ChangeExtension(exe, "exe");
         string[] paths = [.. SplitPath(Environment.GetEnvironmentVariable("PATH")), .. SplitPath(Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User))];
-        foreach (string test in paths)
+        foreach (string path in paths.Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)))
         {
-            string path = test.Trim();
-            if (!string.IsNullOrEmpty(path) && File.Exists(Path.Combine(path, Path.ChangeExtension(exe, "exe"))))
+            if (File.Exists(Path.Combine(path, replacedExe)))
             {
                 return new(new AbsoluteDirectory(Path.GetFullPath(path)), exe);
             }
