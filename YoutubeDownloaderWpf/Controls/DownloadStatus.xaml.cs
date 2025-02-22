@@ -22,7 +22,6 @@ namespace YoutubeDownloaderWpf.Controls;
 public partial class DownloadStatus : UserControl
 {
     public DownloadStatusContext Context { get; init; }
-    public DownloadStatus(string name, double sizeInMb) : this(new DownloadStatusContext(name, sizeInMb)) { }
     public DownloadStatus(DownloadStatusContext context)
     {
         Context = context;
