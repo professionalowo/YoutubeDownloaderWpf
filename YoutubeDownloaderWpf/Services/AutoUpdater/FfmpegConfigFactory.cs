@@ -20,7 +20,7 @@ public class FfmpegConfigFactory
         foreach (string test in paths)
         {
             string path = test.Trim();
-            if (!string.IsNullOrEmpty(path) && File.Exists(Path.Combine(path, Path.ChangeExtension(exe,"exe"))))
+            if (!string.IsNullOrEmpty(path) && File.Exists(Path.Combine(path, Path.ChangeExtension(exe, "exe"))))
             {
                 return new(new AbsoluteDirectory(Path.GetFullPath(path)), exe);
             }

@@ -56,12 +56,12 @@ public partial class App : Application
     {
         var updater = services.GetService<Updater>()!;
         bool isNewVersion = await updater.IsNewVersionAvailable();
-        var ffmpeg = services.GetService<FfmpegDownloader>()!;
-        await ffmpeg.DownloadFfmpeg();
         if (isNewVersion)
         {
             await updater.UpdateVersion();
         }
+        var ffmpeg = services.GetService<FfmpegDownloader>()!;
+        await ffmpeg.DownloadFfmpeg();
         _mainWindow = services.GetService<MainWindow>();
         _mainWindow?.Show();
     }
