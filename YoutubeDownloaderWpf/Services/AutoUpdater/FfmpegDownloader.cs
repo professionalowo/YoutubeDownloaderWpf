@@ -46,20 +46,19 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
 
 
 
-        string ffmpegExe = AppendExe(config.FfmpegExeName);
+        string ffmpegExe = Path.ChangeExtension(config.FfmpegExeName, "exe");
         string ffmpegPathSource = executables.Where(path => path.EndsWith(ffmpegExe)).First();
         File.Move(ffmpegPathSource, config.Folder.ChildFileName(ffmpegExe));
 
         logger.LogInformation("Installed Ffmpeg");
         return true;
     }
-    private static string AppendExe(string path) => path + ".exe";
     private static bool DoesFfmpegExist(Config config)
     {
         var directory = config.Folder;
         var fullPath = config.Folder.FullPath;
         return Path.Exists(fullPath)
-            && directory.ContainsFile(AppendExe(config.FfmpegExeName));
+            && directory.ContainsFile(Path.ChangeExtension(config.FfmpegExeName, "exe"));
     }
 
 
