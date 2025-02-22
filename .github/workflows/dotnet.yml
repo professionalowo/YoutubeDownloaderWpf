@@ -25,11 +25,8 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-
       - name: Publish
-        run: dotnet publish -c Release -r win-x64 -o publish /p:DebugType=None /p:DebugSymbols=false
+        run: dotnet publish --no-restore -c Release -r win-x64 -o publish /p:DebugType=None /p:DebugSymbols=false
 
       - name: Decode Certificate
         shell: powershell
