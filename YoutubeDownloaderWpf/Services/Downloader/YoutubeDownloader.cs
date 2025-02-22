@@ -105,11 +105,6 @@ namespace YoutubeDownloaderWpf.Services.Downloader
             }
         }
 
-        private async Task Download(string url, CancellationToken token = default)
-        {
-
-        }
-
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

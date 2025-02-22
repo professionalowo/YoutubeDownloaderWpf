@@ -7,17 +7,11 @@ using System.Threading.Tasks;
 
 namespace YoutubeDownloaderWpf.Util.ScopedResource
 {
-    public abstract class ScopedResource : IDisposable
+    public abstract class ScopedResource(string path) : IDisposable
     {
-        protected readonly string _path;
+        protected readonly string _path = path;
         public string FullPath => _path;
         private bool disposedValue;
-        public ScopedResource(string path)
-        {
-            _path = path;
-        }
-
-
 
         protected abstract void CleanResource();
 
