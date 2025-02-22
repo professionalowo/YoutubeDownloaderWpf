@@ -84,7 +84,7 @@ static class ServiceCollectionExtensions
         serviceCollection.AddTransient<DownloadFactory>();
         serviceCollection.AddSingleton<ConverterFactory>();
         serviceCollection.AddScoped<Updater>();
-        serviceCollection.AddSingleton<FfmpegDownloader.Config>();
+        serviceCollection.AddSingleton(_ => FfmpegDownloader.Config.Default);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         serviceCollection.AddSingleton<SystemInfo>();
         return serviceCollection;

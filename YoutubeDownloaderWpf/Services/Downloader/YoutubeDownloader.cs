@@ -78,7 +78,7 @@ public class YoutubeDownloader(
                 var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
                 {
                     var (data, context) = await resolveTask;
-                    string fileName = downlaods.SaveFileName(data.Segments);
+                    string fileName = downlaods.ChildFileName(data.Segments);
                     await semaphoreSlim.WaitAsync(token);
                     await using var mediaStream = data.Stream;
                     await converter.Convert(mediaStream, fileName, context, token);
