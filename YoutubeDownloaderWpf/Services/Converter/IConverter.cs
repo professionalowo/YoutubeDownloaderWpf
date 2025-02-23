@@ -11,5 +11,5 @@ namespace YoutubeDownloaderWpf.Services.Converter;
 
 public interface IConverter
 {
-    public ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default);
+    public ValueTask<string?> Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default);
 }

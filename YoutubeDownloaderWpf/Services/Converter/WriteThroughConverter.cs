@@ -12,7 +12,7 @@ namespace YoutubeDownloaderWpf.Services.Converter;
 
 public class WriteThroughConverter(string extension) : IConverter
 {
-    public async ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
+    public async ValueTask<string?> Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
     {
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
         try
@@ -20,10 +20,12 @@ public class WriteThroughConverter(string extension) : IConverter
             await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
             await data.CopyToAsyncTracked(file, context.GetProgressWrapper(), token);
             context.InvokeDownloadFinished(this, true);
+            return fileInfo.FullName;
         }
         catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
         {
             context.InvokeDownloadFinished(this, false);
         }
+        return null;
     }
 }
