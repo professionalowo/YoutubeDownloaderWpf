@@ -50,7 +50,7 @@ public class YoutubeDownloader(
         }
     }
     public ObservableCollection<DownloadStatusContext> DownloadStatuses { get; } = [];
-    public CancellationTokenSource CancellationSource { private set; get; } = new();
+    private CancellationTokenSource _cancellationSource = new();
 
     public string DownloadDirectoryPath => downlaods.FullPath;
 
@@ -61,14 +61,18 @@ public class YoutubeDownloader(
         await DownloadAction(Url);
     }
 
-
+    public async Task Cancel()
+    {
+        _cancellationSource.Cancel();
+        _cancellationSource = new();
+        await DispatchToUI(DownloadStatuses.Clear);
+    }
 
     private async Task DownloadAction(string url)
     {
         try
         {
-            CancellationSource = new();
-            CancellationToken token = CancellationSource.Token;
+            CancellationToken token = _cancellationSource.Token;
             IConverter converter = converterFactory.GetGonverter(ForceMp3);
             List<Task> tasks = new(20);
             SemaphoreSlim semaphoreSlim = new(info.Cores);
@@ -104,6 +108,6 @@ public class YoutubeDownloader(
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    public static DispatcherOperation DispatchToUI(Action action) => Application.Current.Dispatcher.BeginInvoke(action);
+    public static DispatcherOperation DispatchToUI(Action action, CancellationToken token = default) => Application.Current.Dispatcher.InvokeAsync(action, DispatcherPriority.Render, token);
     public static void DispatchToUISync(Action action) => Application.Current.Dispatcher.BeginInvoke(action);
 }

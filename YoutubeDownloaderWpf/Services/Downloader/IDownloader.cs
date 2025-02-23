@@ -13,7 +13,7 @@ public interface IDownloader
 {
     string Url { get; }
     string DownloadDirectoryPath { get; }
-    public CancellationTokenSource CancellationSource { get; }
     ObservableCollection<DownloadStatusContext> DownloadStatuses { get; }
+    Task Cancel();
     Task Download();
 }

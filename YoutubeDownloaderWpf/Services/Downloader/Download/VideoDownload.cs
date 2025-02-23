@@ -24,7 +24,7 @@ public class VideoDownload(
 {
     public string Path => path;
 
-    public async Task<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default)
+    public async ValueTask<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default)
     {
         var nameTask = GetName(token);
         var streamInfo = await GetStreamInfo(token);
@@ -32,7 +32,7 @@ public class VideoDownload(
 
         var name = await nameTask;
         DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-        _ = YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
+        await YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext), token);
 
         return new(new(await streamTask, [path, name]), statusContext);
     }

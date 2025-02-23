@@ -16,30 +16,28 @@ using System.Windows.Shapes;
 using YoutubeDownloaderWpf.Services.Downloader;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 
-namespace YoutubeDownloaderWpf
+namespace YoutubeDownloaderWpf;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public YoutubeDownloader Downloader { get; private set; }
+    private readonly IDirectory downloads;
+    public MainWindow(YoutubeDownloader downloader, IDirectory downloads)
     {
-        public YoutubeDownloader Downloader { get; private set; }
-        private readonly IDirectory downloads;
-        public MainWindow(YoutubeDownloader downloader, IDirectory downloads)
-        {
-            this.downloads = downloads;
-            this.Downloader = downloader;
-            this.DataContext = Downloader;
-            InitializeComponent();
-        }
-
-        private async void Button_Click(object sender, RoutedEventArgs e) => await Downloader.Download();
-
-        private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => downloads.Open();
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            Downloader.CancellationSource.Cancel();
-        }
+        this.downloads = downloads;
+        this.Downloader = downloader;
+        this.DataContext = Downloader;
+        InitializeComponent();
     }
+
+    private async void Button_Click(object sender, RoutedEventArgs e) => await Downloader.Download();
+
+    private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => downloads.Open();
+
+    private async void Button_Click_1(object sender, RoutedEventArgs e)
+    => await Downloader.Cancel();
+
 }
