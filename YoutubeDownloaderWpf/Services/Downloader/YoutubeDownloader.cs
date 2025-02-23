@@ -72,7 +72,7 @@ public class YoutubeDownloader(
             IConverter converter = converterFactory.GetGonverter(ForceMp3);
             List<Task> tasks = new(20);
             SemaphoreSlim semaphoreSlim = new(info.Cores);
-            await foreach (IDownload download in downloadFactory.Get(url))
+            await foreach (var download in downloadFactory.Get(url))
             {
                 var streamTask = Task.Run(async () => await download.GetStreamAsync(DownloadStatuses));
                 var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
@@ -80,7 +80,7 @@ public class YoutubeDownloader(
                     var (data, context) = await resolveTask;
                     string fileName = downlaods.ChildFileName(data.Segments);
                     await semaphoreSlim.WaitAsync(token);
-                    await using var mediaStream = data.Stream;
+                    await using Stream mediaStream = data.Stream;
                     await converter.Convert(mediaStream, fileName, context, token);
                     semaphoreSlim.Release();
                 });

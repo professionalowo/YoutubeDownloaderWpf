@@ -20,25 +20,33 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download;
 public class VideoDownload(
     YoutubeClient client,
     string url,
-    string path = "") : IDownload
+    string path = "")
 {
     public string Path => path;
-    public Task<string> Name => _name.Value;
 
-    private readonly Lazy<Task<string>> _name = new(async () =>
-    {
-        var video = await client.Videos.GetAsync(url);
-        var streamManifest = await client.Videos.Streams.GetManifestAsync(url);
-        return video.Title.ReplaceIllegalCharacters();
-    });
     public async Task<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default)
     {
-        var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token);
-        string name = await _name.Value;
-        var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
+        var nameTask = GetName(token);
+        var streamInfo = await GetStreamInfo(token);
+        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token);
+
+        var name = await nameTask;
         DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
         _ = YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext));
-        var stream = await client.Videos.Streams.GetAsync(streamInfo, token);
-        return new(new(stream, [path, name]), statusContext);
+
+        return new(new(await streamTask, [path, name]), statusContext);
+    }
+
+    private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
+    {
+        var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token);
+        var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
+        return streamInfo;
+    }
+
+    public async ValueTask<string> GetName(CancellationToken token = default)
+    {
+        var video = await client.Videos.GetAsync(url, token);
+        return video.Title.ReplaceIllegalCharacters();
     }
 }

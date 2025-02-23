@@ -19,9 +19,9 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download;
 public class PlaylistDownload(
     YoutubeClient client,
     string url,
-    IDirectory downloads) : IAsyncEnumerable<IDownload>
+    IDirectory downloads) : IAsyncEnumerable<VideoDownload>
 {
-    public async IAsyncEnumerator<IDownload> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    public async IAsyncEnumerator<VideoDownload> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
         var playlist = await client.Playlists.GetAsync(url, cancellationToken);
         var dir = await downloads.CreateSubDirectoryAsync(playlist.Title);
