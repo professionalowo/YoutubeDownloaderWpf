@@ -42,7 +42,7 @@ public class FfmpegMp3Conversion(FfmpegDownloader.Config config, string outPath)
         "-q:a", "2",
         "-flush_packets", "0",
         "-y",
-        $"{outPath}.mp3"
+        outPath
     ];
 
     #region IDisposable

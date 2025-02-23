@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,20 +17,21 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
 {
     public async ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token)
     {
+        string mp3Path = $"{outPath}.mp3";
         try
         {
-            await ConvertToMp3File(data, outPath, context.GetProgressWrapper(), token);
+            await using FfmpegMp3Conversion conversion = new(config, mp3Path);
+            await data.CopyToAsyncTracked(conversion.Input, context.GetProgressWrapper(), token);
             context.InvokeDownloadFinished(this, true);
         }
         catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
         {
             context.InvokeDownloadFinished(this, false);
         }
-    }
-
-    private async ValueTask ConvertToMp3File(Stream data, string filePath, IProgress<long> progress, CancellationToken token = default)
-    {
-        await using FfmpegMp3Conversion conversion = new(config, filePath);
-        await data.CopyToAsyncTracked(conversion.Input, progress, token);
+        catch (Exception)
+        {
+            File.Delete(mp3Path);
+            throw;
+        }
     }
 }
