@@ -59,7 +59,7 @@
         </DockPanel>
         <DockPanel Grid.Row="4">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">
-                Youtube Downloader by Martin Brandl
+                Youtube Downloader by professionalowo
             </TextBlock>
         </DockPanel>
     </Grid>

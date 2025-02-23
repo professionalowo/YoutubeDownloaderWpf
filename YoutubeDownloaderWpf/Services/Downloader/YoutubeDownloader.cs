@@ -78,8 +78,8 @@ public class YoutubeDownloader(
             SemaphoreSlim semaphoreSlim = new(info.Cores);
             await foreach (var download in downloadFactory.Get(url))
             {
-                var streamTask = Task.Run(async () => await download.GetStreamAsync());
-                var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
+                var streamTask = Task.Run(async () => await download.GetStreamAsync())
+                    .ContinueWith(async (resolveTask) =>
                 {
                     var (data, context) = await resolveTask;
                     await DispatchToUI(() => DownloadStatuses.Add(context), token);
@@ -89,7 +89,7 @@ public class YoutubeDownloader(
                     await converter.Convert(mediaStream, fileName, context, token);
                     semaphoreSlim.Release();
                 });
-                tasks.Add(continuationTask);
+                tasks.Add(streamTask);
             }
             await Task.WhenAll(tasks);
         }
