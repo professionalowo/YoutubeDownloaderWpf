@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace YoutubeDownloaderWpf.Controls;
 
-public class DownloadStatusContext : INotifyPropertyChanged
+public sealed class DownloadStatusContext : INotifyPropertyChanged
 {
 
     private string _name = string.Empty;
@@ -57,19 +57,19 @@ public class DownloadStatusContext : INotifyPropertyChanged
         }
     }
 
-    public Progress<double> ProgressHandler { get; init; }
+    public Progress<double> ProgressHandler { get; private init; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
     public event EventHandler<bool> DownloadFinished;
     public DownloadStatusContext(string name, double sizeInMb)
     {
-        _name = name;
-        _size = Math.Round(sizeInMb, 2);
+        Name = name;
+        Size = Math.Round(sizeInMb, 2);
         ProgressHandler = new(p => ProgressValue = p * 100);
         DownloadFinished += OnDownloadFinished;
     }
