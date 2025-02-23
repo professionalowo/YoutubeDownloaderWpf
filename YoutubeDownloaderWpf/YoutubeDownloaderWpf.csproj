@@ -10,7 +10,7 @@
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
-		<ApplicationIcon>YouTube.ico</ApplicationIcon>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,7 +20,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="YouTube.ico" />
+		<None Remove="icon.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="icon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
