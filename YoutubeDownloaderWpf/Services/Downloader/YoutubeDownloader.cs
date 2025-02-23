@@ -82,13 +82,14 @@ public class YoutubeDownloader(
                     .ContinueWith(async (resolveTask) =>
                 {
                     var (data, context) = await resolveTask;
-                    await DispatchToUI(() => DownloadStatuses.Add(context), token);
                     string fileName = downlaods.ChildFileName(data.Segments);
+                    var uiTask = DispatchToUI(() => DownloadStatuses.Add(context), token);
                     await semaphoreSlim.WaitAsync(token);
+                    await uiTask;
                     await using Stream mediaStream = data.Stream;
                     await converter.Convert(mediaStream, fileName, context, token);
                     semaphoreSlim.Release();
-                });
+                }, token);
                 tasks.Add(streamTask);
             }
             await Task.WhenAll(tasks);
