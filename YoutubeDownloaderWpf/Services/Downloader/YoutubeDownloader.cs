@@ -78,10 +78,11 @@ public class YoutubeDownloader(
             SemaphoreSlim semaphoreSlim = new(info.Cores);
             await foreach (var download in downloadFactory.Get(url))
             {
-                var streamTask = Task.Run(async () => await download.GetStreamAsync(DownloadStatuses));
+                var streamTask = Task.Run(async () => await download.GetStreamAsync());
                 var continuationTask = streamTask.ContinueWith(async (resolveTask) =>
                 {
                     var (data, context) = await resolveTask;
+                    await DispatchToUI(() => DownloadStatuses.Add(context), token);
                     string fileName = downlaods.ChildFileName(data.Segments);
                     await semaphoreSlim.WaitAsync(token);
                     await using Stream mediaStream = data.Stream;

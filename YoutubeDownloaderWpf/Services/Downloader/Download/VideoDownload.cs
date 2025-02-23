@@ -24,23 +24,24 @@ public class VideoDownload(
 {
     public string Path => path;
 
-    public async ValueTask<DownloadData<StreamData>> GetStreamAsync(ObservableCollection<DownloadStatusContext> downloadStatuses, CancellationToken token = default)
+    public async ValueTask<DownloadData<StreamData>> GetStreamAsync(CancellationToken token = default)
     {
         var nameTask = GetName(token);
         var streamInfo = await GetStreamInfo(token);
         var streamTask = client.Videos.Streams.GetAsync(streamInfo, token);
 
         var name = await nameTask;
-        DownloadStatusContext statusContext = new(name.Split("/").Last(), streamInfo.Size.MegaBytes);
-        await YoutubeDownloader.DispatchToUI(() => downloadStatuses.Add(statusContext), token);
-
-        return new(new(await streamTask, [path, name]), statusContext);
+        DownloadStatusContext statusContext = new(name, streamInfo.Size.MegaBytes);
+        StreamData data = new(await streamTask, [path, name]);
+        return new(data, statusContext);
     }
 
     private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
     {
         var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token);
-        var streamInfo = streamManifest.GetAudioStreams().Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4).GetWithHighestBitrate();
+        var streamInfo = streamManifest.GetAudioStreams()
+            //.Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4)
+            .GetWithHighestBitrate();
         return streamInfo;
     }
 

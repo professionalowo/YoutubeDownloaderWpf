@@ -14,15 +14,11 @@ namespace YoutubeDownloaderWpf.Services.Converter;
 
 public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
 {
-    public ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token)
-        => ConvertToMp3File(data, outPath, context, token);
-
-    public async ValueTask ConvertToMp3File(Stream data, string filePath, DownloadStatusContext context, CancellationToken token = default)
+    public async ValueTask Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token)
     {
         try
         {
-            await using FfmpegMp3Conversion conversion = new(config, filePath);
-            await data.CopyToAsyncTracked(conversion.Input, context.GetProgressWrapper(), token);
+            await ConvertToMp3File(data, outPath, context.GetProgressWrapper(), token);
             context.InvokeDownloadFinished(this, true);
         }
         catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
@@ -31,4 +27,9 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
         }
     }
 
+    private async ValueTask ConvertToMp3File(Stream data, string filePath, IProgress<long> progress, CancellationToken token = default)
+    {
+        await using FfmpegMp3Conversion conversion = new(config, filePath);
+        await data.CopyToAsyncTracked(conversion.Input, progress, token);
+    }
 }
