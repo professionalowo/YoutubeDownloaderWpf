@@ -27,6 +27,7 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
         catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
         {
             context.InvokeDownloadFinished(this, false);
+            File.Delete(mp3Path);
         }
         catch (Exception)
         {
