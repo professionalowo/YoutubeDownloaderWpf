@@ -29,12 +29,12 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
         {
             context.InvokeDownloadFinished(this, false);
             File.Delete(mp3Path);
-            return null;
         }
         catch (Exception)
         {
             File.Delete(mp3Path);
             throw;
         }
+        return null;
     }
 }

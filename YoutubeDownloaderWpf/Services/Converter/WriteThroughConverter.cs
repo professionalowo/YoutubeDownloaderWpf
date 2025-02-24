@@ -17,7 +17,7 @@ public class WriteThroughConverter(string extension) : IConverter
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
         try
         {
-            await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+            await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
             await data.CopyToAsyncTracked(file, context.GetProgressWrapper(), token);
             context.InvokeDownloadFinished(this, true);
             return fileInfo.FullName;
@@ -25,6 +25,12 @@ public class WriteThroughConverter(string extension) : IConverter
         catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
         {
             context.InvokeDownloadFinished(this, false);
+            fileInfo.Delete();
+        }
+        catch (Exception)
+        {
+            fileInfo.Delete();
+            throw;
         }
         return null;
     }
