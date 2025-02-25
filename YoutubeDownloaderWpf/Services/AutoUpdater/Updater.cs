@@ -3,8 +3,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Navigation;
-using static YoutubeDownloaderWpf.Services.AutoUpdater.Updater;
 
 namespace YoutubeDownloaderWpf.Services.AutoUpdater;
 
