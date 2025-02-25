@@ -49,6 +49,7 @@ public partial class App : Application
                 builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)
         );
+        serviceCollection.AddUpdaters();
         return serviceCollection.BuildServiceProvider();
     }
 
@@ -92,12 +93,17 @@ static class ServiceCollectionExtensions
         serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory>();
         serviceCollection.AddSingleton<ConverterFactory>();
+        serviceCollection.AddSingleton<SystemInfo>();
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
+    {
         serviceCollection.AddScoped<Updater>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<Updater.Version>(_ => new(1, 0, 4));
         serviceCollection.AddSingleton<FfmpegDownloader.Config>(FfmpegConfigFactory.ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();
-        serviceCollection.AddSingleton<SystemInfo>();
         return serviceCollection;
     }
 }
