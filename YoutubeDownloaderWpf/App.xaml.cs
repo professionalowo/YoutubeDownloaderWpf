@@ -71,7 +71,11 @@ static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<HttpClientHandler>();
+        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new()
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+            ConnectTimeout = TimeSpan.FromSeconds(10)
+        });
         serviceCollection.AddScoped<HttpClient>();
         return serviceCollection;
     }
@@ -79,7 +83,7 @@ static class ServiceCollectionExtensions
     public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<YoutubeDownloader>();
-        serviceCollection.AddSingleton(_ =>
+        serviceCollection.AddSingleton<IDirectory>(_ =>
         {
             IDirectory dir = new CwdDirectory("Downloads");
             dir.Init();
@@ -89,7 +93,7 @@ static class ServiceCollectionExtensions
         serviceCollection.AddTransient<DownloadFactory>();
         serviceCollection.AddSingleton<ConverterFactory>();
         serviceCollection.AddScoped<Updater>();
-        serviceCollection.AddSingleton(FfmpegConfigFactory.ResolveConfig);
+        serviceCollection.AddSingleton<FfmpegDownloader.Config>(FfmpegConfigFactory.ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         serviceCollection.AddSingleton<SystemInfo>();
         return serviceCollection;
