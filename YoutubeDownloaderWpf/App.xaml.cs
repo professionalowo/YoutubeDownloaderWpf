@@ -93,6 +93,7 @@ static class ServiceCollectionExtensions
         serviceCollection.AddTransient<DownloadFactory>();
         serviceCollection.AddSingleton<ConverterFactory>();
         serviceCollection.AddScoped<Updater>();
+        serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<Updater.Version>(_ => new(1, 0, 4));
         serviceCollection.AddSingleton<FfmpegDownloader.Config>(FfmpegConfigFactory.ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();

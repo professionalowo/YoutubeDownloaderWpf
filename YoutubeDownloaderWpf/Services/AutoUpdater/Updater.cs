@@ -1,23 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using static YoutubeDownloaderWpf.Services.AutoUpdater.Updater;
 
 namespace YoutubeDownloaderWpf.Services.AutoUpdater;
 
-public class Updater(ILogger<Updater> logger, HttpClient client, Updater.Version currentVersion)
+public partial class Updater(ILogger<Updater> logger, GitHubVersionClient client, Updater.Version currentVersion)
 {
-    [StringSyntax(StringSyntaxAttribute.Uri)]
-    public const string LatestUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases/latest";
     public async Task<bool> IsNewVersionAvailable(CancellationToken token = default)
     {
         try
         {
-            Version githubVersion = await GetNewestVersion(token);
+            Version githubVersion = await client.GetNewestVersion(token);
             return currentVersion.CompareTo(githubVersion) < 0;
         }
         catch (Exception ex)
@@ -26,22 +23,9 @@ public class Updater(ILogger<Updater> logger, HttpClient client, Updater.Version
             return false;
         }
     }
-
     public Task UpdateVersion()
     {
         return Task.CompletedTask;
-    }
-
-    private async Task<Version> GetNewestVersion(CancellationToken token = default)
-    {
-        HttpResponseMessage response = await client.GetAsync(LatestUrl, token);
-        if (response.StatusCode != System.Net.HttpStatusCode.OK)
-        {
-            throw new HttpRequestException("Request was not successfull");
-        }
-        string location = (response.RequestMessage?.RequestUri?.ToString()) ?? throw new HttpRequestException("Could not get newest tag");
-        string tag = location.Split("/").Last().Trim().TrimStart('v');
-        return Version.FromTag(tag);
     }
 
     public record Version(uint Major, uint Minor, uint Patch) : IComparable<Version>
