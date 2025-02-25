@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace YoutubeDownloaderWpf.Services.AutoUpdater;
 
-public partial class Updater(ILogger<Updater> logger, GitHubVersionClient client, Updater.Version currentVersion)
+public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Updater.Version currentVersion)
 {
     public async Task<bool> IsNewVersionAvailable(CancellationToken token = default)
     {
