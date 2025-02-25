@@ -34,15 +34,14 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Update
             null => 1,
             _ when Major != other.Major => Major.CompareTo(other.Major),
             _ when Minor != other.Minor => Minor.CompareTo(other.Minor),
-            _ when Patch != other.Patch => Patch.CompareTo(other.Patch),
-            _ => 0
+            _ => Patch.CompareTo(other.Patch),
         };
 
         public static Version FromTag(string tag)
         {
             if (tag.Split('.').Select(uint.Parse).Take(3).ToArray() is [uint major, uint minor, uint patch])
             {
-                return new Version(major, minor, patch);
+                return new(major, minor, patch);
             }
             throw new ArgumentException("Tag did not conform to the pattern {major}.{minor}.{patch}");
         }
