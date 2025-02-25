@@ -14,7 +14,6 @@ public interface IDownloader
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string Url { get; }
-    string DownloadDirectoryPath { get; }
     ObservableCollection<DownloadStatusContext> DownloadStatuses { get; }
     Task Cancel();
     Task Download();

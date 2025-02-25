@@ -55,9 +55,6 @@ public class YoutubeDownloader(
     public ObservableCollection<DownloadStatusContext> DownloadStatuses { get; } = [];
     private CancellationTokenSource _cancellationSource = new();
 
-    public string DownloadDirectoryPath => downlaods.FullPath;
-
-
     public async Task Download()
     {
         await DispatchToUI(DownloadStatuses.Clear);
@@ -66,7 +63,7 @@ public class YoutubeDownloader(
 
     public async Task Cancel()
     {
-        _cancellationSource.Cancel();
+        await _cancellationSource.CancelAsync();
         await DispatchToUI(DownloadStatuses.Clear);
         _cancellationSource = new();
     }
