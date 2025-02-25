@@ -28,7 +28,6 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Update
 
     public record Version(uint Major, uint Minor, uint Patch) : IComparable<Version>
     {
-        public static Version NullVersion => new(0, 0, 0);
         public int CompareTo(Version? other)
         => other switch
         {
