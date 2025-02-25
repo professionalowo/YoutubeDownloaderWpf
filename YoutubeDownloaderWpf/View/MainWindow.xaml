@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YoutubeDownloaderWpf"
+        xmlns:v="clr-namespace:YoutubeDownloaderWpf.Util.Validator"
         mc:Ignorable="d"
         Title="Downloader" Height="450" Width="800" MinHeight="200" MinWidth="550">
     <Grid>
@@ -16,7 +17,15 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center" Width="auto">
             <Label VerticalAlignment="Center">Url:</Label>
-            <TextBox Name="UrlTextBox" Width="450" Text="{Binding Url,Mode=TwoWay}" VerticalContentAlignment="Center"/>
+            <TextBox Name="UrlTextBox" Width="450" VerticalContentAlignment="Center" Style="{StaticResource textBoxInError}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+                <TextBox.Text>
+                    <Binding Path="Url" Mode="TwoWay">
+                        <Binding.ValidationRules>
+                            <v:UriValidator></v:UriValidator>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <Button Click="Button_Click" Width="150">Download</Button>
             <Label VerticalAlignment="Center">Force Mp3:</Label>
             <CheckBox IsChecked="{Binding ForceMp3,Mode=TwoWay}" VerticalAlignment="Center"/>
