@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -66,6 +67,8 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
     public record Config(IDirectory Folder, string FfmpegExeName = Config.FfmpegName)
     {
         public const string FfmpegName = "ffmpeg";
+
+        [StringSyntax(StringSyntaxAttribute.Uri)]
         public const string Source = "https://github.com/GyanD/codexffmpeg/releases/download/2025-02-06-git-6da82b4485/ffmpeg-2025-02-06-git-6da82b4485-essentials_build.zip";
         public static Config Default => new(new CwdDirectory(FfmpegName));
         public string FfmpegExeFullPath => Folder.ChildFileName(FfmpegExeName);

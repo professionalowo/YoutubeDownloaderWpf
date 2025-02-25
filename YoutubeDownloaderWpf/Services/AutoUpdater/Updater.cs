@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -10,13 +11,18 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater;
 
 public class Updater(ILogger<Updater> logger, HttpClient client, Updater.Version currentVersion)
 {
+    [StringSyntax(StringSyntaxAttribute.Uri)]
     public const string LatestUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases/latest";
     public async ValueTask<bool> IsNewVersionAvailable(CancellationToken token = default)
     {
         try
         {
-            var response = await client.GetAsync(LatestUrl, token);
-            string? location = response?.RequestMessage?.RequestUri?.ToString();
+            HttpResponseMessage response = await client.GetAsync(LatestUrl, token);
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return false;
+            }
+            string? location = response.RequestMessage?.RequestUri?.ToString();
             if (location is null)
             {
                 return false;

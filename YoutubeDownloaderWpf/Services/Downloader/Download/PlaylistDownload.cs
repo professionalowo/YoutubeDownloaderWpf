@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -19,7 +20,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download;
 
 public class PlaylistDownload(
     YoutubeClient client,
-    string url,
+    [StringSyntax(StringSyntaxAttribute.Uri)] string url,
     IDirectory downloads) : IAsyncEnumerable<VideoDownload>
 {
     public async IAsyncEnumerator<VideoDownload> GetAsyncEnumerator(CancellationToken cancellationToken = default)

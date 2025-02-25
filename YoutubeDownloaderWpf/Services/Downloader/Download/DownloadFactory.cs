@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download;
 
 public class DownloadFactory(YoutubeClient client, IDirectory downloads)
 {
-    public async IAsyncEnumerable<VideoDownload> Get(string url)
+    public async IAsyncEnumerable<VideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url)
     {
         var last = url.Split('/').Last().First();
         if (last == 'w')

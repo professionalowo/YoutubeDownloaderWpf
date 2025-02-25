@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace YoutubeDownloaderWpf.Services.Downloader.Download;
 
 public class VideoDownload(
     YoutubeClient client,
-    string url,
+    [StringSyntax(StringSyntaxAttribute.Uri)] string url,
     string path = "")
 {
     public string Path => path;

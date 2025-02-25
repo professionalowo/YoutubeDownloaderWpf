@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Services.Downloader.Download;
 using YoutubeDownloaderWpf.Util;
+using System.Diagnostics.CodeAnalysis;
 
 
 
@@ -32,6 +33,8 @@ public class YoutubeDownloader(
 {
 
     private string _url = string.Empty;
+
+    [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
     {
         get => _url;
@@ -64,11 +67,11 @@ public class YoutubeDownloader(
     public async Task Cancel()
     {
         _cancellationSource.Cancel();
-        _cancellationSource = new();
         await DispatchToUI(DownloadStatuses.Clear);
+        _cancellationSource = new();
     }
 
-    private async Task DownloadAction(string url)
+    private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url)
     {
         try
         {
