@@ -40,7 +40,7 @@ public class Updater(ILogger<Updater> logger, HttpClient client, Updater.Version
 
     public Task UpdateVersion()
     {
-        return new Task(() => { });
+        return Task.CompletedTask;
     }
 
     public record Version(uint Major, uint Minor, uint Patch) : IComparable<Version>
