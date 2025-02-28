@@ -1,8 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using AngleSharp.Io;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using YoutubeDownloaderWpf.Util.Validator;
 
 namespace YoutubeDownloaderWpf.Services.AutoUpdater;
 
@@ -12,14 +16,23 @@ public class GitHubVersionClient(HttpClient client)
     public const string LatestUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases/latest";
     public async Task<Updater.Version> GetNewestVersion(CancellationToken token = default)
     {
-        HttpResponseMessage response = await client.GetAsync(LatestUrl, token);
+        using HttpResponseMessage response = await client.GetAsync(LatestUrl, token);
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             throw new HttpRequestException("Request was not successfull");
         }
-        string location = (response.RequestMessage?.RequestUri?.ToString()) ?? throw new HttpRequestException("Could not get newest tag");
-        string tag = location.Split("/").Last().Trim().TrimStart('v');
+        string location = GetLocation(response) ?? throw new HttpRequestException("Could not get newest tag");
+        if (!TagValidator.IsValid(location))
+        {
+            throw new ArgumentException($"Location {location} doesn't match the scheme v{{major}}.{{minor}}.{{patch}}");
+        }
+        string tag = GetTag(location);
         return Updater.Version.FromTag(tag);
     }
+
+    private static string? GetLocation(HttpResponseMessage response)
+        => response.RequestMessage?.RequestUri?.ToString();
+    private static string GetTag(string location)
+        => location.Split("/").Last().Trim().TrimStart('v');
 }
 

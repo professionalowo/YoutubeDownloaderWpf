@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace YoutubeDownloaderWpf.Util.Validator;
+namespace YoutubeDownloaderWpf.Controls.Validation;
 public class UriValidator : ValidationRule
 {
     public override ValidationResult Validate(object value, CultureInfo cultureInfo)
