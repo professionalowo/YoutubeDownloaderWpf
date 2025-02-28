@@ -17,7 +17,7 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Update
         }
         catch (Exception ex)
         {
-            logger.LogError(ex.ToString());
+            logger.LogError("{Error}",ex);
             return false;
         }
     }

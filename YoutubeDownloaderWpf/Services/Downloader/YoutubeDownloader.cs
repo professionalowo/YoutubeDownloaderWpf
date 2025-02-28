@@ -102,7 +102,7 @@ public class YoutubeDownloader(
         }
         catch (Exception e)
         {
-            logger.LogError(e.ToString());
+            logger.LogError("{Error}", e);
         }
     }
 

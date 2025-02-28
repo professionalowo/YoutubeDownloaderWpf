@@ -36,7 +36,7 @@ public partial class App : Application
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         var logger = services.GetService<ILogger<App>>();
-        logger?.LogError(e.Exception.ToString());
+        logger?.LogError("{Error}", e.Exception);
     }
 
     private static ServiceProvider InitializeServices()
