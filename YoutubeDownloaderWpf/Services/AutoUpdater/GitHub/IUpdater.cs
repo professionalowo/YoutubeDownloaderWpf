@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace YoutubeDownloaderWpf.Services.AutoUpdater.GitHub;
 
-interface IUpdater
+public interface IUpdater
 {
     public ValueTask<bool> IsNewVersionAvailable(CancellationToken token = default);
     public ValueTask UpdateVersion(CancellationToken token = default);

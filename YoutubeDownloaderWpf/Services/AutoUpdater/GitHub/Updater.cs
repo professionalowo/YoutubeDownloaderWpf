@@ -23,15 +23,16 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Tagged
     }
     public ValueTask UpdateVersion(CancellationToken token = default)
     {
+        //TODO: implement
         return ValueTask.CompletedTask;
     }
 
-
-
-    public class Noop : IUpdater
+    public class Noop(bool result) : IUpdater
     {
+        public Noop() : this(false) { }
+
         public ValueTask<bool> IsNewVersionAvailable(CancellationToken token = default)
-            => ValueTask.FromResult(false);
+            => ValueTask.FromResult(result);
 
 
         public ValueTask UpdateVersion(CancellationToken token = default)
