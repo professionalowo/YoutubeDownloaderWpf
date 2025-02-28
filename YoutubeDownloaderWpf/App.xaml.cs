@@ -9,7 +9,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using YoutubeDownloaderWpf.Services.AutoUpdater;
+using YoutubeDownloaderWpf.Services.AutoUpdater.Ffmpeg;
+using YoutubeDownloaderWpf.Services.AutoUpdater.GitHub;
 using YoutubeDownloaderWpf.Services.Converter;
 using YoutubeDownloaderWpf.Services.Downloader;
 using YoutubeDownloaderWpf.Services.Downloader.Download;
@@ -55,7 +56,7 @@ public partial class App : Application
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        var updater = services.GetService<Updater>()!;
+        var updater = services.GetService<IUpdater>()!;
         bool isNewVersion = await updater.IsNewVersionAvailable();
         if (isNewVersion)
         {
@@ -99,9 +100,9 @@ static class ServiceCollectionExtensions
 
     public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<Updater>();
+        serviceCollection.AddScoped<IUpdater,Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
-        serviceCollection.AddSingleton<Updater.Version>(_ => new(1, 0, 4));
+        serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
         serviceCollection.AddSingleton<FfmpegDownloader.Config>(FfmpegConfigFactory.ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;

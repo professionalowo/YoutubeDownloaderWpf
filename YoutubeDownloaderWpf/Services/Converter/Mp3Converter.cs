@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Controls;
-using YoutubeDownloaderWpf.Services.AutoUpdater;
+using YoutubeDownloaderWpf.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Util.Extensions;
 

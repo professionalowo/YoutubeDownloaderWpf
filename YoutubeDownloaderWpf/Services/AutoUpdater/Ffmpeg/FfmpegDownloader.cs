@@ -9,7 +9,7 @@ using System.Windows;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 using YoutubeDownloaderWpf.Util.ScopedResource;
 
-namespace YoutubeDownloaderWpf.Services.AutoUpdater;
+namespace YoutubeDownloaderWpf.Services.AutoUpdater.Ffmpeg;
 
 public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
 {

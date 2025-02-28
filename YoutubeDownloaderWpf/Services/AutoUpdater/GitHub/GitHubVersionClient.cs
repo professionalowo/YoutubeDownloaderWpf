@@ -7,13 +7,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Util.Validator;
 
-namespace YoutubeDownloaderWpf.Services.AutoUpdater;
+namespace YoutubeDownloaderWpf.Services.AutoUpdater.GitHub;
 
 public class GitHubVersionClient(HttpClient client)
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public const string LatestUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases/latest";
-    public async Task<Updater.Version> GetNewestVersion(CancellationToken token = default)
+    public async Task<TaggedVersion> GetNewestVersion(CancellationToken token = default)
     {
         using HttpResponseMessage response = await client.GetAsync(LatestUrl, token);
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
@@ -26,7 +26,7 @@ public class GitHubVersionClient(HttpClient client)
             throw new ArgumentException($"Location {location} doesn't match the scheme v{{major}}.{{minor}}.{{patch}}");
         }
         string tag = GetTag(location);
-        return Updater.Version.FromTag(tag);
+        return TaggedVersion.FromTag(tag);
     }
 
     private static string? GetLocation(HttpResponseMessage response)

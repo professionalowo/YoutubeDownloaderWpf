@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
 
-namespace YoutubeDownloaderWpf.Services.AutoUpdater;
+namespace YoutubeDownloaderWpf.Services.AutoUpdater.Ffmpeg;
 public class FfmpegConfigFactory
 {
     public static FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
