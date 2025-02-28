@@ -100,7 +100,7 @@ static class ServiceCollectionExtensions
 
     public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<IUpdater,Updater.Noop>();
+        serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
         serviceCollection.AddSingleton<FfmpegDownloader.Config>(FfmpegConfigFactory.ResolveConfig);
