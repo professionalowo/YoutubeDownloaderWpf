@@ -31,11 +31,11 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Tagged
     {
         public Noop() : this(false) { }
 
-        public ValueTask<bool> IsNewVersionAvailable(CancellationToken token = default)
+        ValueTask<bool> IUpdater.IsNewVersionAvailable(CancellationToken token)
             => ValueTask.FromResult(result);
 
 
-        public ValueTask UpdateVersion(CancellationToken token = default)
+        ValueTask IUpdater.UpdateVersion(CancellationToken token)
         => ValueTask.CompletedTask;
     }
 }
