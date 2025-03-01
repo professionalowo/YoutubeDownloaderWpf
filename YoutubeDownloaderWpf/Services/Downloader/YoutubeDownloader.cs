@@ -73,7 +73,7 @@ public class YoutubeDownloader(
         try
         {
             CancellationToken token = _cancellationSource.Token;
-            IConverter converter = converterFactory.GetGonverter(ForceMp3);
+            IConverter converter = converterFactory.GetConverter(ForceMp3);
             List<Task> tasks = new(20);
             SemaphoreSlim semaphoreSlim = new(info.Cores);
             await foreach (var download in downloadFactory.Get(url))
