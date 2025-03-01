@@ -37,7 +37,7 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
         using ScopedResource.File zipSource = new(config.Folder.ChildFileName("source.zip"));
         using ScopedResource.Directory sourceUnzipped = new(config.Folder.ChildFileName(Path.GetFileNameWithoutExtension(zipSource.FullPath)));
 
-        using (FileStream fileStream = new(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+        await using (FileStream fileStream = new(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
         {
             await readStream.CopyToAsync(fileStream, token);
         }

@@ -14,10 +14,10 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater.GitHub;
 public class GitHubVersionClient(HttpClient client)
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
-    public const string ReleasesUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases/";
+    public const string ReleasesUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases";
     public async Task<TaggedVersion> GetNewestVersion(CancellationToken token = default)
     {
-        string latestUrl = Path.Combine(ReleasesUrl, "latest");
+        string latestUrl = $"{ReleasesUrl}/latest";
         using HttpResponseMessage response = await client.GetAsync(latestUrl, token);
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
@@ -33,18 +33,19 @@ public class GitHubVersionClient(HttpClient client)
     }
 
     public async Task DownloadVersion(TaggedVersion version, CancellationToken token = default)
-    {   
+    {
         string zipFileName = $"YoutubeDownloader-{version}.zip";
-        string fileUrl = Path.Combine(ReleasesUrl, version.ToString(),zipFileName);
+        string fileUrl = $"{ReleasesUrl}/download/{version}/{zipFileName}";
 
         using HttpResponseMessage response = await client.GetAsync(fileUrl, token);
         await using Stream readStream = await response.Content.ReadAsStreamAsync(token);
 
         string fullFilePath = Path.Combine(KnownFolders.GetDownloadsPath(), zipFileName);
 
-        await using FileStream outStream = File.OpenWrite(fullFilePath);
-
-        await readStream.CopyToAsync(outStream, token);
+        await using (FileStream outStream = new(fullFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+        {
+            await readStream.CopyToAsync(outStream, token);
+        }
     }
 
     private static string? GetLocation(HttpResponseMessage response)
