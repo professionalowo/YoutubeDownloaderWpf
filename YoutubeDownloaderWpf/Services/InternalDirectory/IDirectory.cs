@@ -28,5 +28,5 @@ public interface IDirectory
 
     Task<DirectoryInfo> CreateSubDirectoryAsync(params string[] segments) => Task.Run(() => CreateSubDirectory(segments));
 
-    bool ContainsFile(string name) => new FileInfo(ChildFileName(name)).Exists;
+    bool ContainsFile(string name) => File.Exists(ChildFileName(name));
 }
