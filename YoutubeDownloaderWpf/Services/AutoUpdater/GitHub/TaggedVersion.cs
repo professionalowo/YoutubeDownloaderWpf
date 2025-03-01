@@ -25,4 +25,6 @@ public record TaggedVersion(uint Major, uint Minor, uint Patch) : IComparable<Ta
         }
         throw new ArgumentException("Tag did not conform to the pattern {major}.{minor}.{patch}");
     }
+
+    public override string ToString() => $"v{Major}.{Minor}.{Patch}";
 }

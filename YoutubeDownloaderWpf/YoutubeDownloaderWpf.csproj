@@ -11,6 +11,7 @@
 		<UseWPF>true</UseWPF>
 		<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using YoutubeDownloaderWpf.Services.InternalDirectory;
@@ -13,7 +14,7 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater.Ffmpeg;
 
 public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
 {
-    public async ValueTask<bool> DownloadFfmpeg()
+    public async ValueTask<bool> DownloadFfmpeg(CancellationToken token = default)
     {
 
         if (DoesFfmpegExist(config))
@@ -30,15 +31,15 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
             return false;
         }
 
-        using var response = await client.GetAsync(Config.Source);
-        using var readStream = await response.Content.ReadAsStreamAsync();
+        using HttpResponseMessage response = await client.GetAsync(Config.Source, token);
+        await using Stream readStream = await response.Content.ReadAsStreamAsync(token);
 
         using ScopedResource.File zipSource = new(config.Folder.ChildFileName("source.zip"));
         using ScopedResource.Directory sourceUnzipped = new(config.Folder.ChildFileName(Path.GetFileNameWithoutExtension(zipSource.FullPath)));
 
         using (FileStream fileStream = new(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
         {
-            readStream.CopyTo(fileStream);
+            await readStream.CopyToAsync(fileStream, token);
         }
 
 

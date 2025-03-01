@@ -21,10 +21,10 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Tagged
             return false;
         }
     }
-    public ValueTask UpdateVersion(CancellationToken token = default)
+    public async ValueTask UpdateVersion(CancellationToken token = default)
     {
-        //TODO: implement
-        return ValueTask.CompletedTask;
+        TaggedVersion githubVersion = await client.GetNewestVersion(token);
+        await client.DownloadVersion(githubVersion, token);
     }
 
     public class Noop(bool result) : IUpdater
