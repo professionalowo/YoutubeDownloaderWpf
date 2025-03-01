@@ -63,7 +63,14 @@ public partial class App : Application
             await updater.UpdateVersion();
         }
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
-        await ffmpeg.DownloadFfmpeg();
+        if (!ffmpeg.DoesFfmpegExist())
+        {
+            var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Downlaod Ffmpeg", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            if (res == MessageBoxResult.OK)
+            {
+                await ffmpeg.DownloadFfmpeg();
+            }
+        }
         _mainWindow = services.GetService<MainWindow>();
         _mainWindow?.Show();
     }

@@ -14,23 +14,9 @@ namespace YoutubeDownloaderWpf.Services.AutoUpdater.Ffmpeg;
 
 public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
 {
-    public async ValueTask<bool> DownloadFfmpeg(CancellationToken token = default)
+    public async ValueTask DownloadFfmpeg(CancellationToken token = default)
     {
-
-        if (DoesFfmpegExist(config))
-        {
-            return true;
-        }
-
         Directory.CreateDirectory(config.Folder.FullPath);
-
-        var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Downlaod Ffmpeg", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-
-        if (res != MessageBoxResult.OK)
-        {
-            return false;
-        }
-
         using HttpResponseMessage response = await client.GetAsync(Config.Source, token);
         await using Stream readStream = await response.Content.ReadAsStreamAsync(token);
 
@@ -42,20 +28,17 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
             await readStream.CopyToAsync(fileStream, token);
         }
 
-
         ZipFile.ExtractToDirectory(zipSource.FullPath, sourceUnzipped.FullPath);
         string[] executables = Directory.GetFiles(sourceUnzipped.FullPath, "*.exe", SearchOption.AllDirectories);
-
-
 
         string ffmpegExe = Path.ChangeExtension(config.FfmpegExeName, "exe");
         string ffmpegPathSource = executables.Where(path => path.EndsWith(ffmpegExe)).First();
         File.Move(ffmpegPathSource, config.Folder.ChildFileName(ffmpegExe));
 
         logger.LogInformation("Installed Ffmpeg");
-        return true;
     }
-    private static bool DoesFfmpegExist(Config config)
+
+    public bool DoesFfmpegExist()
     {
         var directory = config.Folder;
         var fullPath = config.Folder.FullPath;
