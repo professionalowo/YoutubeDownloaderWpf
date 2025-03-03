@@ -9,7 +9,7 @@ namespace YoutubeDownloaderWpf.Util;
 
 public static class UrlUtil
 {
-    public static string Combine(string first, string second)
+    private  static string Combine(string first, string second)
         => $"{first.Trim('/')}/{second.Trim('/')}";
 
     /// <summary>
