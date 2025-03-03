@@ -12,6 +12,30 @@ namespace YoutubeDownloaderWpf.Util.Tests;
 public class UrlUtilTests
 {
     [TestMethod()]
+    public void CombineTest_OneArgument_IsIdentical()
+    {
+        string expected = "hello";
+        string actual = UrlUtil.Combine(expected);
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod()]
+    public void CombineTest_OneArgument_Trailing_IsIdentical()
+    {
+        string expected = "hello/";
+        string actual = UrlUtil.Combine(expected);
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod()]
+    public void CombineTest_OneArgument_Leading_IsIdentical()
+    {
+        string expected = "/hello";
+        string actual = UrlUtil.Combine(expected);
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod()]
     public void CombineTest_TwoArguments_NoSlashes_Equals()
     {
         string expected = "hello/world";
