@@ -1,4 +1,4 @@
-name: Run Tests
+name: Tests
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # Change to windows-latest if needed
+    runs-on: windows-latest  # Change to windows-latest if needed
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
