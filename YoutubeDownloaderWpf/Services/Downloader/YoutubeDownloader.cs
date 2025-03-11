@@ -29,7 +29,7 @@ public class YoutubeDownloader(
     SystemInfo info,
     ILogger<YoutubeDownloader> logger,
     DownloadFactory downloadFactory,
-    IDirectory downlaods) : IDownloader, INotifyPropertyChanged
+    IDirectory downloads) : IDownloader, INotifyPropertyChanged
 {
 
     private string _url = string.Empty;
@@ -82,7 +82,7 @@ public class YoutubeDownloader(
                     .ContinueWith(async (resolveTask) =>
                 {
                     var (data, context) = await resolveTask;
-                    string fileName = downlaods.ChildFileName(data.Segments);
+                    string fileName = downloads.ChildFileName(data.Segments);
                     var uiTask = DispatchToUI(() => DownloadStatuses.Add(context), token);
                     await semaphoreSlim.WaitAsync(token);
                     await uiTask;
