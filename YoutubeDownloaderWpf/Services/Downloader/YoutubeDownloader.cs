@@ -58,13 +58,13 @@ public class YoutubeDownloader(
     private CancellationTokenSource CancellationSource
     {
         get {
-            using (_cancellationSourceLock.EnterScope())
+            lock (_cancellationSourceLock)
             {
                 return _cancellationSource;
             }
         }
         set {
-            using (_cancellationSourceLock.EnterScope())
+            lock (_cancellationSourceLock)
             {
                 _cancellationSource = value;
             }
