@@ -58,7 +58,7 @@ public class YoutubeDownloader(
     public async Task Download()
     {
         await DispatchToUI(DownloadStatuses.Clear);
-        await DownloadAction(Url, _cancellationSource.Token);
+        await DownloadAction(Url, _cancellationSource.Token).ConfigureAwait(false);
     }
 
     public async Task Cancel()
@@ -77,21 +77,21 @@ public class YoutubeDownloader(
             SemaphoreSlim semaphoreSlim = new(info.Cores);
             await foreach (var download in downloadFactory.Get(url))
             {
-                var streamTask = Task.Run(async () => await download.GetStreamAsync(token))
+                var streamTask = Task.Run(async () => await download.GetStreamAsync(token).ConfigureAwait(false))
                     .ContinueWith(async (resolveTask) =>
                 {
                     var (data, context) = await resolveTask;
                     string fileName = downloads.ChildFileName(data.Segments);
                     var uiTask = DispatchToUI(() => DownloadStatuses.Add(context), token);
-                    await semaphoreSlim.WaitAsync(token);
+                    await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
                     await uiTask;
                     await using Stream mediaStream = data.Stream;
-                    await converter.Convert(mediaStream, fileName, context, token);
+                    await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
                     semaphoreSlim.Release();
                 }, token);
                 tasks.Add(streamTask);
             }
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is OperationCanceledException)
         {
