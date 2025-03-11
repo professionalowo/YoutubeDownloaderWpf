@@ -63,7 +63,7 @@ public class YoutubeDownloader(
 
     public async Task Cancel()
     {
-        await _cancellationSource.CancelAsync();
+        await _cancellationSource.CancelAsync().ConfigureAwait(false);
         await DispatchToUI(DownloadStatuses.Clear);
         _cancellationSource = new();
     }
