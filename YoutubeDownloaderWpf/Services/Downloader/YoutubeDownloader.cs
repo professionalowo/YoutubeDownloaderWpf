@@ -53,19 +53,35 @@ public class YoutubeDownloader(
         }
     }
     public ObservableCollection<DownloadStatusContext> DownloadStatuses { get; } = [];
+    private readonly Lock _cancellationSourceLock = new();
     private CancellationTokenSource _cancellationSource = new();
+    private CancellationTokenSource CancellationSource
+    {
+        get {
+            using (_cancellationSourceLock.EnterScope())
+            {
+                return _cancellationSource;
+            }
+        }
+        set {
+            using (_cancellationSourceLock.EnterScope())
+            {
+                _cancellationSource = value;
+            }
+        }
+    }
 
     public async Task Download()
     {
         await DispatchToUI(DownloadStatuses.Clear);
-        await DownloadAction(Url, _cancellationSource.Token).ConfigureAwait(false);
+        await DownloadAction(Url, CancellationSource.Token).ConfigureAwait(false);
     }
 
     public async Task Cancel()
     {
-        await _cancellationSource.CancelAsync().ConfigureAwait(false);
+        await CancellationSource.CancelAsync().ConfigureAwait(false);
         await DispatchToUI(DownloadStatuses.Clear);
-        _cancellationSource = new();
+        CancellationSource = new();
     }
 
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url, CancellationToken token = default)
