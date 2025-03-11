@@ -58,7 +58,7 @@ public class YoutubeDownloader(
     public async Task Download()
     {
         await DispatchToUI(DownloadStatuses.Clear);
-        await DownloadAction(Url);
+        await DownloadAction(Url, _cancellationSource.Token);
     }
 
     public async Task Cancel()
@@ -68,11 +68,10 @@ public class YoutubeDownloader(
         _cancellationSource = new();
     }
 
-    private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url)
+    private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url, CancellationToken token = default)
     {
         try
         {
-            CancellationToken token = _cancellationSource.Token;
             IConverter converter = converterFactory.GetConverter(ForceMp3);
             List<Task> tasks = new(20);
             SemaphoreSlim semaphoreSlim = new(info.Cores);
