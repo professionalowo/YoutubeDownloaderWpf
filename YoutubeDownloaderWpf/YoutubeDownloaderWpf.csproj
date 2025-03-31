@@ -12,6 +12,7 @@
 		<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	</PropertyGroup>
 
 	<ItemGroup>
