@@ -6,22 +6,20 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using YoutubeDownloader.Wpf.Controls;
-using YoutubeDownloader.Wpf.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
-using YoutubeDownloader.Wpf.Util.Extensions;
+using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
+using YoutubeDownloader.Core.Util.Extensions;
 
-namespace YoutubeDownloader.Wpf.Services.Converter;
+namespace YoutubeDownloader.Core.Services.Converter;
 
 public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
 {
-    public async ValueTask<string?> Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
+    public async ValueTask<string?> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
     {
         string mp3Path = $"{outPath}.mp3";
         try
         {
             await using FfmpegMp3Conversion conversion = new(config, mp3Path);
-            await data.CopyToAsyncTracked(conversion.Input, context.GetProgressWrapper(), token);
+            await data.CopyToAsyncTracked(conversion.Input, context.GetProgress(), token);
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
         }

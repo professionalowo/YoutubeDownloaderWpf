@@ -7,14 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
-using YoutubeDownloader.Wpf.Controls;
-using YoutubeDownloader.Wpf.Data;
-using YoutubeDownloader.Wpf.Util.Extensions;
+using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Util.Extensions;
 using YoutubeExplode;
-using YoutubeExplode.Playlists;
-using YoutubeExplode.Videos;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader.Download;
 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Util.Extensions;
+namespace YoutubeDownloader.Core.Util.Extensions;
 
 public static class StreamExtensions
 {

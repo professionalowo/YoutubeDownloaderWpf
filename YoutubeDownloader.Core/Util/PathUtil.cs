@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Util;
+namespace YoutubeDownloader.Core.Util;
 
 public static class PathUtil
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Services.AutoUpdater.GitHub;
+namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 
 public class Updater(ILogger<Updater> logger, GitHubVersionClient client, TaggedVersion currentVersion) : IUpdater
 {
@@ -21,21 +21,24 @@ public class Updater(ILogger<Updater> logger, GitHubVersionClient client, Tagged
             return false;
         }
     }
-    public async ValueTask UpdateVersion(CancellationToken token = default)
+
+    public async ValueTask UpdateVersion(string downloadDir, CancellationToken token = default)
     {
         TaggedVersion githubVersion = await client.GetNewestVersion(token);
-        await client.DownloadVersion(githubVersion, token);
+        await client.DownloadVersion(downloadDir, githubVersion, token);
     }
 
     public class Noop(bool result) : IUpdater
     {
-        public Noop() : this(false) { }
+        public Noop() : this(false)
+        {
+        }
 
         ValueTask<bool> IUpdater.IsNewVersionAvailable(CancellationToken token)
             => ValueTask.FromResult(result);
 
 
-        ValueTask IUpdater.UpdateVersion(CancellationToken token)
-        => ValueTask.CompletedTask;
+        ValueTask IUpdater.UpdateVersion(string _, CancellationToken token)
+            => ValueTask.CompletedTask;
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Util.ScopedResource;
+namespace YoutubeDownloader.Core.Util;
 
 public abstract class ScopedResource(string path) : IDisposable
 {

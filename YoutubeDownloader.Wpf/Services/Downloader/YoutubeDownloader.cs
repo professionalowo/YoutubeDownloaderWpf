@@ -15,10 +15,10 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using YoutubeDownloader.Wpf.Controls;
-using YoutubeDownloader.Wpf.Services.Converter;
+using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Wpf.Services.Downloader.Download;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
-using YoutubeDownloader.Wpf.Util;
+using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Util;
 
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;

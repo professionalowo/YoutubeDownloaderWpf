@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeDownloader.Wpf.Services.AutoUpdater.Ffmpeg;
+using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
-namespace YoutubeDownloader.Wpf.Services.Converter;
+namespace YoutubeDownloader.Core.Services.Converter;
 
 public class ConverterFactory(FfmpegDownloader.Config config)
 {

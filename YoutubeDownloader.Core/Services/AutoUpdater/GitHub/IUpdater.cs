@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Services.AutoUpdater.GitHub;
+namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 
 public interface IUpdater
 {
     public ValueTask<bool> IsNewVersionAvailable(CancellationToken token = default);
-    public ValueTask UpdateVersion(CancellationToken token = default);
+    public ValueTask UpdateVersion(string downloadDir,CancellationToken token = default);
 }

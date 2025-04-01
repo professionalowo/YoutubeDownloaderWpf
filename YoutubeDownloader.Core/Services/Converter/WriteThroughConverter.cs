@@ -5,20 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using YoutubeDownloader.Wpf.Controls;
-using YoutubeDownloader.Wpf.Util.Extensions;
+using YoutubeDownloader.Core.Util.Extensions;
 
-namespace YoutubeDownloader.Wpf.Services.Converter;
+namespace YoutubeDownloader.Core.Services.Converter;
 
 public class WriteThroughConverter(string extension) : IConverter
 {
-    public async ValueTask<string?> Convert(Stream data, string outPath, DownloadStatusContext context, CancellationToken token = default)
+    public async ValueTask<string?> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
     {
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
         try
         {
             await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
-            await data.CopyToAsyncTracked(file, context.GetProgressWrapper(), token);
+            await data.CopyToAsyncTracked(file, context.GetProgress(), token);
             context.InvokeDownloadFinished(this, true);
             return fileInfo.FullName;
         }

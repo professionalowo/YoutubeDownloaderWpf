@@ -7,10 +7,11 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
-using YoutubeDownloader.Wpf.Util.ScopedResource;
+using YoutubeDownloader.Core.Services;
+using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Util;
 
-namespace YoutubeDownloader.Wpf.Services.AutoUpdater.Ffmpeg;
+namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
 {

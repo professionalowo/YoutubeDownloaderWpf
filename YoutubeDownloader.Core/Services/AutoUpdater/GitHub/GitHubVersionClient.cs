@@ -6,10 +6,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using YoutubeDownloader.Wpf.Util;
-using YoutubeDownloader.Wpf.Util.Validator;
+using YoutubeDownloader.Core.Util;
+using YoutubeDownloader.Core.Util.Validator;
 
-namespace YoutubeDownloader.Wpf.Services.AutoUpdater.GitHub;
+namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 
 public class GitHubVersionClient(HttpClient client)
 {
@@ -32,7 +32,7 @@ public class GitHubVersionClient(HttpClient client)
         return TaggedVersion.FromTag(tag);
     }
 
-    public async Task DownloadVersion(TaggedVersion version, CancellationToken token = default)
+    public async Task DownloadVersion(String downloadDir,TaggedVersion version, CancellationToken token = default)
     {
         string zipFileName = $"YoutubeDownloader-{version}.zip";
         string fileUrl = UrlUtil.Combine(ReleasesUrl, "download", version.ToString(), zipFileName);
@@ -40,7 +40,7 @@ public class GitHubVersionClient(HttpClient client)
         using HttpResponseMessage response = await client.GetAsync(fileUrl, token);
         await using Stream readStream = await response.Content.ReadAsStreamAsync(token);
 
-        string fullFilePath = Path.Combine(KnownFolders.GetDownloadsPath(), zipFileName);
+        string fullFilePath = Path.Combine(downloadDir, zipFileName);
 
         await using (FileStream outStream = new(fullFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
         {

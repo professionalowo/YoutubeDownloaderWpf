@@ -9,9 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using YoutubeDownloader.Wpf.Controls;
+using YoutubeDownloader.Core.Data;
+using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Util.Extensions;
 using YoutubeDownloader.Wpf.Data;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
-using YoutubeDownloader.Wpf.Util.Extensions;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 using Container = YoutubeExplode.Videos.Streams.Container;
@@ -25,7 +26,7 @@ public class VideoDownload(
 {
     public string Path => path;
 
-    public async ValueTask<DownloadData<StreamData>> GetStreamAsync(CancellationToken token = default)
+    public async ValueTask<DownloadData<StreamData,DownloadStatusContext>> GetStreamAsync(CancellationToken token = default)
     {
         var nameTask = GetName(token);
         var streamInfo = await GetStreamInfo(token);

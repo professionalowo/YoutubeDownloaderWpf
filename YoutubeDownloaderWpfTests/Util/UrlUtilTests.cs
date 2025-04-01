@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloaderWpf.Util.Tests;
 

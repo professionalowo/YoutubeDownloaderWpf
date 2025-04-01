@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
+using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Wpf.Services.Downloader;
 
 namespace YoutubeDownloader.Wpf;

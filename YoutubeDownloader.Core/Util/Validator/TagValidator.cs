@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Util.Validator;
+namespace YoutubeDownloader.Core.Util.Validator;
 
 public static partial class TagValidator
 {

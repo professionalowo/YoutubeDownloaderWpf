@@ -9,11 +9,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using YoutubeDownloader.Wpf.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Wpf.Services.AutoUpdater.GitHub;
-using YoutubeDownloader.Wpf.Services.Converter;
+using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
+using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
+using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Wpf.Services.Downloader.Download;
-using YoutubeDownloader.Wpf.Services.InternalDirectory;
+using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Util;
 using YoutubeDownloader.Wpf.Services.Logging;
 using YoutubeDownloader.Wpf.Util;
 using YoutubeDownloader.Wpf.Services.Downloader;
@@ -60,7 +61,7 @@ public partial class App : Application
         bool isNewVersion = await updater.IsNewVersionAvailable();
         if (isNewVersion)
         {
-            await updater.UpdateVersion();
+            await updater.UpdateVersion(KnownFolders.GetDownloadsPath());
         }
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
         if (!ffmpeg.DoesFfmpegExist())

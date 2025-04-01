@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeDownloader.Wpf.Services.AutoUpdater.Ffmpeg;
+using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
-namespace YoutubeDownloader.Wpf.Services.Converter;
+namespace YoutubeDownloader.Core.Services.Converter;
 
 public class FfmpegMp3Conversion(FfmpegDownloader.Config config, string outPath) : IDisposable, IAsyncDisposable
 {

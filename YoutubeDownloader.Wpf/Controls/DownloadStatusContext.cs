@@ -7,10 +7,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using YoutubeDownloader.Core.Services.Converter;
 
 namespace YoutubeDownloader.Wpf.Controls;
 
-public sealed class DownloadStatusContext : INotifyPropertyChanged
+public sealed class DownloadStatusContext : INotifyPropertyChanged, IConverter.IConverterContext
 {
 
     private string _name = string.Empty;
@@ -81,7 +82,7 @@ public sealed class DownloadStatusContext : INotifyPropertyChanged
         Background = e ? Brushes.LightGreen : Brushes.OrangeRed;
     }
 
-    public Progress<long> GetProgressWrapper()
+    public IProgress<long> GetProgress()
     {
         Progress<long> downloadProgress = new();
         downloadProgress.ProgressChanged += (_, e) =>
