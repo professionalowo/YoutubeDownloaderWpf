@@ -5,13 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace YoutubeDownloaderWpf.Services.Logging;
 
 public class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, IDisposable
 {
-    private readonly string _loggerName = loggerName;
+    private readonly Lock _writerLock = new();
     private readonly StreamWriter _writer = new(outStream) { AutoFlush = true };
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
@@ -26,11 +27,15 @@ public class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, 
     }
 
     public bool IsEnabled(LogLevel logLevel)
-    => true;
+        => true;
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+        Func<TState, Exception?, string> formatter)
     {
-        string formatted = $"[{_loggerName}]({logLevel}): {formatter(state, exception)}";
-        _writer.WriteLine(formatted);
+        string formatted = $"[{loggerName}]({logLevel}): {formatter(state, exception)}";
+        lock (_writerLock)
+        {
+            _writer.WriteLine(formatted);
+        }
     }
 }
