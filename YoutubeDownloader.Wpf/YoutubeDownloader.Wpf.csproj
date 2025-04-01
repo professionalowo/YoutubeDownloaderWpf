@@ -42,4 +42,8 @@
 		</Resource>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\YoutubeDownloader.Core\YoutubeDownloader.Core.csproj" />
+	</ItemGroup>
+
 </Project>
