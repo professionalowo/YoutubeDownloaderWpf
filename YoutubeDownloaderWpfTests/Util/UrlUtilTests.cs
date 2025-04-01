@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using YoutubeDownloaderWpf.Util;
+using YoutubeDownloader.Wpf.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;

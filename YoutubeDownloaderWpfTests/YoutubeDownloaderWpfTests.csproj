@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\YoutubeDownloaderWpf\YoutubeDownloaderWpf.csproj" />
+		<ProjectReference Include="..\YoutubeDownloader.Wpf\YoutubeDownloader.Wpf.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
