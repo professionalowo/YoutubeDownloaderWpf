@@ -1,4 +1,6 @@
-﻿namespace YoutubeDownloader.Core.Data;
+﻿using YoutubeDownloader.Core.Services.Converter;
 
-public readonly record struct DownloadData<TData,TContext>(TData Data, TContext Context);
+namespace YoutubeDownloader.Core.Data;
 
+public readonly record struct DownloadData<TData, TContext>(TData Data, TContext Context)
+    where TContext : IConverter.IConverterContext;
