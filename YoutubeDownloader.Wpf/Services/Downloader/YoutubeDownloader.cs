@@ -79,8 +79,8 @@ public class YoutubeDownloader(
     public async Task Cancel()
     {
         await CancellationSource.CancelAsync().ConfigureAwait(false);
-        await DispatchToUI(DownloadStatuses.Clear);
         CancellationSource = new();
+        await DispatchToUI(DownloadStatuses.Clear);
     }
 
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url, CancellationToken token = default)
