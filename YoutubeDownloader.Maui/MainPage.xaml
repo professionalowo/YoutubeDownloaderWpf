@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="YoutubeDownloader.Maui.MainPage">
     <VerticalStackLayout
-        Padding="30,0"
+        Padding="30,15"
         Spacing="25">
         <Grid HorizontalOptions="Fill"
               VerticalOptions="Center"
