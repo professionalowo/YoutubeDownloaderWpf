@@ -1,4 +1,4 @@
-﻿namespace Maui;
+﻿namespace YoutubeDownloader.Maui;
 
 public partial class MainPage : ContentPage
 {

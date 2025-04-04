@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace Maui;
+namespace YoutubeDownloader.Maui;
 
 public class Program
 {

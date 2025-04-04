@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
 
-namespace Maui;
+namespace YoutubeDownloader.Maui;
 
 public static class MauiProgram
 {
