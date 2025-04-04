@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Hosting;
+using Microsoft.Maui.Controls.Hosting;
 
 
 namespace YoutubeDownloader.Maui;

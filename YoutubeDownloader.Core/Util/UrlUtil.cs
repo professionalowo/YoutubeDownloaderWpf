@@ -1,4 +1,6 @@
-﻿namespace YoutubeDownloader.Core.Util;
+﻿using System;
+
+namespace YoutubeDownloader.Core.Util;
 
 public static class UrlUtil
 {

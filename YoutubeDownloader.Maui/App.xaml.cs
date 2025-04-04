@@ -1,4 +1,7 @@
-﻿namespace YoutubeDownloader.Maui;
+﻿using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+
+namespace YoutubeDownloader.Maui;
 
 public partial class App : Application
 {
