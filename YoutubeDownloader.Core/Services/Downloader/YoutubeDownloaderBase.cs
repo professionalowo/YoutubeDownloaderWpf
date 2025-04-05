@@ -31,46 +31,67 @@ public abstract class YoutubeDownloaderBase<TContext>(
     DownloadFactory<TContext> downloadFactory,
     IDirectory downloads) : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter.IConverterContext
 {
+    private readonly Lock _cancellationSourceLock = new();
+    private readonly Lock _statusesLock = new();
     
-    private string _url = string.Empty;
-
+    
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
     {
-        get => _url;
-        set { _url = value; OnPropertyChanged(); }
-    }
-
-    private bool _forceMp3 = true;
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = "";
     public bool ForceMp3
     {
 
-        get => _forceMp3;
+        get;
         set
         {
-            _forceMp3 = value;
+            field = value;
             OnPropertyChanged();
         }
-    }
-    
-    public ObservableCollection<TContext> DownloadStatuses { get; } = [];
-    private readonly Lock _cancellationSourceLock = new();
-    private CancellationTokenSource _cancellationSource = new();
-    protected CancellationTokenSource CancellationSource
+    } = true;
+    public ObservableCollection<TContext> DownloadStatuses
     {
-        get {
-            lock (_cancellationSourceLock)
+        get
+        {
+            lock (_statusesLock)
             {
-                return _cancellationSource;
+                return field;
             }
         }
-        set {
-            lock (_cancellationSourceLock)
+        set
+        {
+            lock (_statusesLock)
             {
-                _cancellationSource = value;
+                field = value;
+                OnPropertyChanged();
             }
         }
-    }
+    } = [];
+    private CancellationTokenSource CancellationSource
+    {
+        get
+        {
+            lock (_cancellationSourceLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (_cancellationSourceLock)
+            {
+                field = value;
+            }
+        }
+    } = new();
+    
+    
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
     
     public async Task Download()
@@ -110,9 +131,8 @@ public abstract class YoutubeDownloaderBase<TContext>(
                 {
                     var (data, context) = await resolveTask;
                     string fileName = downloads.ChildFileName(data.Segments);
-                    var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
+                    await DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
                     await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
-                    await uiTask;
                     await using Stream mediaStream = data.Stream;
                     await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
                     semaphoreSlim.Release();
