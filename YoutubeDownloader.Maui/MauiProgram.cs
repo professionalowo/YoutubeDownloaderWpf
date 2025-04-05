@@ -1,5 +1,4 @@
-﻿using Foundation;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Hosting;
 using YoutubeDownloader.Core.Data;
