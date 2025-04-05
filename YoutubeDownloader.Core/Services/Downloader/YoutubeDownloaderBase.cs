@@ -131,7 +131,13 @@ public abstract class YoutubeDownloaderBase<TContext>(
                 {
                     var (data, context) = await resolveTask;
                     string fileName = downloads.ChildFileName(data.Segments);
-                    await DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
+                    await DispatchToUi(() =>
+                    {
+                        lock (_statusesLock)
+                        {
+                            DownloadStatuses.Add(context);
+                        }
+                    }, token).ConfigureAwait(false);
                     await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
                     await using Stream mediaStream = data.Stream;
                     await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
