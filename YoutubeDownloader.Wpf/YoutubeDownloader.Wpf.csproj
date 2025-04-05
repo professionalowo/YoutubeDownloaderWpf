@@ -13,6 +13,7 @@
 		<ApplicationIcon>icon.ico</ApplicationIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

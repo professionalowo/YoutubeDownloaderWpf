@@ -18,5 +18,9 @@ public class YoutubeDownloader(ConverterFactory converterFactory,
     => new(name, size);
 
     protected override Task DispatchToUi(Action action, CancellationToken token = default)
-    => Task.Run(action, token);
+    => Dispatcher.GetForCurrentThread() switch
+        {
+            null => Task.Run(action, token),
+            var dispatcher => dispatcher.DispatchAsync(action)
+        };
 }

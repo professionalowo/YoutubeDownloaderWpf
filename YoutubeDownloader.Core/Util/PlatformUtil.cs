@@ -10,4 +10,10 @@ public class PlatformUtil
     
     
     public static string AsExecutablePath(string executablePath) => IsWindows() ? Path.ChangeExtension(executablePath,"exe") : executablePath;
+
+    public static string GetExplorer()
+    {
+        if (IsWindows()) return "explorer.exe";
+        return "open";
+    }
 }

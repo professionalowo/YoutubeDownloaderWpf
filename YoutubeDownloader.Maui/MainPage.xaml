@@ -2,16 +2,26 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:data="clr-namespace:YoutubeDownloader.Core.Data;assembly=YoutubeDownloader.Core"
+             xmlns:downloader="clr-namespace:YoutubeDownloader.Maui.Services"
+             x:DataType="downloader:YoutubeDownloader"
              x:Class="YoutubeDownloader.Maui.MainPage">
-    <VerticalStackLayout
-        Padding="30,15"
-        Spacing="25">
-        <Grid HorizontalOptions="Fill"
+    <Grid
+        Padding="30,15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0"
+              HorizontalOptions="Fill"
               VerticalOptions="Center"
               ColumnSpacing="25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" VerticalTextAlignment="Center"
@@ -20,8 +30,37 @@
             <Entry Grid.Column="1" ReturnType="Search"
                    HorizontalOptions="Fill"
                    VerticalTextAlignment="Center"
-                   Placeholder="https://youtube.com" />
-            <Button Grid.Column="2" Text="Download"/>
+                   Placeholder="https://youtube.com" Text="{Binding Url}" />
+            <Button Grid.Column="2"
+                    Text="Download"
+                    Clicked="Download_OnClicked" />
+            <Label Grid.Column="3"
+                   Text="Force Mp3"
+                   VerticalOptions="Center" />
+            <CheckBox Grid.Column="4"
+                      VerticalOptions="Center"
+                      IsChecked="{Binding Path=ForceMp3, Mode=TwoWay}" />
         </Grid>
-    </VerticalStackLayout>
+        <ListView Grid.Row="1" VerticalOptions="Fill" ItemsSource="{Binding DownloadStatuses ,Mode=TwoWay}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="data:DownloadContext">
+                    <ViewCell>
+                        <Grid VerticalOptions="Fill">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Text="{Binding Name}" VerticalOptions="Center" />
+                            <ProgressBar Grid.Column="1" Progress="{Binding ProgressValue}" Background="White"
+                                         VerticalOptions="Fill" ProgressColor="#FF41C127" />
+                            <Label Grid.Column="2" Text="{Binding Size}" HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button Grid.Row="2" Text="Open Downloads" Clicked="Open_OnClicked" />
+    </Grid>
 </ContentPage>

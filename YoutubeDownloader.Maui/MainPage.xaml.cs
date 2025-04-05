@@ -7,11 +7,23 @@ namespace YoutubeDownloader.Maui;
 using Microsoft.Maui.Controls;
 public partial class MainPage : ContentPage
 {
-    private readonly Services.YoutubeDownloader downloader;
-    public MainPage(Services.YoutubeDownloader downloader)
+    private readonly Services.YoutubeDownloader _downloader;
+    private readonly IDirectory _downloads;
+    public MainPage(Services.YoutubeDownloader downloader,IDirectory downloads)
     {
-        this.downloader = downloader;
+        _downloader = downloader;
+        _downloads = downloads;
         BindingContext = downloader;
         InitializeComponent();
+    }
+
+    private async void Download_OnClicked(object? sender, EventArgs e)
+    {
+        await _downloader.Download();
+    }
+
+    private void Open_OnClicked(object? sender, EventArgs e)
+    {
+        _downloads.Open();
     }
 }

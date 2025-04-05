@@ -52,6 +52,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
             OnPropertyChanged();
         }
     }
+    
     public ObservableCollection<TContext> DownloadStatuses { get; } = [];
     private readonly Lock _cancellationSourceLock = new();
     private CancellationTokenSource _cancellationSource = new();
@@ -74,14 +75,21 @@ public abstract class YoutubeDownloaderBase<TContext>(
     
     public async Task Download()
     {
-        await DispatchToUi(DownloadStatuses.Clear).ConfigureAwait(false);
+        await DispatchToUi(ClearStatuses).ConfigureAwait(false);
         await DownloadAction(Url, CancellationSource.Token).ConfigureAwait(false);
     }
 
+
+    private void ClearStatuses()
+    {
+        DownloadStatuses.Clear();
+        OnPropertyChanged(nameof(DownloadStatuses));
+    }
+    
     public async Task Cancel()
     {
         await CancellationSource.CancelAsync().ConfigureAwait(false);
-        await DispatchToUi(DownloadStatuses.Clear).ConfigureAwait(false);
+        await DispatchToUi(ClearStatuses).ConfigureAwait(false);
         CancellationSource = new();
     }
 
@@ -102,7 +110,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
                 {
                     var (data, context) = await resolveTask;
                     string fileName = downloads.ChildFileName(data.Segments);
-                    var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token);
+                    var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
                     await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
                     await uiTask;
                     await using Stream mediaStream = data.Stream;

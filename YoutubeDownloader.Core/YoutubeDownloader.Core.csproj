@@ -4,6 +4,7 @@
         <TargetFrameworks>net9.0;net9.0-maccatalyst</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

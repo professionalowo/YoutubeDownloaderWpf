@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.InternalDirectory;
 
@@ -20,7 +21,7 @@ public interface IDirectory
     void Open()
     {
         Init();
-        Process.Start("explorer.exe", FullPath);
+        Process.Start(PlatformUtil.GetExplorer(), FullPath);
     }
 
     string ChildFileName(params string[] fileNames) => Path.Combine([FullPath, .. fileNames.Where(s => !string.IsNullOrEmpty(s))]);
