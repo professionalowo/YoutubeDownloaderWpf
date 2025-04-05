@@ -7,19 +7,19 @@ namespace YoutubeDownloader.Maui;
 
 public partial class App : Application
 {
-    private readonly FfmpegDownloader ffmpegDownloader;
+    private readonly FfmpegDownloader _ffmpegDownloader;
     public App(FfmpegDownloader ffmpegDownloader)
     {
-        this.ffmpegDownloader = ffmpegDownloader;
+        _ffmpegDownloader = ffmpegDownloader;
         InitializeComponent();
     }
 
     protected async override void OnStart()
     {
         base.OnStart();
-        if (!ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOS()) //can't do shit on mac
+        if (!_ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOS()) //can't do shit on mac
         {
-            await ffmpegDownloader.DownloadFfmpeg();
+            await _ffmpegDownloader.DownloadFfmpeg();
         }
     }
 
