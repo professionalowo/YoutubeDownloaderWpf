@@ -29,5 +29,7 @@
 	<array>
 		<string>fetch</string>
 	</array>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string></string>
 </dict>
 </plist>
