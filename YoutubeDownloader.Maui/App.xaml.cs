@@ -17,7 +17,7 @@ public partial class App : Application
     protected async override void OnStart()
     {
         base.OnStart();
-        if (!_ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOS()) //can't do shit on mac
+        if (!_ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOs()) //can't do shit on mac
         {
             await _ffmpegDownloader.DownloadFfmpeg();
         }

@@ -13,7 +13,7 @@ public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
     public FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
     => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? defaultConfig;
 
-    private static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
+    public static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
     {
         string replacedExe = PlatformUtil.AsExecutablePath(exe);
         string[] paths = [.. SplitPath(Environment.GetEnvironmentVariable("PATH")), .. SplitPath(Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User))];

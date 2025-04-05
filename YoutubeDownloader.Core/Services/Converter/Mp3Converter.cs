@@ -28,8 +28,9 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
             context.InvokeDownloadFinished(this, false);
             File.Delete(mp3Path);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Console.WriteLine(e);
             File.Delete(mp3Path);
             throw;
         }

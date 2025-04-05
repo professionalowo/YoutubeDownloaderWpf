@@ -69,7 +69,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Platforms\MacCatalyst\Resources\" />
       <Folder Include="Resources\Images\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Platforms\Windows\PlatformSpecificServiceExtensions.cs" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Foundation;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Hosting;
 using YoutubeDownloader.Core.Data;
@@ -10,7 +11,7 @@ using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
-using YoutubeDownloader.Wpf.Services.Logging;
+using YoutubeDownloader.Maui.Util;
 using YoutubeExplode;
 
 
@@ -81,7 +82,7 @@ static class ServicesExtensions
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
-        serviceCollection.AddSingleton<FfmpegDownloader.Config>(new FfmpegConfigFactory(new(_directory.Value)).ResolveConfig);
+        serviceCollection.AddFfmpeg(_directory.Value);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }
