@@ -16,6 +16,7 @@
         <Grid Grid.Row="0"
               HorizontalOptions="Fill"
               VerticalOptions="Center"
+              Padding="0,15"
               ColumnSpacing="25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>

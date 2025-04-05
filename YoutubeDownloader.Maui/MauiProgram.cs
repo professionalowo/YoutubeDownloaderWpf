@@ -45,8 +45,7 @@ static class ServicesExtensions
 {
     private static Lazy<IDirectory> _directory = new (() =>
     {
-        string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Downloads");
-        string path = Path.Combine(downloadsPath, "YoutubeDownloader");
+        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YoutubeDownloader");
         IDirectory dir = new AbsoluteDirectory(path);
         return dir;
     });
