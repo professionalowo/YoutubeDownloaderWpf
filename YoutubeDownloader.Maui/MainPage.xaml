@@ -31,7 +31,9 @@
             <Entry Grid.Column="1" ReturnType="Search"
                    HorizontalOptions="Fill"
                    VerticalTextAlignment="Center"
-                   Placeholder="https://youtube.com" Text="{Binding Url}" />
+                   Placeholder="https://youtube.com"
+                   Text="{Binding Url}"
+                   Completed="Download_OnClicked"/>
             <Button Grid.Column="2"
                     Text="Download"
                     Clicked="Download_OnClicked" />
