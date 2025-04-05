@@ -19,6 +19,7 @@ using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
+using YoutubeDownloader.Core.Services.Downloader;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;
 
@@ -27,13 +28,13 @@ public class YoutubeDownloader(
     SystemInfo info,
     ILogger<YoutubeDownloader> logger,
     DownloadFactory<DownloadStatusContext> downloadFactory,
-    IDirectory downloads) : Core.Services.Downloader.YoutubeDownloader<DownloadStatusContext>(converterFactory, info, logger, downloadFactory, downloads)
+    IDirectory downloads) : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, info, logger, downloadFactory, downloads)
 {
 
     protected override async Task DispatchToUi(Action action, CancellationToken cancellationToken = default)
         => await Dispatch(action, cancellationToken);
 
     protected override DownloadStatusContext ContextFactory(string name, double size)
-    => new (name, size);
+        => new (name, size);
     static DispatcherOperation Dispatch(Action action, CancellationToken token = default) => Application.Current.Dispatcher.InvokeAsync(action, DispatcherPriority.Render, token);
 }

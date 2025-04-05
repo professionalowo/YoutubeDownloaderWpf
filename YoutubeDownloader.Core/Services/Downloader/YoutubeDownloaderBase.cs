@@ -24,10 +24,10 @@ using YoutubeDownloader.Wpf.Data;
 
 namespace YoutubeDownloader.Core.Services.Downloader;
 
-public abstract class YoutubeDownloader<TContext>(
+public abstract class YoutubeDownloaderBase<TContext>(
     ConverterFactory converterFactory,
     SystemInfo info,
-    ILogger<YoutubeDownloader<TContext>> logger,
+    ILogger<YoutubeDownloaderBase<TContext>> logger,
     DownloadFactory<TContext> downloadFactory,
     IDirectory downloads) : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter.IConverterContext
 {
@@ -74,14 +74,14 @@ public abstract class YoutubeDownloader<TContext>(
     
     public async Task Download()
     {
-        await DispatchToUi(DownloadStatuses.Clear);
+        await DispatchToUi(DownloadStatuses.Clear).ConfigureAwait(false);
         await DownloadAction(Url, CancellationSource.Token).ConfigureAwait(false);
     }
 
     public async Task Cancel()
     {
         await CancellationSource.CancelAsync().ConfigureAwait(false);
-        await DispatchToUi(DownloadStatuses.Clear);
+        await DispatchToUi(DownloadStatuses.Clear).ConfigureAwait(false);
         CancellationSource = new();
     }
 
