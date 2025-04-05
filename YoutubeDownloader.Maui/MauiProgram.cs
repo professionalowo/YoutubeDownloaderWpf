@@ -82,7 +82,7 @@ static class ServicesExtensions
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
-        serviceCollection.AddSingleton<FfmpegDownloader.Config>(_ => new(_directory.Value,FfmpegDownloader.Config.FfmpegName));
+        serviceCollection.AddSingleton<FfmpegDownloader.Config>(new FfmpegConfigFactory(new(_directory.Value)).ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }

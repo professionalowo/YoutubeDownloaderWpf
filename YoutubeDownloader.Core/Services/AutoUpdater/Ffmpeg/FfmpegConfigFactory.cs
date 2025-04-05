@@ -5,16 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-public class FfmpegConfigFactory
+public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
 {
-    public static FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
-    => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? FfmpegDownloader.Config.Default;
+    public FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
+    => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? defaultConfig;
 
     private static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
     {
-        string replacedExe = Path.ChangeExtension(exe, "exe");
+        string replacedExe = PlatformUtil.AsExecutablePath(exe);
         string[] paths = [.. SplitPath(Environment.GetEnvironmentVariable("PATH")), .. SplitPath(Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User))];
         foreach (string path in paths.Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)))
         {
@@ -26,5 +27,10 @@ public class FfmpegConfigFactory
         return null;
     }
 
-    private static string[] SplitPath(string? variable) => (variable ?? "").Split(';');
+    private static string[] SplitPath(string? variable)
+    {
+        string toSplit = variable ?? ""; 
+        char separator = PlatformUtil.IsWindows() ? ';' : ':';
+        return toSplit.Split(separator);
+    }
 }

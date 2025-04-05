@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
+using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Maui;
 
@@ -16,7 +17,7 @@ public partial class App : Application
     protected async override void OnStart()
     {
         base.OnStart();
-        if (!ffmpegDownloader.DoesFfmpegExist())
+        if (!ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOS()) //can't do shit on mac
         {
             await ffmpegDownloader.DownloadFfmpeg();
         }
