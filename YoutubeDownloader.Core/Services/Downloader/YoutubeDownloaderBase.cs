@@ -33,8 +33,8 @@ public abstract class YoutubeDownloaderBase<TContext>(
 {
     private readonly Lock _cancellationSourceLock = new();
     private readonly Lock _statusesLock = new();
-    
-    
+
+
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
     {
@@ -45,9 +45,9 @@ public abstract class YoutubeDownloaderBase<TContext>(
             OnPropertyChanged();
         }
     } = "";
+
     public bool ForceMp3
     {
-
         get;
         set
         {
@@ -55,6 +55,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
             OnPropertyChanged();
         }
     } = true;
+
     public ObservableCollection<TContext> DownloadStatuses
     {
         get
@@ -73,6 +74,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
             }
         }
     } = [];
+
     private CancellationTokenSource CancellationSource
     {
         get
@@ -90,10 +92,10 @@ public abstract class YoutubeDownloaderBase<TContext>(
             }
         }
     } = new();
-    
-    
+
+
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
-    
+
     public async Task Download()
     {
         await DispatchToUi(ClearStatuses).ConfigureAwait(false);
@@ -106,7 +108,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
         DownloadStatuses.Clear();
         OnPropertyChanged(nameof(DownloadStatuses));
     }
-    
+
     public async Task Cancel()
     {
         await CancellationSource.CancelAsync().ConfigureAwait(false);
@@ -115,8 +117,9 @@ public abstract class YoutubeDownloaderBase<TContext>(
     }
 
     protected abstract TContext ContextFactory(string name, double size);
-    
-    protected async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url, CancellationToken token = default)
+
+    protected async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
+        CancellationToken token = default)
     {
         try
         {
@@ -125,26 +128,22 @@ public abstract class YoutubeDownloaderBase<TContext>(
             SemaphoreSlim semaphoreSlim = new(info.Cores);
             await foreach (var download in downloadFactory.Get(url))
             {
-                Func<Task<DownloadData<StreamData,TContext>>> downloadAction = async () => await download.GetStreamAsync(ContextFactory,token).ConfigureAwait(false);
-                var streamTask = Task.Run(downloadAction,token)
+                Func<Task<DownloadData<StreamData, TContext>>> downloadAction = async () =>
+                    await download.GetStreamAsync(ContextFactory, token).ConfigureAwait(false);
+                var streamTask = Task.Run(downloadAction, token)
                     .ContinueWith((async (resolveTask) =>
-                {
-                    var (data, context) = await resolveTask;
-                    string fileName = downloads.ChildFileName(data.Segments);
-                    await DispatchToUi(() =>
                     {
-                        lock (_statusesLock)
-                        {
-                            DownloadStatuses.Add(context);
-                        }
-                    }, token).ConfigureAwait(false);
-                    await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
-                    await using Stream mediaStream = data.Stream;
-                    await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
-                    semaphoreSlim.Release();
-                }), token);
+                        var (data, context) = await resolveTask;
+                        string fileName = downloads.ChildFileName(data.Segments);
+                        await DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
+                        await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
+                        await using Stream mediaStream = data.Stream;
+                        await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
+                        semaphoreSlim.Release();
+                    }), token);
                 tasks.Add(streamTask);
             }
+
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is OperationCanceledException)
@@ -160,5 +159,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
