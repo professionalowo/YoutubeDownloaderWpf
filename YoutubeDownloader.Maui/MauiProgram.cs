@@ -43,7 +43,7 @@ public static class MauiProgram
 
 static class ServicesExtensions
 {
-    private static Lazy<IDirectory> _directory = new (() =>
+    private static readonly Lazy<IDirectory> _baseDirectory = new (() =>
     {
         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YoutubeDownloader");
         IDirectory dir = new AbsoluteDirectory(path);
@@ -65,9 +65,10 @@ static class ServicesExtensions
         serviceCollection.AddTransient<Services.YoutubeDownloader>();
         serviceCollection.AddSingleton<IDirectory>(_ =>
         {
-            var dir = _directory.Value;
-            dir.Init();
-            return dir;
+
+            IDirectory child = new ChildDirectory(_baseDirectory.Value, "Downloads");
+            child.Init();
+            return child;
         });
         serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory<DownloadContext>>();
@@ -81,7 +82,7 @@ static class ServicesExtensions
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
-        serviceCollection.AddFfmpeg(_directory.Value);
+        serviceCollection.AddFfmpeg(new ChildDirectory(_baseDirectory.Value, "ffmpeg"));
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }
