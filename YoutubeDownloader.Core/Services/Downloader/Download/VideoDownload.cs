@@ -12,7 +12,7 @@ using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util.Extensions;
-using YoutubeDownloader.Wpf.Data;
+using YoutubeDownloader.Core.Data;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 using Container = YoutubeExplode.Videos.Streams.Container;

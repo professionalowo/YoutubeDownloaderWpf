@@ -5,6 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Wpf.Data;
+namespace YoutubeDownloader.Core.Data;
 public readonly record struct StreamData(Stream Stream, string[] Segments);
 
