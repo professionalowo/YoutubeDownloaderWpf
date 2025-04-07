@@ -28,28 +28,29 @@ public class VideoDownload<TContext>(
 
     public async ValueTask<DownloadData<StreamData,TContext>> GetStreamAsync(Func<string,double,TContext> contextFactory,CancellationToken token = default)
     {
-        var nameTask = GetName(token);
-        var streamInfo = await GetStreamInfo(token);
-        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token);
+        var nameTask = GetName(token).ConfigureAwait(false);
+        var streamInfo = await GetStreamInfo(token).ConfigureAwait(false);
+        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token).ConfigureAwait(false);
 
         var name = await nameTask;
         TContext statusContext = contextFactory(name, streamInfo.Size.MegaBytes);
-        StreamData data = new(await streamTask, [path, name]);
+        var stream = await streamTask;
+        StreamData data = new(stream, [path, name]);
         return new(data, statusContext);
     }
 
     private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
     {
-        var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token);
+        var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token).ConfigureAwait(false);
         var streamInfo = streamManifest.GetAudioStreams()
             //.Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4)
             .GetWithHighestBitrate();
         return streamInfo;
     }
 
-    public async ValueTask<string> GetName(CancellationToken token = default)
+    private async ValueTask<string> GetName(CancellationToken token = default)
     {
-        var video = await client.Videos.GetAsync(url, token);
+        var video = await client.Videos.GetAsync(url, token).ConfigureAwait(false);
         return video.Title.ReplaceIllegalCharacters();
     }
 }
