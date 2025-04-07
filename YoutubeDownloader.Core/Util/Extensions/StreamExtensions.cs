@@ -33,7 +33,7 @@ public static class StreamExtensions
         // Ensure buffer size is a multiple of 4
         Span<byte> buffer = stackalloc byte[1024 * 1024];  // Buffer size: multiple of 4
         long totalBytesRead = 0;
-        int bytesRead = 0;
+        int bytesRead;
         while ((bytesRead = input.Read(buffer)) > 0)
         {
             
