@@ -8,16 +8,17 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Maui.Services;
 
-public class YoutubeDownloader(ConverterFactory converterFactory,
+public class YoutubeDownloader(
+    ConverterFactory converterFactory,
     SystemInfo info,
     ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
     DownloadFactory<DownloadContext> downloadFactory,
-    IDirectory downloads) : YoutubeDownloaderBase<DownloadContext>(converterFactory, info, logger, downloadFactory, downloads)
+    IDirectory downloads)
+    : YoutubeDownloaderBase<DownloadContext>(converterFactory, info, logger, downloadFactory, downloads)
 {
     protected override DownloadContext ContextFactory(string name, double size)
-    => new(name, size);
+        => new(name, size);
 
     protected override Task DispatchToUi(Action action, CancellationToken token = default)
-    => MainThread.InvokeOnMainThreadAsync(action);
-
+        => MainThread.InvokeOnMainThreadAsync(action);
 }
