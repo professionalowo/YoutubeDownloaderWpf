@@ -17,12 +17,12 @@ public class FfmpegMp3Conversion(FfmpegDownloader.Config config, string outPath)
         p.Start();
         return p;
     });
-    public Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
+    public Stream Input => Stream.Synchronized(_ffmpegProcess.Value.StandardInput.BaseStream);
     private static Process CreateProcess(FfmpegDownloader.Config config, string outPath)
     {
-        return new()
+        return new Process
         {
-            StartInfo = new(config.FfmpegExeFullPath, GetArguments(outPath))
+            StartInfo = new ProcessStartInfo(config.FfmpegExeFullPath, GetArguments(outPath))
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
