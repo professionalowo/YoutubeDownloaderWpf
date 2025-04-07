@@ -62,6 +62,7 @@ static class ServicesExtensions
 
     public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"));
         serviceCollection.AddTransient<Services.YoutubeDownloader>();
         serviceCollection.AddSingleton<IDirectory>(_ =>
         {
@@ -82,7 +83,6 @@ static class ServicesExtensions
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
-        serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"));
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }
