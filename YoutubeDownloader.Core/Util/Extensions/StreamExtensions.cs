@@ -17,10 +17,10 @@ public static class StreamExtensions
         Memory<byte> buffer = new byte[1024 * 1024];  // Buffer size: multiple of 4
         long totalBytesRead = 0;
         int bytesRead = 0;
-        while ((bytesRead = await input.ReadAsync(buffer, cancellationToken)) > 0)
+        while ((bytesRead = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
         {
             
-            await destination.WriteAsync(buffer[..bytesRead], cancellationToken);
+            await destination.WriteAsync(buffer[..bytesRead], cancellationToken).ConfigureAwait(false);
             totalBytesRead += bytesRead;
 
             // Report progress

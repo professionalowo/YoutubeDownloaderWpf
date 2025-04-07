@@ -19,7 +19,7 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
         try
         {
             await using FfmpegMp3Conversion conversion = new(config, mp3Path);
-            await data.CopyToAsyncTracked(conversion.Input, context.GetProgress(), token);
+            await data.CopyToAsyncTracked(conversion.Input, context.GetProgress(), token).ConfigureAwait(false);
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
         }
