@@ -32,7 +32,6 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services.AddLogging();
         builder.Services.AddHttp();
         builder.Services.AddDownloadServices();
         builder.Services.AddUpdaters();
