@@ -13,20 +13,19 @@ namespace YoutubeDownloader.Core.Services.Converter;
 
 public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
 {
-    public async ValueTask<string?> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
+    
+    public ValueTask<string?> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
+    => ValueTask.FromResult(ConvertSync(data, outPath, context));
+
+    private string? ConvertSync(Stream data, string outPath, IConverter.IConverterContext context)
     {
-        string mp3Path = $"{outPath}.mp3";
+        var mp3Path = $"{outPath}.mp3";
         try
         {
-            await using FfmpegMp3Conversion conversion = new(config, mp3Path);
-            await data.CopyToAsyncTracked(conversion.Input, context.GetProgress(), token).ConfigureAwait(false);
+            using FfmpegMp3Conversion conversion = new(config, mp3Path);
+            data.CopyToTracked(conversion.Input, context.GetProgress());
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
-        }
-        catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
-        {
-            context.InvokeDownloadFinished(this, false);
-            File.Delete(mp3Path);
         }
         catch (Exception e)
         {
@@ -34,6 +33,5 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
             File.Delete(mp3Path);
             throw;
         }
-        return null;
     }
 }

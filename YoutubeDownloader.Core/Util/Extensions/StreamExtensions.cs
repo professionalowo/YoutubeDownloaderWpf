@@ -27,4 +27,20 @@ public static class StreamExtensions
             progress?.Report(totalBytesRead);
         }
     }
+    
+    public static void CopyToTracked(this Stream input, Stream destination, IProgress<long> progress)
+    {
+        // Ensure buffer size is a multiple of 4
+        Span<byte> buffer = stackalloc byte[1024 * 1024];  // Buffer size: multiple of 4
+        long totalBytesRead = 0;
+        int bytesRead = 0;
+        while ((bytesRead = input.Read(buffer)) > 0)
+        {
+            
+            destination.Write(buffer[..bytesRead]);
+            totalBytesRead += bytesRead;
+            // Report progress
+            progress?.Report(totalBytesRead);
+        }
+    }
 }
