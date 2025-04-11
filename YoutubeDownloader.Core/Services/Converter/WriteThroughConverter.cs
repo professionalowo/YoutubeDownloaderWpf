@@ -11,7 +11,7 @@ namespace YoutubeDownloader.Core.Services.Converter;
 
 public class WriteThroughConverter(string extension) : IConverter
 {
-    public async ValueTask<string?> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
+    public async ValueTask<string> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
     {
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
         try
@@ -25,12 +25,12 @@ public class WriteThroughConverter(string extension) : IConverter
         {
             context.InvokeDownloadFinished(this, false);
             fileInfo.Delete();
+            throw;
         }
         catch (Exception)
         {
             fileInfo.Delete();
             throw;
         }
-        return null;
     }
 }

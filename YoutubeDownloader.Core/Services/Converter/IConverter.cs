@@ -16,6 +16,6 @@ public interface IConverter
         void InvokeDownloadFinished(object sender, bool finished);
     }
 
-    public ValueTask<string?> Convert(Stream data, string outPath, IConverterContext context,
+    public ValueTask<string> Convert(Stream data, string outPath, IConverterContext context,
         CancellationToken token = default);
 }
