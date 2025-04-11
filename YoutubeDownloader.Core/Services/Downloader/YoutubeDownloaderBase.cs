@@ -125,12 +125,10 @@ public abstract class YoutubeDownloaderBase<TContext>(
             IConverter converter = converterFactory.GetConverter(ForceMp3);
             List<Task> tasks = new(20);
             SemaphoreSlim semaphoreSlim = new(info.Cores);
-            await foreach (var download in downloadFactory.Get(url))
+            await foreach (VideoDownload<TContext> download in downloadFactory.Get(url))
             {
-                Func<Task<DownloadData<StreamData, TContext>>> downloadAction = async () =>
-                    await download.GetStreamAsync(ContextFactory, token).ConfigureAwait(false);
-                var streamTask = Task.Run(downloadAction, token)
-                    .ContinueWith((async (resolveTask) =>
+                var streamTask = Task.Run(DownloadThis, token)
+                    .ContinueWith(async (resolveTask) =>
                     {
                         var (data, context) = await resolveTask;
                         string fileName = downloads.ChildFileName(data.Segments);
@@ -139,11 +137,15 @@ public abstract class YoutubeDownloaderBase<TContext>(
                         await using Stream mediaStream = data.Stream;
                         await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
                         semaphoreSlim.Release();
-                    }), token);
+                    }, token);
                 tasks.Add(streamTask);
+                continue;
+                async Task<DownloadData<StreamData, TContext>> DownloadThis()
+                    => await download.GetStreamAsync(ContextFactory, token).ConfigureAwait(false);
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
+            
         }
         catch (Exception ex) when (ex is OperationCanceledException)
         {
