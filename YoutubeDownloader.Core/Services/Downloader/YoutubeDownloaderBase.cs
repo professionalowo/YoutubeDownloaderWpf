@@ -147,11 +147,9 @@ public abstract class YoutubeDownloaderBase<TContext>(
             await Task.WhenAll(tasks).ConfigureAwait(false);
             
         }
-        catch (Exception ex) when (ex is OperationCanceledException)
+        catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
         {
-        }
-        catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
-        {
+            //ignore these since they are most likely produced by the user
         }
         catch (Exception e)
         {
