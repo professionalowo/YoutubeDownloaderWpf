@@ -15,9 +15,9 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
 {
     
     public ValueTask<string?> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
-    => ValueTask.FromResult(ConvertSync(data, outPath, context));
+    => ValueTask.FromResult<string?>(ConvertSync(data, outPath, context));
 
-    private string? ConvertSync(Stream data, string outPath, IConverter.IConverterContext context)
+    private string ConvertSync(Stream data, string outPath, IConverter.IConverterContext context)
     {
         var mp3Path = $"{outPath}.mp3";
         try
