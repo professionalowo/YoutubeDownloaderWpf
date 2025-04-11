@@ -9,20 +9,20 @@ using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class FfmpegMp3Conversion(FfmpegDownloader.Config config, string outPath) : IDisposable, IAsyncDisposable
+public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : IDisposable, IAsyncDisposable
 {
     private readonly Lazy<Process> _ffmpegProcess = new(() =>
     {
-        var p = CreateProcess(config, outPath);
+        var p = CreateProcess(ffmpegAbsolutePath, outPath);
         p.Start();
         return p;
     });
     public Stream Input => Stream.Synchronized(_ffmpegProcess.Value.StandardInput.BaseStream);
-    private static Process CreateProcess(FfmpegDownloader.Config config, string outPath)
+    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath)
     {
         return new Process
         {
-            StartInfo = new ProcessStartInfo(config.FfmpegExeFullPath, GetArguments(outPath))
+            StartInfo = new ProcessStartInfo(ffmpegAbsolutePath, GetArguments(outPath))
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,

@@ -22,7 +22,7 @@ public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
         var mp3Path = $"{outPath}.mp3";
         try
         {
-            using FfmpegMp3Conversion conversion = new(config, mp3Path);
+            using FfmpegMp3Conversion conversion = new(config.FfmpegExeFullPath, mp3Path);
             data.CopyToTracked(conversion.Input, context.GetProgress());
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
