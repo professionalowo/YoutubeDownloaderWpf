@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public class DownloadFactory<TContext>(YoutubeClient client, IDirectory downloads) where TContext: IConverter.IConverterContext
+public class DownloadFactory<TContext>(YoutubeClient client, IDirectory downloads)
+    where TContext : IConverter.IConverterContext
 {
-    public async IAsyncEnumerable<VideoDownload<TContext>> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url)
+    public async IAsyncEnumerable<VideoDownload<TContext>> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
+        [EnumeratorCancellation] CancellationToken token = default)
     {
+        token.ThrowIfCancellationRequested();
         var last = url.Split('/').Last().First();
         if (last == 'w')
         {
@@ -21,7 +20,10 @@ public class DownloadFactory<TContext>(YoutubeClient client, IDirectory download
         }
         else
         {
-            await foreach (var download in new PlaylistDownload<TContext>(client, url, downloads))
+            var playlist = new PlaylistDownload<TContext>(client, url, downloads)
+                .WithCancellation(token)
+                .ConfigureAwait(false);
+            await foreach (var download in playlist)
             {
                 yield return download;
             }
