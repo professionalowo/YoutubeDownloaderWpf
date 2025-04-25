@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Channels;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
@@ -106,36 +107,35 @@ public abstract class YoutubeDownloaderBase<TContext>(
 
     protected abstract TContext ContextFactory(string name, double size);
 
+    private async Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader)
+    {
+        await Parallel.ForEachAsync(reader.ReadAllAsync(), ProcessDownload);
+    }
+
+    private async ValueTask ProcessDownload(VideoDownload<TContext> download,CancellationToken token = default)
+    {
+        var (data, context) = await download.GetStreamAsync(ContextFactory, token).ConfigureAwait(false);;
+        string fileName = downloads.ChildFileName(data.Segments);
+        await DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
+        await using Stream mediaStream = data.Stream;
+        var converter = converterFactory.GetConverter(ForceMp3);
+        await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
+    }
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
+        var enumerable = downloadFactory.Get(url, token).ConfigureAwait(false);
         try
         {
-            var converter = converterFactory.GetConverter(ForceMp3);
-            List<Task> tasks = new(20);
-            SemaphoreSlim semaphoreSlim = new(info.Cores);
-            var enumerable = downloadFactory.Get(url, token).ConfigureAwait(false);
+            var channel = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
+            var consumer = ProcessChannel(channel.Reader);
             await foreach (var download in enumerable)
             {
-                var streamTask = Task.Run(DownloadThis, token)
-                    .ContinueWith(async (resolveTask) =>
-                    {
-                        var (data, context) = await resolveTask;
-                        string fileName = downloads.ChildFileName(data.Segments);
-                        await DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
-                        await semaphoreSlim.WaitAsync(token).ConfigureAwait(false);
-                        await using Stream mediaStream = data.Stream;
-                        await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
-                        semaphoreSlim.Release();
-                    }, token);
-                tasks.Add(streamTask);
-                continue;
-
-                async Task<DownloadData<StreamData, TContext>> DownloadThis()
-                    => await download.GetStreamAsync(ContextFactory, token).ConfigureAwait(false);
+                await channel.Writer.WriteAsync(download, token).ConfigureAwait(false);
             }
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            channel.Writer.Complete();
+            await consumer.ConfigureAwait(false);
+            
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
         {
