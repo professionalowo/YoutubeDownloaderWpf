@@ -115,8 +115,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         var converter = converterFactory.GetConverter(ForceMp3);
         var downloadSource = reader.ReadAllAsync(token);
-        var downloadConsumer = ProcessDownloadFactory(converter);
-        await Parallel.ForEachAsync(downloadSource, token, downloadConsumer);
+        await Parallel.ForEachAsync(downloadSource, token, ProcessDownloadFactory(converter));
     }
 
     private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(IConverter converter)
