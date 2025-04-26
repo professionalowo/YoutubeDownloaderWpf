@@ -138,10 +138,10 @@ public abstract class YoutubeDownloaderBase<TContext>(
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var enumerable = downloadFactory.Get(url, token)
-            .ConfigureAwait(false);
         var channel = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
         var consumer = ProcessChannel(channel.Reader, token)
+            .ConfigureAwait(false);
+        var enumerable = downloadFactory.Get(url, token)
             .ConfigureAwait(false);
         try
         {
