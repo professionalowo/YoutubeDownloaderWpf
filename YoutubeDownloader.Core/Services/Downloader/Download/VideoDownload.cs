@@ -21,22 +21,27 @@ namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
 public class VideoDownload<TContext>(
     YoutubeClient client,
-    [StringSyntax(StringSyntaxAttribute.Uri)] string url,
+    [StringSyntax(StringSyntaxAttribute.Uri)]
+    string url,
     string path = "") where TContext : IConverter.IConverterContext
 {
     public string Path => path;
 
-    public async ValueTask<DownloadData<StreamData,TContext>> GetStreamAsync(Func<string,double,TContext> contextFactory,CancellationToken token = default)
+    public async ValueTask<DownloadData<StreamData, TContext>> GetStreamAsync(
+        Func<string, double, TContext> contextFactory, CancellationToken token = default)
     {
-        var nameTask = GetName(token).ConfigureAwait(false);
-        var streamInfo = await GetStreamInfo(token).ConfigureAwait(false);
-        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token).ConfigureAwait(false);
+        var nameTask = GetName(token)
+            .ConfigureAwait(false);
+        var streamInfo = await GetStreamInfo(token)
+            .ConfigureAwait(false);
+        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token)
+            .ConfigureAwait(false);
 
         var name = await nameTask;
-        TContext statusContext = contextFactory(name, streamInfo.Size.MegaBytes);
+        var statusContext = contextFactory(name, streamInfo.Size.MegaBytes);
         var stream = await streamTask;
-        StreamData data = new(stream, [path, name]);
-        return new(data, statusContext);
+        var data = new StreamData(stream, [path, name]);
+        return new DownloadData<StreamData, TContext>(data, statusContext);
     }
 
     private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
