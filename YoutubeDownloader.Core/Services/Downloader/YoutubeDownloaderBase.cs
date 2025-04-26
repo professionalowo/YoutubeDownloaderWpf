@@ -113,12 +113,18 @@ public abstract class YoutubeDownloaderBase<TContext>(
 
     private async Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
     {
-        await Parallel.ForEachAsync(reader.ReadAllAsync(token), token, ProcessDownload);
+        var converter = converterFactory.GetConverter(ForceMp3);
+        var downloadSource = reader.ReadAllAsync(token);
+        var downloadConsumer = ProcessDownloadFactory(converter);
+        await Parallel.ForEachAsync(downloadSource, token, downloadConsumer);
     }
 
-    private async ValueTask ProcessDownload(VideoDownload<TContext> download, CancellationToken token = default)
+    private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(IConverter converter)
+        => (download, token) => ProcessDownload(download, converter, token);
+
+    private async ValueTask ProcessDownload(VideoDownload<TContext> download, IConverter converter,
+        CancellationToken token = default)
     {
-        var converter = converterFactory.GetConverter(ForceMp3);
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
             .ConfigureAwait(false);
         var fileName = downloads.ChildFileName(segments);
