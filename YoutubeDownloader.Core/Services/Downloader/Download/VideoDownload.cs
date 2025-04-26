@@ -46,7 +46,8 @@ public class VideoDownload<TContext>(
 
     private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
     {
-        var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token).ConfigureAwait(false);
+        var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token)
+            .ConfigureAwait(false);
         var streamInfo = streamManifest.GetAudioStreams()
             //.Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4)
             .GetWithHighestBitrate();
@@ -55,7 +56,8 @@ public class VideoDownload<TContext>(
 
     private async ValueTask<string> GetName(CancellationToken token = default)
     {
-        var video = await client.Videos.GetAsync(url, token).ConfigureAwait(false);
+        var video = await client.Videos.GetAsync(url, token)
+            .ConfigureAwait(false);
         return video.Title.ReplaceIllegalCharacters();
     }
 }
