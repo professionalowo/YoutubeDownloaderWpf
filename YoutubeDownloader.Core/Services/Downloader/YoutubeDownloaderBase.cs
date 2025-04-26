@@ -87,8 +87,10 @@ public abstract class YoutubeDownloaderBase<TContext>(
 
     public async Task Download()
     {
-        await DispatchToUi(ClearStatuses).ConfigureAwait(false);
-        await DownloadAction(Url, CancellationSource.Token).ConfigureAwait(false);
+        await DispatchToUi(ClearStatuses)
+            .ConfigureAwait(false);
+        await DownloadAction(Url, CancellationSource.Token)
+            .ConfigureAwait(false);
     }
 
 
@@ -100,42 +102,51 @@ public abstract class YoutubeDownloaderBase<TContext>(
 
     public async Task Cancel()
     {
-        await CancellationSource.CancelAsync().ConfigureAwait(false);
-        await DispatchToUi(ClearStatuses).ConfigureAwait(false);
+        await CancellationSource.CancelAsync()
+            .ConfigureAwait(false);
+        await DispatchToUi(ClearStatuses)
+            .ConfigureAwait(false);
         CancellationSource = new CancellationTokenSource();
     }
 
     protected abstract TContext ContextFactory(string name, double size);
 
-    private async Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader)
+    private async Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
     {
-        await Parallel.ForEachAsync(reader.ReadAllAsync(), ProcessDownload);
+        await Parallel.ForEachAsync(reader.ReadAllAsync(token), token, ProcessDownload);
     }
 
-    private async ValueTask ProcessDownload(VideoDownload<TContext> download,CancellationToken token = default)
+    private async ValueTask ProcessDownload(VideoDownload<TContext> download, CancellationToken token = default)
     {
-        var (data, context) = await download.GetStreamAsync(ContextFactory, token).ConfigureAwait(false);;
-        string fileName = downloads.ChildFileName(data.Segments);
-        await DispatchToUi(() => DownloadStatuses.Add(context), token).ConfigureAwait(false);
-        await using Stream mediaStream = data.Stream;
         var converter = converterFactory.GetConverter(ForceMp3);
-        await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
+        var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
+            .ConfigureAwait(false);
+        var fileName = downloads.ChildFileName(segments);
+        await DispatchToUi(() => DownloadStatuses.Add(context), token)
+            .ConfigureAwait(false);
+        await using var mediaStream = stream;
+        await converter.Convert(mediaStream, fileName, context, token)
+            .ConfigureAwait(false);
     }
+
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var enumerable = downloadFactory.Get(url, token).ConfigureAwait(false);
+        var enumerable = downloadFactory.Get(url, token)
+            .ConfigureAwait(false);
+        var channel = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
+        var consumer = ProcessChannel(channel.Reader, token)
+            .ConfigureAwait(false);
         try
         {
-            var channel = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
-            var consumer = ProcessChannel(channel.Reader);
             await foreach (var download in enumerable)
             {
-                await channel.Writer.WriteAsync(download, token).ConfigureAwait(false);
+                await channel.Writer.WriteAsync(download, token)
+                    .ConfigureAwait(false);
             }
+
             channel.Writer.Complete();
-            await consumer.ConfigureAwait(false);
-            
+            await consumer;
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
         {
