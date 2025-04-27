@@ -9,6 +9,7 @@ using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
+using YoutubeDownloader.Core.Util.Extensions;
 
 
 namespace YoutubeDownloader.Core.Services.Downloader;
@@ -134,8 +135,8 @@ public abstract class YoutubeDownloaderBase<TContext>(
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var channel = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
-        var consumer = ProcessChannel(channel.Reader, token)
+        var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
+        var consumer = ProcessChannel(rx, token)
             .ConfigureAwait(false);
         var enumerable = downloadFactory.Get(url, token)
             .ConfigureAwait(false);
@@ -143,11 +144,11 @@ public abstract class YoutubeDownloaderBase<TContext>(
         {
             await foreach (var download in enumerable)
             {
-                await channel.Writer.WriteAsync(download, token)
+                await tx.WriteAsync(download, token)
                     .ConfigureAwait(false);
             }
 
-            channel.Writer.Complete();
+            tx.Complete();
             await consumer;
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
