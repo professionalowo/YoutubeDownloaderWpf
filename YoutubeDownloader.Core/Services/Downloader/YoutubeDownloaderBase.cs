@@ -90,8 +90,19 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         await DispatchToUi(ClearStatuses)
             .ConfigureAwait(false);
-        await DownloadAction(Url, CancellationSource.Token)
-            .ConfigureAwait(false);
+        try
+        {
+            await DownloadAction(Url, CancellationSource.Token)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
+        {
+            //ignore these since they are most likely produced by the user
+        }
+        catch (Exception e)
+        {
+            logger.LogError("{Error}", e);
+        }
     }
 
 
@@ -138,21 +149,9 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
         var consumer = ProcessChannel(rx, token);
-        try
-        {
-            await Parallel.ForEachAsync(downloadFactory.Get(url, token), token, tx.WriteAsync)
-                .ConfigureAwait(false);
-            tx.Complete();
-            await consumer.ConfigureAwait(false);
-        }
-        catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
-        {
-            //ignore these since they are most likely produced by the user
-        }
-        catch (Exception e)
-        {
-            logger.LogError("{Error}", e);
-        }
+        await Parallel.ForEachAsync(downloadFactory.Get(url, token), token, tx.WriteAsync).ConfigureAwait(false);
+        tx.Complete();
+        await consumer.ConfigureAwait(false);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
