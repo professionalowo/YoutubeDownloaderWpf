@@ -124,32 +124,26 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
             .ConfigureAwait(false);
-        var fileName = downloads.ChildFileName(segments);
-        await DispatchToUi(() => DownloadStatuses.Add(context), token)
+        var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token)
             .ConfigureAwait(false);
+        var fileName = downloads.ChildFileName(segments);
         await using var mediaStream = stream;
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
+        await uiTask;
     }
 
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
         var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
-        var consumer = ProcessChannel(rx, token)
-            .ConfigureAwait(false);
-        var enumerable = downloadFactory.Get(url, token)
-            .ConfigureAwait(false);
+        var consumer = ProcessChannel(rx, token);
         try
         {
-            await foreach (var download in enumerable)
-            {
-                await tx.WriteAsync(download, token)
-                    .ConfigureAwait(false);
-            }
-
+            await Parallel.ForEachAsync(downloadFactory.Get(url, token), token, tx.WriteAsync)
+                .ConfigureAwait(false);
             tx.Complete();
-            await consumer;
+            await consumer.ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
         {
