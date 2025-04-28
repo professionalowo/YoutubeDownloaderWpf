@@ -17,7 +17,9 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         p.Start();
         return p;
     });
+
     public Stream Input => Stream.Synchronized(_ffmpegProcess.Value.StandardInput.BaseStream);
+
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath)
     {
         return new Process
@@ -31,12 +33,12 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         };
     }
 
-    private static ICollection<string> GetArguments(string outPath) => [
+    private static ICollection<string> GetArguments(string outPath) =>
+    [
         "-i", "pipe:0",
         "-vn",
         "-c:a", "libmp3lame",
         "-preset", "fast",
-        "-threads", "3",
         "-map_metadata", "0:s:0",
         "-map_metadata", "0",
         "-q:a", "2",
@@ -46,43 +48,43 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
     ];
 
     #region IDisposable
-    private bool disposedValue;
 
-    void IDisposable.Dispose()
+    private bool _disposedValue;
+
+    public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (_disposedValue) return;
+
+        if (disposing)
         {
-            if (disposing)
+            if (_ffmpegProcess.IsValueCreated)
             {
-                if (_ffmpegProcess.IsValueCreated)
-                {
-                    var p = _ffmpegProcess.Value;
-                    Input.Flush();
-                    Input.Close();
-                    p.WaitForExit();
-                    p.Dispose();
-                }
+                var p = _ffmpegProcess.Value;
+                Input.Flush();
+                Input.Close();
+                p.WaitForExit();
+                p.Dispose();
             }
-            disposedValue = true;
         }
+        _disposedValue = true;
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await DisposeAsync(disposing: true);
         GC.SuppressFinalize(this);
     }
 
-    protected virtual async ValueTask DisposeAsync(bool disposing)
+    private async ValueTask DisposeAsync(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
@@ -94,11 +96,11 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
                     await p.WaitForExitAsync();
                     p.Dispose();
 
-                    disposedValue = true;
+                    _disposedValue = true;
                 }
             }
         }
-
     }
+
     #endregion
 }
