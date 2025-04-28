@@ -51,6 +51,8 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
 
     private bool _disposedValue;
 
+    private bool ShouldDispose(bool disposing) => !_disposedValue && disposing && _ffmpegProcess.IsValueCreated;
+
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -60,19 +62,14 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
 
     private void Dispose(bool disposing)
     {
-        if (_disposedValue) return;
+        if (!ShouldDispose(disposing)) return;
 
-        if (disposing)
-        {
-            if (_ffmpegProcess.IsValueCreated)
-            {
-                var p = _ffmpegProcess.Value;
-                Input.Flush();
-                Input.Close();
-                p.WaitForExit();
-                p.Dispose();
-            }
-        }
+        var p = _ffmpegProcess.Value;
+        Input.Flush();
+        Input.Close();
+        p.WaitForExit();
+        p.Dispose();
+
         _disposedValue = true;
     }
 
@@ -84,22 +81,15 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
 
     private async ValueTask DisposeAsync(bool disposing)
     {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                if (_ffmpegProcess.IsValueCreated)
-                {
-                    var p = _ffmpegProcess.Value;
-                    await Input.FlushAsync();
-                    Input.Close();
-                    await p.WaitForExitAsync();
-                    p.Dispose();
+        if (!ShouldDispose(disposing)) return;
 
-                    _disposedValue = true;
-                }
-            }
-        }
+        var p = _ffmpegProcess.Value;
+        await Input.FlushAsync();
+        Input.Close();
+        await p.WaitForExitAsync();
+        p.Dispose();
+
+        _disposedValue = true;
     }
 
     #endregion
