@@ -156,9 +156,14 @@ public abstract class YoutubeDownloaderBase<TContext>(
         await Parallel.ForEachAsync(GetDownloadsAsync(url), token, tx.WriteAsync).ConfigureAwait(false);
         tx.Complete();
         await consumer.ConfigureAwait(false);
+        OnDownloadFinished();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public event EventHandler? DownloadFinished;
+
+    private void OnDownloadFinished() => DownloadFinished?.Invoke(this, EventArgs.Empty);
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
