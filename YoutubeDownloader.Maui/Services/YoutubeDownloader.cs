@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using Microsoft.Extensions.Logging;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.Converter;
@@ -24,7 +26,8 @@ public class YoutubeDownloader
 
     private static void OnDownloadFinished(object? sender, EventArgs e)
     {
-        Trace.WriteLine("Download finished");
+        var toast = Toast.Make("Download finished", ToastDuration.Long);
+        toast.Show().GetAwaiter().GetResult();
     }
 
     protected override DownloadContext ContextFactory(string name, double size)
