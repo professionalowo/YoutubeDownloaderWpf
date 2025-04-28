@@ -28,13 +28,18 @@ public class YoutubeDownloader(
     SystemInfo info,
     ILogger<YoutubeDownloader> logger,
     DownloadFactory<DownloadStatusContext> downloadFactory,
-    IDirectory downloads) : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, info, logger, downloadFactory, downloads)
+    IDirectory downloads)
+    : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, info, logger, downloadFactory, downloads)
 {
-
     protected override async Task DispatchToUi(Action action, CancellationToken cancellationToken = default)
         => await Dispatch(action, cancellationToken);
 
+    protected override async Task DispatchToUi(Func<Task> action, CancellationToken token = default) =>
+        await Dispatch(() => action(), token);
+
     protected override DownloadStatusContext ContextFactory(string name, double size)
-        => new (name, size);
-    static DispatcherOperation Dispatch(Action action, CancellationToken token = default) => Application.Current.Dispatcher.InvokeAsync(action, DispatcherPriority.Render, token);
+        => new(name, size);
+
+    static DispatcherOperation Dispatch(Action action, CancellationToken token = default) =>
+        Application.Current.Dispatcher.InvokeAsync(action, DispatcherPriority.Render, token);
 }

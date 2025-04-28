@@ -85,6 +85,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
     private IConverter Converter => converterFactory.GetConverter(ForceMp3);
 
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
+    protected abstract Task DispatchToUi(Func<Task> action, CancellationToken token = default);
 
     public async Task Download()
     {
