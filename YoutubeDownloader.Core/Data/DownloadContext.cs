@@ -6,41 +6,37 @@ namespace YoutubeDownloader.Core.Data;
 
 public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContext>.IConverterContext
 {
-
-    private string _name = string.Empty;
     public string Name
     {
-        get => _name;
+        get;
         set
         {
-            _name = value;
+            field = value;
             OnPropertyChanged();
         }
     }
 
-    private double _size = 0;
     public double Size
     {
-        get => _size;
+        get;
         set
         {
-            _size = value;
+            field = value;
             OnPropertyChanged();
         }
     }
 
-    private double _progress = 0;
     public double ProgressValue
     {
-        get => _progress;
+        get;
         set
         {
-            _progress = value;
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = 0;
 
-    public Progress<double> ProgressHandler { get; private init; }
+    private IProgress<double> ProgressHandler { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -48,14 +44,17 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
+
     public event EventHandler<bool> DownloadFinished;
+
     public DownloadContext(string name, double sizeInMb)
     {
         Name = name;
         Size = Math.Round(sizeInMb, 2);
-        ProgressHandler = new(p => ProgressValue = p * 100);
+        ProgressHandler = new Progress<double>(p => ProgressValue = p * 100);
         DownloadFinished += OnDownloadFinished;
     }
+
     public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
 
     protected virtual void OnDownloadFinished(object? sender, bool e)
@@ -69,10 +68,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         downloadProgress.ProgressChanged += (_, e) =>
         {
             var percentage = Math.Min(e / (Size * 1000), 100);
-            if (ProgressHandler is IProgress<double> p)
-            {
-                p.Report(percentage);
-            }
+            ProgressHandler.Report(percentage);
         };
 
         return downloadProgress;
