@@ -19,7 +19,8 @@ public partial class MainPage : ContentPage
 
     private async void Download_OnClicked(object? sender, EventArgs e)
     {
-        await _downloader.Download();
+        await _downloader.Download()
+            .ConfigureAwait(false);
     }
 
     private void Open_OnClicked(object? sender, EventArgs e)

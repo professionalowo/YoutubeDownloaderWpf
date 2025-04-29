@@ -19,7 +19,8 @@ public partial class App : Application
         base.OnStart();
         if (!_ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOs()) //can't do shit on mac
         {
-            await _ffmpegDownloader.DownloadFfmpeg();
+            await _ffmpegDownloader.DownloadFfmpeg()
+                .ConfigureAwait(false);
         }
     }
 
