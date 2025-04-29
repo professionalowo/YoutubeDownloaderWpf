@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace YoutubeDownloader.Core.Services.Converter;
 
 
-public interface IConverter<T> where T : IConverter<T>.IConverterContext
+public interface IConverter<in TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public interface IConverterContext
     {
@@ -17,6 +17,6 @@ public interface IConverter<T> where T : IConverter<T>.IConverterContext
         void InvokeDownloadFinished(object sender, bool finished);
     }
 
-    public ValueTask<string> Convert(Stream data, string outPath, T context,
+    public ValueTask<string> Convert(Stream data, string outPath, TContext context,
         CancellationToken token = default);
 }
