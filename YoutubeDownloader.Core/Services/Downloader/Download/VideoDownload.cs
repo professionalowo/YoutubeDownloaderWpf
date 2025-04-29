@@ -25,8 +25,6 @@ public class VideoDownload<TContext>(
     string url,
     string path = "") where TContext : IConverter<TContext>.IConverterContext
 {
-    public string Path => path;
-
     public async ValueTask<DownloadData<StreamData, TContext>> GetStreamAsync(
         Func<string, double, TContext> contextFactory, CancellationToken token = default)
     {
