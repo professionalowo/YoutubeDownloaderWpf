@@ -17,7 +17,7 @@ public class WriteThroughConverter(string extension) : IConverter
         try
         {
             await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
-            await data.CopyToAsyncTracked(file, context.GetProgress(), token);
+            await data.CopyToTrackedAsync(file, context.GetProgress(), token);
             context.InvokeDownloadFinished(this, true);
             return fileInfo.FullName;
         }
