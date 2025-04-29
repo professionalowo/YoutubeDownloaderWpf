@@ -46,6 +46,12 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     }
 
     public event EventHandler<bool> DownloadFinished;
+    public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
+
+    protected virtual void OnDownloadFinished(object? sender, bool e)
+    {
+        ProgressValue = 100;
+    }
 
     public DownloadContext(string name, double sizeInMb)
     {
@@ -55,12 +61,6 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         DownloadFinished += OnDownloadFinished;
     }
 
-    public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
-
-    protected virtual void OnDownloadFinished(object? sender, bool e)
-    {
-        ProgressValue = 100;
-    }
 
     public IProgress<long> GetProgress()
     {
