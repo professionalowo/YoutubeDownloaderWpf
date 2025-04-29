@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 using YoutubeDownloader.Core.Services.Converter;
@@ -30,6 +31,7 @@ public partial class App : Application
 {
     private MainWindow? _mainWindow;
     private readonly ServiceProvider services;
+
     public App()
     {
         services = InitializeServices();
@@ -49,7 +51,7 @@ public partial class App : Application
         serviceCollection.AddDownloadServices();
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddLogging(builder =>
-                builder.AddProvider(new FileLoggerProvider("logs.txt"))
+            builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)
         );
         serviceCollection.AddUpdaters();
@@ -64,15 +66,18 @@ public partial class App : Application
         {
             await updater.UpdateVersion(KnownFolders.GetDownloadsPath());
         }
+
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
         if (!ffmpeg.DoesFfmpegExist())
         {
-            var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Downlaod Ffmpeg", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Downlaod Ffmpeg",
+                MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (res == MessageBoxResult.OK)
             {
                 await ffmpeg.DownloadFfmpeg();
             }
         }
+
         _mainWindow = services.GetService<MainWindow>();
         _mainWindow?.Show();
     }
@@ -102,7 +107,7 @@ static class ServiceCollectionExtensions
         });
         serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
-        serviceCollection.AddSingleton<ConverterFactory>();
+        serviceCollection.AddSingleton<ConverterFactory<DownloadStatusContext>>();
         serviceCollection.AddSingleton<SystemInfo>();
         return serviceCollection;
     }
@@ -112,7 +117,8 @@ static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
         serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
-        serviceCollection.AddSingleton<FfmpegDownloader.Config>(new FfmpegConfigFactory(FfmpegDownloader.Config.Default).ResolveConfig);
+        serviceCollection.AddSingleton<FfmpegDownloader.Config>(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
+            .ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }

@@ -7,7 +7,7 @@ using YoutubeExplode;
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
 public class DownloadFactory<TContext>(YoutubeClient client, IDirectory downloads)
-    where TContext : IConverter.IConverterContext
+    where TContext : IConverter<TContext>.IConverterContext
 {
     public async IAsyncEnumerable<VideoDownload<TContext>> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         [EnumeratorCancellation] CancellationToken token = default)

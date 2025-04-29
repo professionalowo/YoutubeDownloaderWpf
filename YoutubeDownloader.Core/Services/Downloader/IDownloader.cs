@@ -10,7 +10,7 @@ using YoutubeDownloader.Core.Services.Converter;
 
 namespace YoutubeDownloader.Core.Services.Downloader;
 
-public interface IDownloader<TContext> where TContext : IConverter.IConverterContext
+public interface IDownloader<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string Url { get; }

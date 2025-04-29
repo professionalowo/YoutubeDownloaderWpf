@@ -14,7 +14,7 @@ public class YoutubeDownloader
     : YoutubeDownloaderBase<DownloadContext>
 {
     public YoutubeDownloader(
-        ConverterFactory converterFactory,
+        ConverterFactory<DownloadContext> converterFactory,
         SystemInfo info,
         ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
         DownloadFactory<DownloadContext> downloadFactory,

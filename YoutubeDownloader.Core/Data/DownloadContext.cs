@@ -4,7 +4,7 @@ using YoutubeDownloader.Core.Services.Converter;
 
 namespace YoutubeDownloader.Core.Data;
 
-public class DownloadContext : INotifyPropertyChanged, IConverter.IConverterContext
+public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContext>.IConverterContext
 {
 
     private string _name = string.Empty;

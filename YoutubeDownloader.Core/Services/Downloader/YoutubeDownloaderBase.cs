@@ -14,11 +14,12 @@ using YoutubeDownloader.Core.Util.Extensions;
 namespace YoutubeDownloader.Core.Services.Downloader;
 
 public abstract class YoutubeDownloaderBase<TContext>(
-    ConverterFactory converterFactory,
+    ConverterFactory<TContext> converterFactory,
     SystemInfo info,
     ILogger<YoutubeDownloaderBase<TContext>> logger,
     DownloadFactory<TContext> downloadFactory,
-    IDirectory downloads) : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter.IConverterContext
+    IDirectory downloads)
+    : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lock _cancellationSourceLock = new();
     private readonly Lock _statusesLock = new();
@@ -82,7 +83,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
         }
     } = new();
 
-    private IConverter Converter => converterFactory.GetConverter(ForceMp3);
+    private IConverter<TContext> Converter => converterFactory.GetConverter(ForceMp3);
 
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
     protected abstract Task DispatchToUi(Func<Task> action, CancellationToken token = default);
@@ -132,10 +133,11 @@ public abstract class YoutubeDownloaderBase<TContext>(
         => Parallel.ForEachAsync(reader.ReadAllAsync(token), token,
             ProcessDownloadFactory(Converter));
 
-    private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(IConverter converter)
+    private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(
+        IConverter<TContext> converter)
         => (download, token) => ProcessDownload(download, converter, token);
 
-    private async ValueTask ProcessDownload(VideoDownload<TContext> download, IConverter converter,
+    private async ValueTask ProcessDownload(VideoDownload<TContext> download, IConverter<TContext> converter,
         CancellationToken token = default)
     {
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)

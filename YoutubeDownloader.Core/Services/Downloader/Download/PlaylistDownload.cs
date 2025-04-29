@@ -18,7 +18,7 @@ namespace YoutubeDownloader.Core.Services.Downloader.Download;
 public class PlaylistDownload<TContext>(
     YoutubeClient client,
     [StringSyntax(StringSyntaxAttribute.Uri)] string url,
-    IDirectory downloads) : IAsyncEnumerable<VideoDownload<TContext>> where TContext : IConverter.IConverterContext
+    IDirectory downloads) : IAsyncEnumerable<VideoDownload<TContext>> where TContext : IConverter<TContext>.IConverterContext
 {
     public async IAsyncEnumerator<VideoDownload<TContext>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {

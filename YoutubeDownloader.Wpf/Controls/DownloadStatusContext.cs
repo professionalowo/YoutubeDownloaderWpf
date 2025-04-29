@@ -12,18 +12,19 @@ using YoutubeDownloader.Core.Services.Converter;
 
 namespace YoutubeDownloader.Wpf.Controls;
 
-public sealed class DownloadStatusContext(string name, double sizeInMb): DownloadContext(name,sizeInMb)
+public sealed class DownloadStatusContext(string name, double sizeInMb)
+    : DownloadContext(name, sizeInMb), IConverter<DownloadStatusContext>.IConverterContext
 {
-    private Brush _background = Brushes.White;
     public Brush Background
     {
-        get => _background;
+        get;
         set
         {
-            _background = value;
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = Brushes.Transparent;
+
     protected override void OnDownloadFinished(object? sender, bool e)
     {
         base.OnDownloadFinished(sender, e);

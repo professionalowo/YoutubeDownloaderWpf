@@ -7,11 +7,11 @@ using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class ConverterFactory(FfmpegDownloader.Config config)
+public class ConverterFactory<T>(FfmpegDownloader.Config config) where T : IConverter<T>.IConverterContext
 {
-    private readonly Lazy<IConverter> _mp3Converter = new(() => new Mp3Converter(config));
-    private readonly Lazy<IConverter> _noopConverter = new(() => new WriteThroughConverter(".mp4"));
-    public IConverter GetConverter(bool forceMp3) => forceMp3 switch
+    private readonly Lazy<IConverter<T>> _mp3Converter = new(() => new Mp3Converter<T>(config));
+    private readonly Lazy<IConverter<T>> _noopConverter = new(() => new WriteThroughConverter<T>(".mp4"));
+    public IConverter<T> GetConverter(bool forceMp3) => forceMp3 switch
     {
         true => _mp3Converter.Value,
         false => _noopConverter.Value,

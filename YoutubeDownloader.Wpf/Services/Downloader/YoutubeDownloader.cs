@@ -24,7 +24,7 @@ using YoutubeDownloader.Core.Services.Downloader;
 namespace YoutubeDownloader.Wpf.Services.Downloader;
 
 public class YoutubeDownloader(
-    ConverterFactory converterFactory,
+    ConverterFactory<DownloadStatusContext> converterFactory,
     SystemInfo info,
     ILogger<YoutubeDownloader> logger,
     DownloadFactory<DownloadStatusContext> downloadFactory,

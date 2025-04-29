@@ -11,13 +11,12 @@ using YoutubeDownloader.Core.Util.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class Mp3Converter(FfmpegDownloader.Config config) : IConverter
+public class Mp3Converter<T>(FfmpegDownloader.Config config) : IConverter<T> where T : IConverter<T>.IConverterContext
 {
-    
-    public ValueTask<string> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
-    => ValueTask.FromResult(ConvertSync(data, outPath, context));
+    public ValueTask<string> Convert(Stream data, string outPath, T context, CancellationToken token = default)
+        => ValueTask.FromResult(ConvertSync(data, outPath, context));
 
-    private string ConvertSync(Stream data, string outPath, IConverter.IConverterContext context)
+    private string ConvertSync(Stream data, string outPath, T context)
     {
         var mp3Path = $"{outPath}.mp3";
         try

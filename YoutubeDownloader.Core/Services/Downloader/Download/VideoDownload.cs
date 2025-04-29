@@ -23,7 +23,7 @@ public class VideoDownload<TContext>(
     YoutubeClient client,
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string url,
-    string path = "") where TContext : IConverter.IConverterContext
+    string path = "") where TContext : IConverter<TContext>.IConverterContext
 {
     public string Path => path;
 

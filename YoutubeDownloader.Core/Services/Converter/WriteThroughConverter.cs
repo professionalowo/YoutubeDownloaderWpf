@@ -9,9 +9,9 @@ using YoutubeDownloader.Core.Util.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class WriteThroughConverter(string extension) : IConverter
+public class WriteThroughConverter<T>(string extension) : IConverter<T> where T : IConverter<T>.IConverterContext
 {
-    public async ValueTask<string> Convert(Stream data, string outPath, IConverter.IConverterContext context, CancellationToken token = default)
+    public async ValueTask<string> Convert(Stream data, string outPath, T context, CancellationToken token = default)
     {
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
         try
