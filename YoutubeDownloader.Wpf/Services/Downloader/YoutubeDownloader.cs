@@ -40,6 +40,6 @@ public class YoutubeDownloader(
     protected override DownloadStatusContext ContextFactory(string name, double size)
         => new(name, size);
 
-    static DispatcherOperation Dispatch(Action action, CancellationToken token = default) =>
+    private static DispatcherOperation Dispatch(Action action, CancellationToken token = default) =>
         Application.Current.Dispatcher.InvokeAsync(action, DispatcherPriority.Render, token);
 }
