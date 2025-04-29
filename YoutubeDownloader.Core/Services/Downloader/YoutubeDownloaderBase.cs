@@ -142,13 +142,12 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
             .ConfigureAwait(false);
-        var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token)
-            .ConfigureAwait(false);
+        var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token);
         var fileName = downloads.ChildFileName(segments);
         await using var mediaStream = stream;
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
-        await uiTask;
+        await uiTask.ConfigureAwait(false);
     }
 
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
@@ -156,7 +155,8 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
         var consumer = ProcessChannel(rx, token);
-        await Parallel.ForEachAsync(GetDownloadsAsync(url), token, tx.WriteAsync).ConfigureAwait(false);
+        await Parallel.ForEachAsync(GetDownloadsAsync(url), token, tx.WriteAsync)
+            .ConfigureAwait(false);
         tx.Complete();
         await consumer.ConfigureAwait(false);
         OnDownloadFinished();
