@@ -47,7 +47,6 @@ public class VideoDownload<TContext>(
         var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token)
             .ConfigureAwait(false);
         var streamInfo = streamManifest.GetAudioStreams()
-            //.Where(s => s.Container == Container.Mp3 || s.Container == Container.Mp4)
             .GetWithHighestBitrate();
         return streamInfo;
     }
