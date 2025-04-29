@@ -11,7 +11,8 @@ using YoutubeDownloader.Core.Util.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class Mp3Converter<TContext>(FfmpegDownloader.Config config) : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
+public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
+    : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public ValueTask<string> Convert(Stream data, string outPath, TContext context, CancellationToken token = default)
         => ValueTask.FromResult(ConvertSync(data, outPath, context));
