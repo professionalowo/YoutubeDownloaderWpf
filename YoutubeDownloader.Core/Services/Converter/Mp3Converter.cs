@@ -15,7 +15,9 @@ public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public ValueTask<string> Convert(Stream data, string outPath, TContext context, CancellationToken token = default)
-        => ValueTask.FromResult(ConvertSync(data, outPath, context));
+        => token.IsCancellationRequested
+            ? ValueTask.FromCanceled<string>(token)
+            : ValueTask.FromResult(ConvertSync(data, outPath, context));
 
     private string ConvertSync(Stream data, string outPath, TContext context)
     {
