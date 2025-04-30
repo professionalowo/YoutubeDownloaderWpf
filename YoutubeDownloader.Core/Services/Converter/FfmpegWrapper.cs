@@ -11,18 +11,14 @@ namespace YoutubeDownloader.Core.Services.Converter;
 
 public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : IDisposable, IAsyncDisposable
 {
-    private readonly Lazy<Process> _ffmpegProcess = new(() =>
-    {
-        var p = CreateProcess(ffmpegAbsolutePath, outPath);
-        p.Start();
-        return p;
-    });
+    private readonly Lazy<Process> _ffmpegProcess
+        = new(() => CreateProcess(ffmpegAbsolutePath, outPath));
 
     public Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
 
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath)
     {
-        return new Process
+        return AsStarted(new Process
         {
             StartInfo = new ProcessStartInfo(ffmpegAbsolutePath, GetArguments(outPath))
             {
@@ -30,7 +26,7 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
                 CreateNoWindow = true,
                 RedirectStandardInput = true,
             }
-        };
+        });
     }
 
     private static ICollection<string> GetArguments(string outPath) =>
@@ -46,6 +42,12 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         "-y",
         outPath
     ];
+
+    private static Process AsStarted(Process process)
+    {
+        process.Start();
+        return process;
+    }
 
     #region IDisposable
 
