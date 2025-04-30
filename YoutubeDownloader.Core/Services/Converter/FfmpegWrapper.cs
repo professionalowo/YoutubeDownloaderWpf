@@ -11,6 +11,19 @@ namespace YoutubeDownloader.Core.Services.Converter;
 
 public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : IDisposable, IAsyncDisposable
 {
+    #region args
+    private const string static_args = "-i pipe:0 " +
+                                       "-vn " +
+                                       "-c:a libmp3lame " +
+                                       "-preset fast " +
+                                       "-map_metadata 0:s:0 " +
+                                       "-map_metadata 0 " +
+                                       "-q:a 2 " +
+                                       "-flush_packets 0 " +
+                                       "-y";
+
+    #endregion
+
     private readonly Lazy<Process> _ffmpegProcess
         = new(() => CreateProcess(ffmpegAbsolutePath, outPath));
 
@@ -20,7 +33,7 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
     {
         return AsStarted(new Process
         {
-            StartInfo = new ProcessStartInfo(ffmpegAbsolutePath, GetArguments(outPath))
+            StartInfo = new ProcessStartInfo(ffmpegAbsolutePath, Args(outPath))
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -29,19 +42,7 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         });
     }
 
-    private static ICollection<string> GetArguments(string outPath) =>
-    [
-        "-i", "pipe:0",
-        "-vn",
-        "-c:a", "libmp3lame",
-        "-preset", "fast",
-        "-map_metadata", "0:s:0",
-        "-map_metadata", "0",
-        "-q:a", "2",
-        "-flush_packets", "0",
-        "-y",
-        outPath
-    ];
+    private static ICollection<string> Args(string outPath) => [static_args, outPath];
 
     private static Process AsStarted(Process process)
     {
