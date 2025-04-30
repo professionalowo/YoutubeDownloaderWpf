@@ -15,15 +15,18 @@ public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public ValueTask<string> Convert(Stream data, string outPath, TContext context, CancellationToken token = default)
-        => ValueTask.FromResult(ConvertSync(data, outPath, context));
+        => token.IsCancellationRequested
+            ? ValueTask.FromCanceled<string>(token)
+            : ValueTask.FromResult(ConvertSync(data, outPath, context));
 
     private string ConvertSync(Stream data, string outPath, TContext context)
     {
         var mp3Path = $"{outPath}.mp3";
+        using var buffer = new BufferedStream(data);
+        using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
         try
         {
-            using FfmpegMp3Conversion conversion = new(config.FfmpegExeFullPath, mp3Path);
-            data.CopyToTracked(conversion.Input, context.GetProgress());
+            buffer.CopyToTracked(conversion.Input, context.GetProgress());
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
         }
