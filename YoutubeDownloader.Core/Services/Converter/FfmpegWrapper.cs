@@ -18,7 +18,7 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         return p;
     });
 
-    public Stream Input => Stream.Synchronized(_ffmpegProcess.Value.StandardInput.BaseStream);
+    public Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
 
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath)
     {
