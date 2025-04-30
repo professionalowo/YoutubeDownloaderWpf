@@ -18,7 +18,7 @@ public class WriteThroughConverter<TContext>(string extension)
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
         try
         {
-            await using FileStream file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write,
+            await using var file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write,
                 FileShare.ReadWrite | FileShare.Delete);
             await data.CopyToTrackedAsync(file, context.GetProgress(), token)
                 .ConfigureAwait(false);
