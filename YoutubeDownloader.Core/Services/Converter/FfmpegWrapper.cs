@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
+﻿using System.Diagnostics;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
@@ -29,7 +22,7 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         });
     }
 
-    private static ICollection<string> Args(string outPath) =>
+    private static IEnumerable<string> Args(string outPath) =>
     [
         "-i", "pipe:0",
         "-vn",
