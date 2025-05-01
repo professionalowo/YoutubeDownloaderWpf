@@ -12,11 +12,13 @@ namespace YoutubeDownloader.Core.Util.Extensions;
 
 public static class StreamExtensions
 {
+    private const int buffer_size = 1024 * 64;
+
     public static async Task CopyToTrackedAsync(this Stream input, Stream destination, IProgress<long> progress,
         CancellationToken cancellationToken = default)
     {
         // Ensure buffer size is a multiple of 4
-        using var shared = MemoryPool<byte>.Shared.Rent(1024 * 1024); // Buffer size: multiple of 4
+        using var shared = MemoryPool<byte>.Shared.Rent(buffer_size); // Buffer size: multiple of 4
         var memory = shared.Memory;
         long totalBytesRead = 0;
         int bytesRead;
@@ -32,7 +34,7 @@ public static class StreamExtensions
     public static void CopyToTracked(this Stream input, Stream destination, IProgress<long> progress)
     {
         // Ensure buffer size is a multiple of 4
-        Span<byte> buffer = stackalloc byte[1024 * 1024]; // Buffer size: multiple of 4
+        Span<byte> buffer = stackalloc byte[buffer_size]; // Buffer size: multiple of 4
         long totalBytesRead = 0;
         int bytesRead;
         while ((bytesRead = input.Read(buffer)) > 0)
