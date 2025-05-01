@@ -26,7 +26,7 @@ public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
         using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
         try
         {
-            buffer.CopyToTracked(conversion.Input, context.GetProgress());
+            buffer.CopyToTracked(conversion.Input, context.GetProgress(), true);
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
         }
