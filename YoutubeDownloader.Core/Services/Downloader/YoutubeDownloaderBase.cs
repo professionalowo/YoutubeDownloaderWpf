@@ -136,7 +136,8 @@ public abstract class YoutubeDownloaderBase<TContext>(
         await using var mediaStream = new BufferedStream(stream);
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
-        await uiTask.ConfigureAwait(false);
+        await uiTask
+            .ConfigureAwait(false);
     }
 
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
