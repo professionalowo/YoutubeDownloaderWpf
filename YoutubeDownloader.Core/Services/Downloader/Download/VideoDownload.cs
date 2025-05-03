@@ -28,16 +28,17 @@ public class VideoDownload<TContext>(
     public async ValueTask<DownloadData<StreamData, TContext>> GetStreamAsync(
         Func<string, double, TContext> contextFactory, CancellationToken token = default)
     {
-        var nameTask = GetName(token)
-            .ConfigureAwait(false);
+        var nameTask = GetName(token);
         var streamInfo = await GetStreamInfo(token)
             .ConfigureAwait(false);
-        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token)
+        var streamTask = client.Videos.Streams.GetAsync(streamInfo, token);
+
+        var name = await nameTask
+            .ConfigureAwait(false);
+        var statusContext = contextFactory(name, streamInfo.Size.MegaBytes);
+        var stream = await streamTask
             .ConfigureAwait(false);
 
-        var name = await nameTask;
-        var statusContext = contextFactory(name, streamInfo.Size.MegaBytes);
-        var stream = await streamTask;
         var data = new StreamData(stream, [path, name]);
         return new DownloadData<StreamData, TContext>(data, statusContext);
     }
