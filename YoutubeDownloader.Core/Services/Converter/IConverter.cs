@@ -14,7 +14,7 @@ public interface IConverter<in TContext> where TContext : IConverter<TContext>.I
     public interface IConverterContext
     {
         IProgress<long> GetProgress();
-        void InvokeDownloadFinished(object sender, bool finished);
+        void InvokeDownloadFinished(object sender, bool finishedSuccessfully);
     }
 
     public ValueTask<string> Convert(Stream audioStream, string outPath, TContext context,

@@ -46,7 +46,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     }
 
     public event EventHandler<bool> DownloadFinished;
-    public void InvokeDownloadFinished(object? sender, bool status) => DownloadFinished.Invoke(sender, status);
+    public void InvokeDownloadFinished(object? sender, bool finishedSuccessfully) => DownloadFinished.Invoke(sender, finishedSuccessfully);
 
     protected virtual void OnDownloadFinished(object? sender, bool e)
     {
