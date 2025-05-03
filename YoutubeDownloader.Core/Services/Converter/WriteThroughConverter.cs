@@ -12,7 +12,7 @@ namespace YoutubeDownloader.Core.Services.Converter;
 public class WriteThroughConverter<TContext>(string extension)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
-    public async ValueTask<string> Convert(Stream data, string outPath, TContext context,
+    public async ValueTask<string> Convert(Stream audioStream, string outPath, TContext context,
         CancellationToken token = default)
     {
         FileInfo fileInfo = new(Path.ChangeExtension(outPath, extension));
@@ -20,7 +20,7 @@ public class WriteThroughConverter<TContext>(string extension)
         {
             await using var file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write,
                 FileShare.ReadWrite | FileShare.Delete);
-            await data.CopyToTrackedAsync(file, context.GetProgress(), token)
+            await audioStream.CopyToTrackedAsync(file, context.GetProgress(), token)
                 .ConfigureAwait(false);
             context.InvokeDownloadFinished(this, true);
             return fileInfo.FullName;
