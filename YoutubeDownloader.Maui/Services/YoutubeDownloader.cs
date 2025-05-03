@@ -23,7 +23,7 @@ public class YoutubeDownloader
         DownloadFinished += OnDownloadFinished;
     }
 
-    private void OnDownloadFinished(object? sender, EventArgs e)
+    private static void OnDownloadFinished(object? sender, EventArgs e)
     {
         var toast = Toast.Make("Download finished", ToastDuration.Long);
         DispatchToUi(async () => await toast.Show()).GetAwaiter().GetResult();
@@ -35,6 +35,6 @@ public class YoutubeDownloader
     protected override Task DispatchToUi(Action action, CancellationToken token = default)
         => MainThread.InvokeOnMainThreadAsync(action);
 
-    protected override Task DispatchToUi(Func<Task> action, CancellationToken token = default) =>
+    private static Task DispatchToUi(Func<Task> action) =>
         MainThread.InvokeOnMainThreadAsync(action);
 }

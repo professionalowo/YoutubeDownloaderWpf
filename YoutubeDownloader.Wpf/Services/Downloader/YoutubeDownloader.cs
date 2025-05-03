@@ -34,9 +34,6 @@ public class YoutubeDownloader(
     protected override async Task DispatchToUi(Action action, CancellationToken cancellationToken = default)
         => await Dispatch(action, cancellationToken);
 
-    protected override async Task DispatchToUi(Func<Task> action, CancellationToken token = default) =>
-        await Dispatch(() => action(), token);
-
     protected override DownloadStatusContext ContextFactory(string name, double size)
         => new(name, size);
 
