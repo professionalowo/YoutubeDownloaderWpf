@@ -119,8 +119,11 @@ public abstract class YoutubeDownloaderBase<TContext>(
         string url, CancellationToken token = default) => downloadFactory.Get(url, token);
 
     private Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
-        => Parallel.ForEachAsync(reader.ReadAllAsync(token), token,
-            ProcessDownloadFactory(Converter));
+        => Parallel.ForEachAsync(
+            reader.ReadAllAsync(token),
+            token,
+            ProcessDownloadFactory(Converter)
+        );
 
     private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(
         IConverter<TContext> converter)
@@ -134,10 +137,8 @@ public abstract class YoutubeDownloaderBase<TContext>(
         var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token);
         var fileName = downloads.ChildFileName(segments);
         await using var mediaStream = new BufferedStream(stream);
-        await converter.Convert(mediaStream, fileName, context, token)
-            .ConfigureAwait(false);
-        await uiTask
-            .ConfigureAwait(false);
+        await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
+        await uiTask.ConfigureAwait(false);
     }
 
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
