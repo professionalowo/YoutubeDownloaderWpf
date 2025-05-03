@@ -116,7 +116,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
 
     private IAsyncEnumerable<VideoDownload<TContext>> GetDownloadsAsync(
         [StringSyntax(StringSyntaxAttribute.Uri)]
-        string url) => downloadFactory.Get(url);
+        string url, CancellationToken token = default) => downloadFactory.Get(url, token);
 
     private Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
         => Parallel.ForEachAsync(reader.ReadAllAsync(token), token,
@@ -145,7 +145,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
     {
         var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
         var consumer = ProcessChannel(rx, token);
-        await Parallel.ForEachAsync(GetDownloadsAsync(url), token, tx.WriteAsync)
+        await Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, tx.WriteAsync)
             .ConfigureAwait(false);
         tx.Complete();
         await consumer.ConfigureAwait(false);
