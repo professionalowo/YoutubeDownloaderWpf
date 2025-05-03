@@ -23,10 +23,9 @@ public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     {
         var mp3Path = $"{outPath}.mp3";
         using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
-        using var inputBuffer = new BufferedStream(data);
         try
         {
-            inputBuffer.CopyToTracked(conversion.Input, context.GetProgress());
+            data.CopyToTracked(conversion.Input, context.GetProgress());
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
         }

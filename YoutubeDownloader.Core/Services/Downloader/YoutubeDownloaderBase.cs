@@ -133,7 +133,7 @@ public abstract class YoutubeDownloaderBase<TContext>(
             .ConfigureAwait(false);
         var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token);
         var fileName = downloads.ChildFileName(segments);
-        await using var mediaStream = stream;
+        await using var mediaStream = new BufferedStream(stream);
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);
