@@ -11,18 +11,18 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
 
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath)
     {
-        return AsStarted(new Process
+        var args = Args(outPath);
+        var info = new ProcessStartInfo(ffmpegAbsolutePath, args)
         {
-            StartInfo = new ProcessStartInfo(ffmpegAbsolutePath, Args(outPath))
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardInput = true,
-            }
-        });
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardInput = true,
+        };
+        return Process.Start(info) ??
+               throw new InvalidOperationException($"Unable to create {ffmpegAbsolutePath} process.");
     }
 
-    private static IEnumerable<string> Args(string outPath) =>
+    private static ICollection<string> Args(string outPath) =>
     [
         "-i", "pipe:0",
         "-vn",
@@ -35,12 +35,6 @@ public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : ID
         "-y",
         outPath
     ];
-
-    private static Process AsStarted(Process process)
-    {
-        process.Start();
-        return process;
-    }
 
     #region IDisposable
 
