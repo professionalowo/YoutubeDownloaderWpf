@@ -13,7 +13,7 @@ using YoutubeDownloader.Core.Util.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Downloader;
 
-public abstract class YoutubeDownloaderBase<TContext>(
+public abstract partial class YoutubeDownloaderBase<TContext>(
     ConverterFactory<TContext> converterFactory,
     SystemInfo info,
     ILogger<YoutubeDownloaderBase<TContext>> logger,
