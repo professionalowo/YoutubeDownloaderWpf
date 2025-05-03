@@ -22,11 +22,12 @@ public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     private string ConvertSync(Stream data, string outPath, TContext context)
     {
         var mp3Path = $"{outPath}.mp3";
-        using var buffer = new BufferedStream(data);
         using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
+        using var inputBuffer = new BufferedStream(data);
+        using var outputBuffer = new BufferedStream(conversion.Input);
         try
         {
-            buffer.CopyToTracked(conversion.Input, context.GetProgress(), true);
+            inputBuffer.CopyToTracked(outputBuffer, context.GetProgress());
             context.InvokeDownloadFinished(this, true);
             return mp3Path;
         }

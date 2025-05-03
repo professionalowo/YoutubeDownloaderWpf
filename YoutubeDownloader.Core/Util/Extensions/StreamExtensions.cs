@@ -15,7 +15,6 @@ public static class StreamExtensions
     private const int buffer_size = 1024 * 64;
 
     public static async Task CopyToTrackedAsync(this Stream input, Stream destination, IProgress<long> progress,
-        bool flush,
         CancellationToken token = default)
     {
         // Ensure buffer size is a multiple of 4
@@ -26,14 +25,13 @@ public static class StreamExtensions
         while ((bytesRead = await input.ReadAsync(memory, token).ConfigureAwait(false)) > 0)
         {
             await destination.WriteAsync(memory[..bytesRead], token).ConfigureAwait(false);
-            if (flush) await destination.FlushAsync(token);
             totalBytesRead += bytesRead;
             // Report progress
             progress?.Report(totalBytesRead);
         }
     }
 
-    public static void CopyToTracked(this Stream input, Stream destination, IProgress<long> progress, bool flush)
+    public static void CopyToTracked(this Stream input, Stream destination, IProgress<long> progress)
     {
         // Ensure buffer size is a multiple of 4
         Span<byte> buffer = stackalloc byte[buffer_size]; // Buffer size: multiple of 4
@@ -42,7 +40,6 @@ public static class StreamExtensions
         while ((bytesRead = input.Read(buffer)) > 0)
         {
             destination.Write(buffer[..bytesRead]);
-            if (flush) destination.Flush();
             totalBytesRead += bytesRead;
             // Report progress
             progress?.Report(totalBytesRead);

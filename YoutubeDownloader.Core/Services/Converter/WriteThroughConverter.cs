@@ -20,7 +20,7 @@ public class WriteThroughConverter<TContext>(string extension)
         {
             await using var file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write,
                 FileShare.ReadWrite | FileShare.Delete);
-            await data.CopyToTrackedAsync(file, context.GetProgress(), true, token)
+            await data.CopyToTrackedAsync(file, context.GetProgress(), token)
                 .ConfigureAwait(false);
             context.InvokeDownloadFinished(this, true);
             return fileInfo.FullName;
