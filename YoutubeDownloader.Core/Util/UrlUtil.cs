@@ -4,7 +4,7 @@ namespace YoutubeDownloader.Core.Util;
 
 public static class UrlUtil
 {
-    private  static string Combine(string first, string second)
+    private static string Combine(string first, string second)
         => $"{first.TrimEnd('/')}/{second.TrimStart('/')}";
 
     /// <summary>
