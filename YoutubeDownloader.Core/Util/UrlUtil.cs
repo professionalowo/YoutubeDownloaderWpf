@@ -4,7 +4,7 @@ namespace YoutubeDownloader.Core.Util;
 
 public static class UrlUtil
 {
-    private static string Combine(string first, string second)
+    private static string CombineSpan(ReadOnlySpan<char> first, ReadOnlySpan<char> second)
         => $"{first.TrimEnd('/')}/{second.TrimStart('/')}";
 
     /// <summary>
@@ -16,7 +16,7 @@ public static class UrlUtil
     public static string Combine(string first, params ReadOnlySpan<string> rest) => rest switch
     {
         [] => first,
-        [var head] => Combine(first, head),
-        [var head, .. var tail] => Combine(Combine(first, head), tail),
+        [var head] => CombineSpan(first, head),
+        [var head, .. var tail] => Combine(CombineSpan(first, head), tail),
     };
 }
