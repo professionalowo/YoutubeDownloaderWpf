@@ -30,8 +30,8 @@ public class YoutubeDownloader(
     IDirectory downloads)
     : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, logger, downloadFactory, downloads)
 {
-    protected override async Task DispatchToUi(Action action, CancellationToken cancellationToken = default)
-        => await Dispatch(action, cancellationToken);
+    protected override Task DispatchToUi(Action action, CancellationToken token = default)
+        => Dispatch(action, token).Task;
 
     protected override DownloadStatusContext ContextFactory(string name, double size)
         => new(name, size);
