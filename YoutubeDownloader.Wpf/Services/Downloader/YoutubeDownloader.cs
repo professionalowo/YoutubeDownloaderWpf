@@ -25,11 +25,10 @@ namespace YoutubeDownloader.Wpf.Services.Downloader;
 
 public class YoutubeDownloader(
     ConverterFactory<DownloadStatusContext> converterFactory,
-    SystemInfo info,
     ILogger<YoutubeDownloader> logger,
     DownloadFactory<DownloadStatusContext> downloadFactory,
     IDirectory downloads)
-    : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, info, logger, downloadFactory, downloads)
+    : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, logger, downloadFactory, downloads)
 {
     protected override async Task DispatchToUi(Action action, CancellationToken cancellationToken = default)
         => await Dispatch(action, cancellationToken);

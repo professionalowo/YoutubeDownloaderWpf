@@ -108,7 +108,6 @@ static class ServiceCollectionExtensions
         serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
         serviceCollection.AddSingleton<ConverterFactory<DownloadStatusContext>>();
-        serviceCollection.AddSingleton<SystemInfo>();
         return serviceCollection;
     }
 

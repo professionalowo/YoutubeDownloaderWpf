@@ -15,10 +15,9 @@ public partial class YoutubeDownloader
 {
     public YoutubeDownloader(
         ConverterFactory<DownloadContext> converterFactory,
-        SystemInfo info,
         ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
         DownloadFactory<DownloadContext> downloadFactory,
-        IDirectory downloads) : base(converterFactory, info, logger, downloadFactory, downloads)
+        IDirectory downloads) : base(converterFactory, logger, downloadFactory, downloads)
     {
         DownloadFinished += OnDownloadFinished;
     }

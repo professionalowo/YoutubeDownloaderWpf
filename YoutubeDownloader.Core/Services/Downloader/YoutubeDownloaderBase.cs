@@ -15,7 +15,6 @@ namespace YoutubeDownloader.Core.Services.Downloader;
 
 public abstract partial class YoutubeDownloaderBase<TContext>(
     ConverterFactory<TContext> converterFactory,
-    SystemInfo info,
     ILogger<YoutubeDownloaderBase<TContext>> logger,
     DownloadFactory<TContext> downloadFactory,
     IDirectory downloads)
@@ -143,7 +142,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(info.Cores);
+        var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(SystemInfo.Cores);
         var consumer = ProcessChannel(rx, token);
         await Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, tx.WriteAsync)
             .ConfigureAwait(false);

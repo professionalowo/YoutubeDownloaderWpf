@@ -41,18 +41,19 @@ public static class MauiProgram
     }
 }
 
-
 static class ServicesExtensions
 {
-    private static readonly Lazy<IDirectory> BaseDirectory = new (() =>
+    private static readonly Lazy<IDirectory> BaseDirectory = new(() =>
     {
-        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YoutubeDownloader");
+        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "YoutubeDownloader");
         IDirectory dir = new AbsoluteDirectory(path);
         return dir;
     });
+
     public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new()
+        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new SocketsHttpHandler()
         {
             PooledConnectionLifetime = TimeSpan.FromMinutes(2),
             ConnectTimeout = TimeSpan.FromSeconds(10)
@@ -67,7 +68,6 @@ static class ServicesExtensions
         serviceCollection.AddTransient<Services.YoutubeDownloader>();
         serviceCollection.AddSingleton<IDirectory>(_ =>
         {
-
             IDirectory child = new ChildDirectory(BaseDirectory.Value, "Downloads");
             child.Init();
             return child;
@@ -75,7 +75,6 @@ static class ServicesExtensions
         serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory<DownloadContext>>();
         serviceCollection.AddSingleton<ConverterFactory<DownloadContext>>();
-        serviceCollection.AddSingleton<SystemInfo>();
         return serviceCollection;
     }
 
@@ -83,7 +82,7 @@ static class ServicesExtensions
     {
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
-        serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
+        serviceCollection.AddSingleton<TaggedVersion>(_ => new TaggedVersion(1, 0, 4));
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }

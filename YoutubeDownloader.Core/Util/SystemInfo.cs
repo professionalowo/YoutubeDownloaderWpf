@@ -11,5 +11,5 @@ public class SystemInfo
     /// <summary>
     /// Use 80% of cores
     /// </summary>
-    public int Cores => (int)Math.Ceiling(Environment.ProcessorCount * 0.8);
+    public static int Cores => (int)Math.Ceiling(Environment.ProcessorCount * 0.8);
 }
