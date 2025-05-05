@@ -32,7 +32,7 @@ public class GitHubVersionClient(HttpClient client)
         return TaggedVersion.FromTag(tag);
     }
 
-    public async Task DownloadVersion(String downloadDir,TaggedVersion version, CancellationToken token = default)
+    public async Task DownloadVersion(string downloadDir,TaggedVersion version, CancellationToken token = default)
     {
         string zipFileName = $"YoutubeDownloader-{version}.zip";
         string fileUrl = UrlUtil.Combine(ReleasesUrl, "download", version.ToString(), zipFileName);
