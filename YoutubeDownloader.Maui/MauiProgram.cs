@@ -45,10 +45,9 @@ static class ServicesExtensions
 {
     private static readonly Lazy<IDirectory> BaseDirectory = new(() =>
     {
-        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "YoutubeDownloader");
-        IDirectory dir = new AbsoluteDirectory(path);
-        return dir;
+        return new AbsoluteDirectory(path);
     });
 
     public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
@@ -64,6 +63,7 @@ static class ServicesExtensions
 
     public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"));
         serviceCollection.AddTransient<Services.YoutubeDownloader>();
         serviceCollection.AddSingleton<IDirectory>(_ =>
@@ -72,7 +72,6 @@ static class ServicesExtensions
             child.Init();
             return child;
         });
-        serviceCollection.AddTransient<YoutubeClient>();
         serviceCollection.AddTransient<DownloadFactory<DownloadContext>>();
         serviceCollection.AddSingleton<ConverterFactory<DownloadContext>>();
         return serviceCollection;
@@ -80,9 +79,6 @@ static class ServicesExtensions
 
     public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<IUpdater, Updater.Noop>();
-        serviceCollection.AddScoped<GitHubVersionClient>();
-        serviceCollection.AddSingleton<TaggedVersion>(_ => new TaggedVersion(1, 0, 4));
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;
     }
