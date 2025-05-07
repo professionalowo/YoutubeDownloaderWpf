@@ -132,7 +132,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     {
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
             .ConfigureAwait(false);
-        var uiTask = DispatchToUi(() => DownloadStatuses.Add(context), token);
+        var uiTask = AddDownloadStatus(context, token);
         var fileName = downloads.ChildFileName(segments);
         await using var mediaStream = new BufferedStream(stream);
         await converter.Convert(mediaStream, fileName, context, token).ConfigureAwait(false);
@@ -150,6 +150,9 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         await consumer.ConfigureAwait(false);
         OnDownloadFinished();
     }
+
+    private Task AddDownloadStatus(TContext context, CancellationToken token = default) =>
+        DispatchToUi(() => DownloadStatuses.Add(context), token);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
