@@ -1,9 +1,11 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using YoutubeDownloader.Core.Services.Converter;
 
 namespace YoutubeDownloader.Core.Data;
 
+[DebuggerDisplay("Name = {Name},Size = {Size}")]
 public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContext>.IConverterContext
 {
     public string Name
@@ -46,7 +48,9 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     }
 
     public event EventHandler<bool> DownloadFinished;
-    public void InvokeDownloadFinished(object? sender, bool finishedSuccessfully) => DownloadFinished.Invoke(sender, finishedSuccessfully);
+
+    public void InvokeDownloadFinished(object? sender, bool finishedSuccessfully) =>
+        DownloadFinished.Invoke(sender, finishedSuccessfully);
 
     protected virtual void OnDownloadFinished(object? sender, bool e)
     {
