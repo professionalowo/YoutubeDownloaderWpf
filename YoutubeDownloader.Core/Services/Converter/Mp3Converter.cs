@@ -14,12 +14,13 @@ namespace YoutubeDownloader.Core.Services.Converter;
 public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
-    public ValueTask<string> Convert(Stream audioStream, string outPath, TContext context, CancellationToken token = default)
+    public ValueTask<string> Convert(Stream audioStream, string outPath, TContext context,
+        CancellationToken token = default)
         => token.IsCancellationRequested
             ? ValueTask.FromCanceled<string>(token)
             : ValueTask.FromResult(ConvertSync(audioStream, outPath, context));
 
-    private string ConvertSync(Stream data, string outPath, TContext context)
+    private string ConvertSync(Stream data, ReadOnlySpan<char> outPath, TContext context)
     {
         var mp3Path = $"{outPath}.mp3";
         using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
