@@ -2,29 +2,34 @@
 using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
+
 public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
 {
     public FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
-    => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? defaultConfig;
+        => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? defaultConfig;
 
-    public static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
+    private static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
     {
-        string replacedExe = PlatformUtil.AsExecutablePath(exe);
-        string[] paths = [.. SplitPath(Environment.GetEnvironmentVariable("PATH")), .. SplitPath(Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User))];
-        foreach (string path in paths.Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)))
-        {
-            if (File.Exists(Path.Combine(path, replacedExe)))
-            {
-                return new(new AbsoluteDirectory(Path.GetFullPath(path)), exe);
-            }
-        }
-        return null;
+        var replacedExe = PlatformUtil.AsExecutablePath(exe);
+        string[] paths =
+        [
+            .. SplitPath(Environment.GetEnvironmentVariable("PATH")),
+            .. SplitPath(Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User))
+        ];
+
+        return paths.Select(p => p.Trim())
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Where(p => File.Exists(Path.Combine(p, replacedExe)))
+            .Select(Path.GetFullPath)
+            .Select(p => new AbsoluteDirectory(p))
+            .Select(dir => new FfmpegDownloader.Config(dir, exe))
+            .FirstOrDefault();
     }
 
     private static string[] SplitPath(string? variable)
     {
-        string toSplit = variable ?? ""; 
-        char separator = PlatformUtil.IsWindows() ? ';' : ':';
+        var toSplit = variable ?? "";
+        var separator = PlatformUtil.IsWindows() ? ';' : ':';
         return toSplit.Split(separator);
     }
 }
