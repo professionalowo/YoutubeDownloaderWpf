@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using YoutubeDownloader.Core.Util.Extensions;
+﻿using YoutubeDownloader.Core.Util.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 

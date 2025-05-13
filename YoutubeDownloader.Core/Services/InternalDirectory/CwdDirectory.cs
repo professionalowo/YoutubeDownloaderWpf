@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace YoutubeDownloader.Core.Services.InternalDirectory;
+﻿namespace YoutubeDownloader.Core.Services.InternalDirectory;
 
 public class CwdDirectory(string name) : IDirectory
 {

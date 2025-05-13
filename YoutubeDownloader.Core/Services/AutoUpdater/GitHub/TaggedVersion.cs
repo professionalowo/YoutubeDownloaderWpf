@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
+﻿namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 
 public record TaggedVersion(uint Major, uint Minor, uint Patch) : IComparable<TaggedVersion>
 {

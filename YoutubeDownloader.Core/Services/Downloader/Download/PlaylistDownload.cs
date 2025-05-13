@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Diagnostics.CodeAnalysis;
 using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util.Extensions;
 using YoutubeExplode;

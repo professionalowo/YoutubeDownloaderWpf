@@ -1,8 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 

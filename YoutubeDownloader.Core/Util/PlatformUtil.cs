@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace YoutubeDownloader.Core.Util;
 
 public class PlatformUtil

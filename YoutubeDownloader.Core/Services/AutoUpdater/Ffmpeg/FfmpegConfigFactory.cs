@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YoutubeDownloader.Core.Services.InternalDirectory;
+﻿using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
