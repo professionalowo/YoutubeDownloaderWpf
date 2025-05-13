@@ -12,7 +12,6 @@ public abstract class ScopedResource(string path) : IDisposable
         if (_disposedValue) return;
         if (disposing && Path.Exists(FullPath))
         {
-            // TODO: dispose managed state (managed objects)
             CleanResource();
         }
 

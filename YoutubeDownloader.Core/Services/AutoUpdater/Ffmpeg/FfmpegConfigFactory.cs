@@ -17,8 +17,7 @@ public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
             .. SplitPath(Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User))
         ];
 
-        return paths.Select(p => p.Trim())
-            .Where(p => !string.IsNullOrEmpty(p))
+        return paths.Where(p => !string.IsNullOrEmpty(p))
             .Where(p => File.Exists(Path.Combine(p, replacedExe)))
             .Select(Path.GetFullPath)
             .Select(p => new AbsoluteDirectory(p))
@@ -30,6 +29,6 @@ public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
     {
         var toSplit = variable ?? "";
         var separator = PlatformUtil.IsWindows() ? ';' : ':';
-        return toSplit.Split(separator);
+        return toSplit.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 }
