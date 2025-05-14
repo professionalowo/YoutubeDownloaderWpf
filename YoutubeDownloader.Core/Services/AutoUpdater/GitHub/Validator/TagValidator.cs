@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace YoutubeDownloader.Core.Util.Validator;
+namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub.Validator;
 
 public static partial class TagValidator
 {
