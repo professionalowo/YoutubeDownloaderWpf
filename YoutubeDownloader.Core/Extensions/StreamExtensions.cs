@@ -28,8 +28,7 @@ public static class StreamExtensions
         // Ensure buffer size is a multiple of 4
         Span<byte> buffer = stackalloc byte[buffer_size]; // Buffer size: multiple of 4
         long totalBytesRead = 0;
-        int bytesRead;
-        while ((bytesRead = input.Read(buffer)) > 0)
+        while (input.ReadOut(ref buffer, out var bytesRead))
         {
             destination.Write(buffer[..bytesRead]);
             totalBytesRead += bytesRead;
@@ -37,4 +36,7 @@ public static class StreamExtensions
             progress?.Report(totalBytesRead);
         }
     }
+
+    private static bool ReadOut(this Stream s, ref Span<byte> b, out int r)
+        => (r = s.Read(b)) > 0;
 }
