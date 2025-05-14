@@ -11,22 +11,22 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
     public async ValueTask DownloadFfmpeg(CancellationToken token = default)
     {
         Directory.CreateDirectory(config.Folder.FullPath);
-        using HttpResponseMessage response = await client.GetAsync(Config.Source, token);
-        await using Stream readStream = await response.Content.ReadAsStreamAsync(token);
+        using var response = await client.GetAsync(Config.Source, token);
+        await using var readStream = await response.Content.ReadAsStreamAsync(token);
 
         using ScopedResource.File zipSource = new(config.Folder.ChildFileName("source.zip"));
         using ScopedResource.Directory sourceUnzipped = new(config.Folder.ChildFileName(Path.GetFileNameWithoutExtension(zipSource.FullPath)));
 
-        await using (FileStream fileStream = new(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+        await using (var fileStream = new FileStream(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
         {
             await readStream.CopyToAsync(fileStream, token);
         }
 
         ZipFile.ExtractToDirectory(zipSource.FullPath, sourceUnzipped.FullPath);
-        string[] executables = Directory.GetFiles(sourceUnzipped.FullPath, "*.exe", SearchOption.AllDirectories);
+        var executables = Directory.GetFiles(sourceUnzipped.FullPath, "*.exe", SearchOption.AllDirectories);
 
-        string ffmpegExe = Path.ChangeExtension(config.FfmpegExeName, "exe");
-        string ffmpegPathSource = executables.First(path => path.EndsWith(ffmpegExe));
+        var ffmpegExe = Path.ChangeExtension(config.FfmpegExeName, "exe");
+        var ffmpegPathSource = executables.First(path => path.EndsWith(ffmpegExe));
         File.Move(ffmpegPathSource, config.Folder.ChildFileName(ffmpegExe));
 
         logger.LogInformation("Installed Ffmpeg");
