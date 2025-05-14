@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using YoutubeDownloader.Core.Data;
+using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Util.Extensions;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 

@@ -1,4 +1,6 @@
-﻿namespace YoutubeDownloader.Core.Util.Extensions;
+﻿using YoutubeDownloader.Core.Util;
+
+namespace YoutubeDownloader.Core.Extensions;
 
 public static class PathExtensions
 {

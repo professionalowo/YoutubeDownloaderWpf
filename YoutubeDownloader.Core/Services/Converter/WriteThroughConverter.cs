@@ -1,4 +1,4 @@
-﻿using YoutubeDownloader.Core.Util.Extensions;
+﻿using YoutubeDownloader.Core.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 

@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace YoutubeDownloader.Core.Util.Extensions;
+namespace YoutubeDownloader.Core.Extensions;
 
 public static class ChannelExtensions
 {

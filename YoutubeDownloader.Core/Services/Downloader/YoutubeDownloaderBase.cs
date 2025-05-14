@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
+using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
-using YoutubeDownloader.Core.Util.Extensions;
 
 
 namespace YoutubeDownloader.Core.Services.Downloader;

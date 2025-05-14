@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace YoutubeDownloader.Core.Util.Extensions;
+namespace YoutubeDownloader.Core.Extensions;
 
 public static class StreamExtensions
 {

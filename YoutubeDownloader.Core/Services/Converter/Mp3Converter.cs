@@ -1,5 +1,5 @@
-﻿using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Core.Util.Extensions;
+﻿using YoutubeDownloader.Core.Extensions;
+using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
