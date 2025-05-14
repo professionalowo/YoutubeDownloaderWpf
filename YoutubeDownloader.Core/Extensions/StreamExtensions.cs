@@ -7,20 +7,45 @@ public static class StreamExtensions
     // Ensure buffer size is a multiple of 4
     private const int buffer_size = 1024 * 64;
 
+    private readonly struct AsyncConversion() : IAsyncDisposable, IDisposable
+    {
+        private readonly IMemoryOwner<byte> _buffer = MemoryPool<byte>.Shared.Rent(buffer_size);
+        public required Stream Input { init; private get; }
+        public required Stream Destination { init; private get; }
+
+        public async Task Convert(IProgress<long> progress,
+            CancellationToken token = default)
+        {
+            var memory = _buffer.Memory;
+            long totalBytesRead = 0;
+            int bytesRead;
+            while ((bytesRead = await Input.ReadAsync(memory, token).ConfigureAwait(false)) > 0)
+            {
+                await Destination.WriteAsync(memory[..bytesRead], token).ConfigureAwait(false);
+                totalBytesRead += bytesRead;
+                // Report progress
+                progress?.Report(totalBytesRead);
+            }
+        }
+
+        public void Dispose() => _buffer.Dispose();
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
+        }
+    }
+
     public static async Task CopyToTrackedAsync(this Stream input, Stream destination, IProgress<long> progress,
         CancellationToken token = default)
     {
-        using var shared = MemoryPool<byte>.Shared.Rent(buffer_size); // Buffer size: multiple of 4
-        var memory = shared.Memory;
-        long totalBytesRead = 0;
-        int bytesRead;
-        while ((bytesRead = await input.ReadAsync(memory, token).ConfigureAwait(false)) > 0)
+        await using var conversion = new AsyncConversion
         {
-            await destination.WriteAsync(memory[..bytesRead], token).ConfigureAwait(false);
-            totalBytesRead += bytesRead;
-            // Report progress
-            progress?.Report(totalBytesRead);
-        }
+            Input = input,
+            Destination = destination,
+        };
+        await conversion.Convert(progress, token).ConfigureAwait(false);
     }
 
     public static void CopyToTracked(this Stream input, Stream destination, IProgress<long> progress)
