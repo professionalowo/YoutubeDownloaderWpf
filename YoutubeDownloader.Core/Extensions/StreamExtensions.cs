@@ -4,7 +4,7 @@ namespace YoutubeDownloader.Core.Extensions;
 
 public static class StreamExtensions
 {
-    public static TrackedStream ToTracked(this Stream inner, IProgress<long> progress)
+    public static TrackedStream Tracked(this Stream inner, IProgress<long> progress)
         => new(inner, progress);
 }
 
