@@ -3,7 +3,7 @@ using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
+public class Mp3Converter<TContext>(string ffmpegPath)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public ValueTask Convert(Stream audioStream, string outPath, TContext context,
@@ -24,7 +24,7 @@ public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     private void ConvertSync(Stream data, ReadOnlySpan<char> outPath, TContext context)
     {
         var mp3Path = $"{outPath}.mp3";
-        using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
+        using var conversion = new FfmpegMp3Conversion(ffmpegPath, mp3Path);
 
         data.CopyToTracked(conversion.Input, context.GetProgress());
         context.InvokeDownloadFinished(this, true);

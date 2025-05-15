@@ -6,7 +6,7 @@ public class ConverterFactory<TContext>(FfmpegDownloader.Config config)
     where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lazy<Mp3Converter<TContext>> _mp3Converter =
-        new(() => new Mp3Converter<TContext>(config));
+        new(() => new Mp3Converter<TContext>(config.FfmpegExeFullPath));
 
     private readonly Lazy<WriteThroughConverter<TContext>> _noopConverter =
         new(() => new WriteThroughConverter<TContext>(".mp4"));
