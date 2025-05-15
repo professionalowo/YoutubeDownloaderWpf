@@ -9,6 +9,6 @@ public interface IConverter<in TContext> where TContext : IConverter<TContext>.I
         void InvokeDownloadFinished(object sender, bool finishedSuccessfully);
     }
 
-    public ValueTask<string> Convert(Stream audioStream, string outPath, TContext context,
+    public ValueTask Convert(Stream audioStream, string outPath, TContext context,
         CancellationToken token = default);
 }

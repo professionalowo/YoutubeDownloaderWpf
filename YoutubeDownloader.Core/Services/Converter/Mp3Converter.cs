@@ -6,29 +6,27 @@ namespace YoutubeDownloader.Core.Services.Converter;
 public class Mp3Converter<TContext>(FfmpegDownloader.Config config)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
-    public ValueTask<string> Convert(Stream audioStream, string outPath, TContext context,
+    public ValueTask Convert(Stream audioStream, string outPath, TContext context,
         CancellationToken token = default)
     {
-        if (token.IsCancellationRequested) return ValueTask.FromCanceled<string>(token);
+        if (token.IsCancellationRequested) return ValueTask.FromCanceled(token);
         try
         {
-            var mp3Path = ConvertSync(audioStream, outPath, context);
-            return ValueTask.FromResult(mp3Path);
+            ConvertSync(audioStream, outPath, context);
+            return ValueTask.CompletedTask;
         }
         catch (Exception e)
         {
-            return ValueTask.FromException<string>(e);
+            return ValueTask.FromException(e);
         }
     }
 
-    private string ConvertSync(Stream data, ReadOnlySpan<char> outPath, TContext context)
+    private void ConvertSync(Stream data, ReadOnlySpan<char> outPath, TContext context)
     {
         var mp3Path = $"{outPath}.mp3";
         using var conversion = new FfmpegMp3Conversion(config.FfmpegExeFullPath, mp3Path);
 
         data.CopyToTracked(conversion.Input, context.GetProgress());
         context.InvokeDownloadFinished(this, true);
-
-        return mp3Path;
     }
 }
