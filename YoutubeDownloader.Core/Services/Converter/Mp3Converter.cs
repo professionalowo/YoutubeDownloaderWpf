@@ -25,8 +25,8 @@ public class Mp3Converter<TContext>(string ffmpegPath)
     {
         var mp3Path = $"{outPath}.mp3";
         using var conversion = new FfmpegMp3Conversion(ffmpegPath, mp3Path);
-
-        data.CopyToTracked(conversion.Input, context.GetProgress());
+        using var tracked = conversion.Input.ToTracked(context.GetProgress());
+        data.CopyTo(tracked);
         context.InvokeDownloadFinished(this, true);
     }
 }

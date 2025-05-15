@@ -12,8 +12,9 @@ public class WriteThroughConverter<TContext>(string extension)
         try
         {
             await using var file = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write,
-                FileShare.ReadWrite | FileShare.Delete);
-            await audioStream.CopyToTrackedAsync(file, context.GetProgress(), token)
+                    FileShare.ReadWrite | FileShare.Delete)
+                .ToTracked(context.GetProgress());
+            await audioStream.CopyToAsync(file, token)
                 .ConfigureAwait(false);
             context.InvokeDownloadFinished(this, true);
         }
