@@ -55,14 +55,14 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
 
     protected virtual void OnDownloadFinished(object? sender, bool e)
     {
-        ProgressValue = 100;
+        ProgressValue = 1;
     }
 
     public DownloadContext(string name, double sizeInMb)
     {
         Name = name;
         Size = Math.Round(sizeInMb, 2);
-        ProgressHandler = new Progress<double>(p => ProgressValue += p * 100);
+        ProgressHandler = new Progress<double>(p => ProgressValue += p);
         DownloadFinished += OnDownloadFinished;
     }
 
