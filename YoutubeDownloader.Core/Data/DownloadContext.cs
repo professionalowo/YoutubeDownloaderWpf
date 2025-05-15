@@ -18,6 +18,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         }
     }
 
+    //Size is in mb
     public double Size
     {
         get;
@@ -61,7 +62,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     {
         Name = name;
         Size = Math.Round(sizeInMb, 2);
-        ProgressHandler = new Progress<double>(p => ProgressValue = p * 100);
+        ProgressHandler = new Progress<double>(p => ProgressValue += p * 100);
         DownloadFinished += OnDownloadFinished;
     }
 
@@ -71,7 +72,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         Progress<long> downloadProgress = new();
         downloadProgress.ProgressChanged += (_, e) =>
         {
-            var percentage = Math.Min(e / (Size * 1000), 100);
+            var percentage = Math.Min(e / (Size * 1000 * 1000), 100);
             ProgressHandler.Report(percentage);
         };
 
