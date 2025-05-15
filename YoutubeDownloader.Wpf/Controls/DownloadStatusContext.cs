@@ -13,7 +13,7 @@ using YoutubeDownloader.Core.Services.Converter;
 namespace YoutubeDownloader.Wpf.Controls;
 
 public sealed class DownloadStatusContext(string name, double sizeInMb)
-    : DownloadContext(name, sizeInMb)
+    : DownloadContext(name, sizeInMb, 100)
 {
     public Brush Background
     {

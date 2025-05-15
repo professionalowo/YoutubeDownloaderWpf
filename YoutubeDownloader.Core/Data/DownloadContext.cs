@@ -29,7 +29,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         }
     }
 
-    public double ProgressValue
+    public virtual double ProgressValue
     {
         get;
         set
@@ -39,14 +39,15 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         }
     } = 0;
 
+    private double ProgressMultiplier { get; }
+
     private IProgress<double> ProgressHandler { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
 
     public event EventHandler<bool> DownloadFinished;
 
@@ -54,16 +55,16 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         DownloadFinished.Invoke(sender, finishedSuccessfully);
 
     protected virtual void OnDownloadFinished(object? sender, bool e)
-    {
-        ProgressValue = 1;
-    }
+        => ProgressValue = 1 * ProgressMultiplier;
 
-    public DownloadContext(string name, double sizeInMb)
+
+    public DownloadContext(string name, double sizeInMb, int progressMultiplier = 1)
     {
         Name = name;
         Size = Math.Round(sizeInMb, 2);
-        ProgressHandler = new Progress<double>(p => ProgressValue += p);
+        ProgressHandler = new Progress<double>(p => ProgressValue += p * ProgressMultiplier);
         DownloadFinished += OnDownloadFinished;
+        ProgressMultiplier = progressMultiplier;
     }
 
 
