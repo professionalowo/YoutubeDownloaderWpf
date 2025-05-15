@@ -28,6 +28,55 @@ public static class StreamExtensions
             }
         }
 
+        private class TrackedStream(Stream inner, IProgress<long> progress) : Stream
+        {
+            private Stream Inner => inner;
+
+            public override void Flush()
+            {
+                Inner.Flush();
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+                => Inner.Read(buffer, offset, count);
+
+            public override long Seek(long offset, SeekOrigin origin) => Inner.Seek(offset, origin);
+
+            public override void SetLength(long value)
+                => Inner.SetLength(value);
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                Inner.Write(buffer, offset, count);
+                progress.Report(count);
+            }
+
+            public override bool CanRead => Inner.CanRead;
+            public override bool CanSeek => Inner.CanSeek;
+            public override bool CanWrite => Inner.CanWrite;
+            public override long Length => Inner.Length;
+
+            public override long Position
+            {
+                get => Inner.Position;
+                set => Inner.Position = value;
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+                Inner.Dispose();
+            }
+
+            public override async ValueTask DisposeAsync()
+            {
+                await base.DisposeAsync()
+                    .ConfigureAwait(false);
+                await Inner.DisposeAsync()
+                    .ConfigureAwait(false);
+            }
+        }
+
         public void Dispose() => _buffer.Dispose();
 
         public ValueTask DisposeAsync()
