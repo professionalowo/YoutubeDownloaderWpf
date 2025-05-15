@@ -4,11 +4,11 @@ namespace YoutubeDownloader.Core.Extensions;
 
 public static class StreamExtensions
 {
-    public static TrackedStream Tracked(this Stream inner, IProgress<long> progress)
-        => new(inner, progress);
+    public static Stream Tracked(this Stream inner, IProgress<long> progress)
+        => new TrackedStream(inner, progress);
 }
 
-public class TrackedStream(Stream inner, IProgress<long> progress) : Stream
+internal class TrackedStream(Stream inner, IProgress<long> progress) : Stream
 {
     public override void Flush()
         => inner.Flush();
