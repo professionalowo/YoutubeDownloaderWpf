@@ -11,7 +11,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     public string Name
     {
         get;
-        set
+        protected set
         {
             field = value;
             OnPropertyChanged();
@@ -22,7 +22,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     public double Size
     {
         get;
-        set
+        protected set
         {
             field = value;
             OnPropertyChanged();
@@ -32,7 +32,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     public virtual double ProgressValue
     {
         get;
-        set
+        protected set
         {
             field = value;
             OnPropertyChanged();
@@ -40,43 +40,57 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     } = 0;
 
     private double ProgressMultiplier { get; }
-
     private IProgress<double> ProgressHandler { get; }
+
+    public DownloadContext(string name, double sizeInMb, int progressMultiplier = 1)
+    {
+        Name = name;
+        Size = Math.Round(sizeInMb, 2);
+        ProgressMultiplier = progressMultiplier;
+        ProgressHandler = new MultiplierHandler(this);
+        DownloadFinished += OnDownloadFinished;
+    }
+
+    #region Progress
+
+    public IProgress<long> GetProgress()
+        => new DownloadProgress(this);
+
+    private class DownloadProgress : Progress<long>
+    {
+        public DownloadProgress(DownloadContext ctx)
+        {
+            ProgressChanged += (_, e) =>
+            {
+                var percentage = Math.Min(e / (ctx.Size * 1000 * 1000), 100);
+                ctx.ProgressHandler.Report(percentage);
+            };
+        }
+    }
+
+    private class MultiplierHandler(DownloadContext ctx)
+        : Progress<double>(p => ctx.ProgressValue += p * ctx.ProgressMultiplier);
+
+    #endregion
+
+    #region DownloadFinished
+
+    public event EventHandler<bool> DownloadFinished;
+
+    public void InvokeDownloadFinished(object sender, bool finishedSuccessfully) =>
+        DownloadFinished.Invoke(sender, finishedSuccessfully);
+
+    protected virtual void OnDownloadFinished(object? sender, bool e)
+        => ProgressValue = 1 * ProgressMultiplier;
+
+    #endregion
+
+    #region INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-
-    public event EventHandler<bool> DownloadFinished;
-
-    public void InvokeDownloadFinished(object? sender, bool finishedSuccessfully) =>
-        DownloadFinished.Invoke(sender, finishedSuccessfully);
-
-    protected virtual void OnDownloadFinished(object? sender, bool e)
-        => ProgressValue = 1 * ProgressMultiplier;
-
-
-    public DownloadContext(string name, double sizeInMb, int progressMultiplier = 1)
-    {
-        Name = name;
-        Size = Math.Round(sizeInMb, 2);
-        ProgressHandler = new Progress<double>(p => ProgressValue += p * ProgressMultiplier);
-        DownloadFinished += OnDownloadFinished;
-        ProgressMultiplier = progressMultiplier;
-    }
-
-
-    public IProgress<long> GetProgress()
-    {
-        Progress<long> downloadProgress = new();
-        downloadProgress.ProgressChanged += (_, e) =>
-        {
-            var percentage = Math.Min(e / (Size * 1000 * 1000), 100);
-            ProgressHandler.Report(percentage);
-        };
-
-        return downloadProgress;
-    }
+    #endregion
 }
