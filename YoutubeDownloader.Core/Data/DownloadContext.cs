@@ -58,14 +58,19 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
 
     private class DownloadProgress : Progress<long>
     {
+        private const int mb = 1000 * 1000;
+
         public DownloadProgress(DownloadContext ctx)
-        {
-            ProgressChanged += (_, e) =>
+            => ProgressChanged += OnProgressChangedFactory(ctx);
+
+
+        private static EventHandler<long> OnProgressChangedFactory(DownloadContext ctx)
+            => (_, value) =>
             {
-                var percentage = Math.Min(e / (ctx.Size * 1000 * 1000), 100);
-                ctx.ProgressHandler.Report(percentage);
+                var percentage = value / (ctx.Size * mb);
+                var report = Math.Min(percentage, 100);
+                ctx.ProgressHandler.Report(report);
             };
-        }
     }
 
     private class MultiplierHandler(DownloadContext ctx)
