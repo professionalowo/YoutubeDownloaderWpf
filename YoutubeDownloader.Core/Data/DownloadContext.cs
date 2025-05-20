@@ -29,7 +29,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         }
     }
 
-    public virtual double ProgressValue
+    public double ProgressValue
     {
         get;
         protected set
