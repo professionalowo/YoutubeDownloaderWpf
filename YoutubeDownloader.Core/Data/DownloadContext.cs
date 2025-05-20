@@ -8,26 +8,10 @@ namespace YoutubeDownloader.Core.Data;
 [DebuggerDisplay("Name = {Name}, Size = {Size}")]
 public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContext>.IConverterContext
 {
-    public string Name
-    {
-        get;
-        protected set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Name { get; }
 
     //Size is in mb
-    public double Size
-    {
-        get;
-        protected set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public double Size { get; }
 
     public double ProgressValue
     {
