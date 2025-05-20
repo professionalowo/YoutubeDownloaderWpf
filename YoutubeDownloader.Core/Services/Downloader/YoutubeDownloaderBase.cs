@@ -21,6 +21,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lock _cancellationSourceLock = new();
+    private readonly Lock _downloadLock = new();
 
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
@@ -92,6 +93,10 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         {
             logger.LogError("{Error}", e);
         }
+        finally
+        {
+            OnDownloadFinished();
+        }
     }
 
 
@@ -148,7 +153,6 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             .ConfigureAwait(false);
         tx.Complete();
         await consumer.ConfigureAwait(false);
-        OnDownloadFinished();
     }
 
     private Task AddDownloadStatus(TContext context, CancellationToken token = default) =>
