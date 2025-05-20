@@ -56,7 +56,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     public IProgress<long> GetProgress()
         => new DownloadProgress(this);
 
-    private class DownloadProgress : Progress<long>
+    private sealed class DownloadProgress : Progress<long>
     {
         private const int mb = 1000 * 1000;
 
@@ -73,7 +73,7 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
             };
     }
 
-    private class MultiplierHandler(DownloadContext ctx)
+    private sealed class MultiplierHandler(DownloadContext ctx)
         : Progress<double>(p => ctx.ProgressValue += p * ctx.ProgressMultiplier);
 
     #endregion
