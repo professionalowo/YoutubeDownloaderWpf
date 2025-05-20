@@ -9,15 +9,17 @@
         Title="Downloader" Height="450" Width="800" MinHeight="200" MinWidth="550">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center" Width="auto">
             <Label VerticalAlignment="Center">Url:</Label>
-            <TextBox Name="UrlTextBox" Width="450" VerticalContentAlignment="Center" Style="{StaticResource textBoxInError}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+            <TextBox Name="UrlTextBox" Width="450" VerticalContentAlignment="Center"
+                     Style="{StaticResource textBoxInError}"
+                     Validation.ErrorTemplate="{StaticResource validationTemplate}">
                 <TextBox.Text>
                     <Binding Path="Url" Mode="TwoWay">
                         <Binding.ValidationRules>
@@ -28,30 +30,38 @@
             </TextBox>
             <Button Click="Button_Click" Width="150">Download</Button>
             <Label VerticalAlignment="Center">Force Mp3:</Label>
-            <CheckBox IsChecked="{Binding ForceMp3,Mode=TwoWay}" VerticalAlignment="Center"/>
+            <CheckBox IsChecked="{Binding ForceMp3, Mode=TwoWay}" VerticalAlignment="Center" />
         </DockPanel>
         <Grid Grid.Row="1" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" HorizontalAlignment="Center">Name</TextBlock>
             <TextBlock Grid.Column="1" HorizontalAlignment="Center">Progress</TextBlock>
             <TextBlock Grid.Column="2" HorizontalAlignment="Center">Size in MB</TextBlock>
         </Grid>
-        <ListView ItemsSource="{Binding DownloadStatuses}" Grid.Row="2" Margin="10,0,10,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch">
+        <ListView ItemsSource="{Binding DownloadStatuses, Mode=OneWay}" Grid.Row="2" Margin="10,0,10,0"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch"
+                  VerticalContentAlignment="Stretch">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Background="{Binding Background}" VerticalAlignment="Stretch">
+                    <Grid Background="{Binding Background, Mode=OneWay}" VerticalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Name}" HorizontalAlignment="Left" VerticalAlignment="Center"></TextBlock>
-                        <ProgressBar Grid.Column="1" Value="{Binding ProgressValue}" Background="White" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" Foreground="#FF41C127"/>
-                        <TextBlock Grid.Column="2" Text="{Binding Size}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" HorizontalAlignment="Left"
+                                   VerticalAlignment="Center">
+                        </TextBlock>
+                        <ProgressBar Grid.Column="1" Value="{Binding ProgressValue, Mode=OneWay}" Background="White"
+                                     VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                     Foreground="#FF41C127" />
+                        <TextBlock Grid.Column="2" Text="{Binding Size, Mode=OneWay}" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                        </TextBlock>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -59,10 +69,10 @@
         <DockPanel HorizontalAlignment="Center" Grid.Row="3">
             <Button Background="White" Click="Button_Click_Open_Downloads">
                 <Span BaselineAlignment="Center">
-                    <Image Source="folder.jpg"/>
+                    <Image Source="folder.jpg" />
                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Downloads</TextBlock>
                 </Span>
-                
+
             </Button>
             <Button Click="Button_Click_1">Cancel All</Button>
         </DockPanel>
