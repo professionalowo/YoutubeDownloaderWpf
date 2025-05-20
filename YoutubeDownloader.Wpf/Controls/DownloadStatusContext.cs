@@ -18,7 +18,7 @@ public sealed class DownloadStatusContext(string name, double sizeInMb)
     public Brush Background
     {
         get;
-        set
+        private set
         {
             field = value;
             OnPropertyChanged();
