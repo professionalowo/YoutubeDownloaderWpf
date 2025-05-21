@@ -57,6 +57,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         {
             lock (_fetchingLock)
             {
+                if (field == value) return;
                 field = value;
                 OnPropertyChanged();
             }
