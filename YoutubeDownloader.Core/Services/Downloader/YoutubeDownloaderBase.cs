@@ -21,7 +21,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lock _cancellationSourceLock = new();
-    private readonly Lock _downloadLock = new();
+    private readonly Lock _fetchingLock = new();
 
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
@@ -43,6 +43,25 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             OnPropertyChanged();
         }
     } = true;
+
+    public bool IsFetching
+    {
+        get
+        {
+            lock (_fetchingLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (_fetchingLock)
+            {
+                field = value;
+                OnPropertyChanged();
+            }
+        }
+    } = false;
 
     public ObservableCollection<TContext> DownloadStatuses
     {
@@ -80,6 +99,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     {
         await DispatchToUi(ClearStatuses)
             .ConfigureAwait(false);
+        IsFetching = true;
         try
         {
             await DownloadAction(Url, CancellationSource.Token)
@@ -156,7 +176,11 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     }
 
     private Task AddDownloadStatus(TContext context, CancellationToken token = default) =>
-        DispatchToUi(() => DownloadStatuses.Add(context), token);
+        DispatchToUi(() =>
+        {
+            IsFetching = false;
+            DownloadStatuses.Add(context);
+        }, token);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
