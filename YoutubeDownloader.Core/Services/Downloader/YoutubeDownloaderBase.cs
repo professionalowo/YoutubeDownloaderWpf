@@ -177,7 +177,11 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     public event EventHandler? DownloadFinished;
 
-    private void OnDownloadFinished() => DownloadFinished?.Invoke(this, EventArgs.Empty);
+    private void OnDownloadFinished()
+    {
+        DownloadFinished?.Invoke(this, EventArgs.Empty);
+        IsFetching = false;
+    }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
