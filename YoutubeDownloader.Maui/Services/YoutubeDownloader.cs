@@ -23,10 +23,14 @@ public partial class YoutubeDownloader
     }
 
     private static void OnDownloadFinished(object? sender, EventArgs e)
-    {
-        var toast = Toast.Make("Download finished", ToastDuration.Long);
-        DispatchToUi(async () => await toast.Show()).GetAwaiter().GetResult();
-    }
+        => DispatchToUi(ShowFinishedToast)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
+
+    private static Task ShowFinishedToast()
+        => Toast.Make("Download finished", ToastDuration.Long)
+            .Show();
 
     protected override DownloadContext ContextFactory(string name, double size)
         => new(name, size);
