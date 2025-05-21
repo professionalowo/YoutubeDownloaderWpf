@@ -64,7 +64,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = [];
 
-    private CancellationTokenSource CancellationSource
+    protected CancellationTokenSource CancellationSource
     {
         get
         {
@@ -73,7 +73,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
                 return field;
             }
         }
-        set
+        private set
         {
             lock (_cancellationSourceLock)
             {

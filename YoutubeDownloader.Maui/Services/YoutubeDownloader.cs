@@ -18,19 +18,21 @@ public partial class YoutubeDownloader
         ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
         DownloadFactory<DownloadContext> downloadFactory,
         IDirectory downloads) : base(converterFactory, logger, downloadFactory, downloads)
-    {
-        DownloadFinished += OnDownloadFinished;
-    }
+        => DownloadFinished += OnDownloadFinished;
 
-    private static void OnDownloadFinished(object? sender, EventArgs e)
+
+    private void OnDownloadFinished(object? sender, EventArgs e)
         => DispatchToUi(ShowFinishedToast)
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
 
-    private static Task ShowFinishedToast()
-        => Toast.Make("Download finished", ToastDuration.Long)
-            .Show();
+    private async Task ShowFinishedToast()
+    {
+        using var toast = Toast.Make("Download finished", ToastDuration.Long);
+        await toast.Show(CancellationSource.Token)
+            .ConfigureAwait(false);
+    }
 
     protected override DownloadContext ContextFactory(string name, double size)
         => new(name, size);
