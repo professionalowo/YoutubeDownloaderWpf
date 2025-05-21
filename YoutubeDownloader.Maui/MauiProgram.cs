@@ -34,14 +34,14 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services.AddHttp();
-        builder.Services.AddDownloadServices();
-        builder.Services.AddUpdaters();
+        builder.Services.AddHttp()
+            .AddDownloadServices()
+            .AddUpdaters();
         return builder.Build();
     }
 }
 
-static class ServicesExtensions
+internal static class ServicesExtensions
 {
     private static readonly Lazy<IDirectory> BaseDirectory = new(() =>
     {
@@ -51,15 +51,12 @@ static class ServicesExtensions
     });
 
     public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new SocketsHttpHandler()
+        => serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new SocketsHttpHandler()
         {
             PooledConnectionLifetime = TimeSpan.FromMinutes(2),
             ConnectTimeout = TimeSpan.FromSeconds(10)
-        });
-        serviceCollection.AddScoped<HttpClient>();
-        return serviceCollection;
-    }
+        }).AddScoped<HttpClient>();
+
 
     public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
     {
@@ -78,8 +75,5 @@ static class ServicesExtensions
     }
 
     public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<FfmpegDownloader>();
-        return serviceCollection;
-    }
+        => serviceCollection.AddSingleton<FfmpegDownloader>();
 }
