@@ -21,7 +21,6 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lock _cancellationSourceLock = new();
-    private readonly Lock _fetchingLock = new();
 
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
@@ -32,7 +31,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             field = value;
             OnPropertyChanged();
         }
-    } = "";
+    } = string.Empty;
 
     public bool ForceMp3
     {
