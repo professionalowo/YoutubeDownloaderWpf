@@ -40,6 +40,6 @@ public partial class YoutubeDownloader
     protected override Task DispatchToUi(Action action, CancellationToken token = default)
         => MainThread.InvokeOnMainThreadAsync(action);
 
-    private static Task DispatchToUi(Func<Task> action) =>
-        MainThread.InvokeOnMainThreadAsync(action);
+    private static Task DispatchToUi(Func<Task> action)
+        => MainThread.InvokeOnMainThreadAsync(action);
 }
