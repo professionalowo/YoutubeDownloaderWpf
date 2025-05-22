@@ -43,7 +43,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = true;
 
-    public bool IsFetching
+    public bool IsPrefetching
     {
         get;
         set
@@ -89,7 +89,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     {
         await DispatchToUi(ClearStatuses)
             .ConfigureAwait(false);
-        IsFetching = true;
+        IsPrefetching = true;
         try
         {
             await DownloadAction(Url, CancellationSource.Token)
@@ -168,7 +168,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     private Task AddDownloadStatus(TContext context, CancellationToken token = default) =>
         DispatchToUi(() =>
         {
-            IsFetching = false;
+            IsPrefetching = false;
             DownloadStatuses.Add(context);
         }, token);
 
@@ -179,7 +179,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     private void OnDownloadFinished()
     {
         DownloadFinished?.Invoke(this, EventArgs.Empty);
-        IsFetching = false;
+        IsPrefetching = false;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>

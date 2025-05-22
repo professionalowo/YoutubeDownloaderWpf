@@ -49,7 +49,7 @@
                   ItemTemplate="{StaticResource DownloadContextTemplate}"
                   ItemsSource="{Binding DownloadStatuses ,Mode=TwoWay}" />
         <ActivityIndicator Grid.Row="1"
-                           IsRunning="{Binding IsFetching}"
+                           IsRunning="{Binding IsPrefetching}"
                            Scale="1.6"
                            Color="{StaticResource PrimaryDark}" />
         <Button Grid.Row="2"
