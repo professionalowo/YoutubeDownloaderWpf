@@ -46,22 +46,14 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     public bool IsPrefetching
     {
         get;
-        set
+        private set
         {
             field = value;
             OnPropertyChanged();
         }
     } = false;
 
-    public ObservableCollection<TContext> DownloadStatuses
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = [];
+    public ObservableCollection<TContext> DownloadStatuses { get; } = [];
 
     protected CancellationTokenSource CancellationSource
     {
