@@ -59,19 +59,18 @@ internal static class ServicesExtensions
 
 
     public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
+        => serviceCollection.AddTransient<YoutubeClient>()
+            .AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
+            .AddTransient<Services.YoutubeDownloader>()
+            .AddSingleton(CreateDownloadDirectory)
+            .AddTransient<DownloadFactory<DownloadContext>>()
+            .AddSingleton<ConverterFactory<DownloadContext>>();
+
+    private static IDirectory CreateDownloadDirectory(IServiceProvider _)
     {
-        serviceCollection.AddTransient<YoutubeClient>();
-        serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"));
-        serviceCollection.AddTransient<Services.YoutubeDownloader>();
-        serviceCollection.AddSingleton<IDirectory>(_ =>
-        {
-            IDirectory child = new ChildDirectory(BaseDirectory.Value, "Downloads");
-            child.Init();
-            return child;
-        });
-        serviceCollection.AddTransient<DownloadFactory<DownloadContext>>();
-        serviceCollection.AddSingleton<ConverterFactory<DownloadContext>>();
-        return serviceCollection;
+        IDirectory child = new ChildDirectory(BaseDirectory.Value, "Downloads");
+        child.Init();
+        return child;
     }
 
     public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
