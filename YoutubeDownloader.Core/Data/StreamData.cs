@@ -1,3 +1,3 @@
 ﻿namespace YoutubeDownloader.Core.Data;
-public readonly record struct StreamData(Stream Stream, string[] Segments);
 
+public record StreamData(Stream Stream, string[] Segments);
