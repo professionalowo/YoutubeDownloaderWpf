@@ -13,7 +13,7 @@ public class VideoDownload<TContext>(
     string url,
     string path = "") where TContext : IConverter<TContext>.IConverterContext
 {
-    public async ValueTask<DownloadData<StreamData, TContext>> GetStreamAsync(
+    public async ValueTask<DownloadData<TContext>> GetStreamAsync(
         Func<string, double, TContext> contextFactory, CancellationToken token = default)
     {
         var nameTask = GetName(token);
@@ -28,7 +28,7 @@ public class VideoDownload<TContext>(
             .ConfigureAwait(false);
 
         var data = new StreamData(stream, [path, name]);
-        return new DownloadData<StreamData, TContext>(data, statusContext);
+        return new DownloadData<TContext>(data, statusContext);
     }
 
     private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
