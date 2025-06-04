@@ -132,9 +132,9 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(
         IConverter<TContext> converter)
-        => (download, token) => ProcessDownload(download, converter, token);
+        => (download, token) => ProcessDownload(converter, download, token);
 
-    private async ValueTask ProcessDownload(VideoDownload<TContext> download, IConverter<TContext> converter,
+    private async ValueTask ProcessDownload(IConverter<TContext> converter, VideoDownload<TContext> download,
         CancellationToken token = default)
     {
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
@@ -165,16 +165,15 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             DownloadStatuses.Add(context);
         }, token);
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    public event EventHandler? DownloadFinished;
+    protected event EventHandler? DownloadFinished;
 
     private void OnDownloadFinished()
     {
         DownloadFinished?.Invoke(this, EventArgs.Empty);
         IsPrefetching = false;
     }
-
+    
+    public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
