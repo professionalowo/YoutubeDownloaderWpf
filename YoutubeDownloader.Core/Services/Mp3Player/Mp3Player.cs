@@ -10,16 +10,14 @@ public class Mp3Player(IDirectory downloads, FfmpegDownloader.Config config) : I
 {
     public const string SearchFilter = "*.mp3";
 
-    public ObservableCollection<Mp3File> Files => new(downloads.GetFiles(SearchFilter)
-        .Select(p => new Mp3File(p)));
+    public ICollection<Mp3File> Files =>
+    [
+        ..downloads.GetFiles(SearchFilter)
+            .Select(p => new Mp3File(p))
+    ];
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-    public record Mp3File(string FullPath)
-    {
-        public string Name => Path.GetFileName(FullPath);
-    }
 }

@@ -6,15 +6,35 @@
              x:DataType="player:Mp3Player"
              x:Class="YoutubeDownloader.Maui.PlayerPage">
     <ContentPage.Content>
-        <ListView
-            HorizontalOptions="Fill"
-            VerticalOptions="Fill"
-            ItemsSource="{Binding  Files, Mode=OneWay}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextCell TextColor="Blue" Text="{Binding Name}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <Grid Padding="30,15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="0.2*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Entry Grid.Row="0"
+                   ReturnType="Search"
+                   HorizontalOptions="Fill"
+                   VerticalTextAlignment="Center"
+                   Placeholder="Search..." />
+            <ListView Grid.Row="1"
+                      HorizontalOptions="Fill"
+                      VerticalOptions="Fill"
+                      SelectionMode="Single"
+                      ItemsSource="{Binding Files, Mode=OneWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="player:Mp3File">
+                        <ViewCell>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label VerticalTextAlignment="Center" Grid.Column="0" Text="{Binding Name}" />
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
