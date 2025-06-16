@@ -17,24 +17,27 @@
                    HorizontalOptions="Fill"
                    VerticalTextAlignment="Center"
                    Placeholder="Search..." />
-            <ListView Grid.Row="1"
-                      HorizontalOptions="Fill"
-                      VerticalOptions="Fill"
-                      SelectionMode="Single"
-                      ItemsSource="{Binding Files, Mode=OneWay}">
-                <ListView.ItemTemplate>
+            <CollectionView Grid.Row="1"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding Files, Mode=OneWay}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="player:Mp3File">
-                        <ViewCell>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Label VerticalTextAlignment="Center" Grid.Column="0" Text="{Binding Name}" />
-                            </Grid>
-                        </ViewCell>
+                        <Grid HorizontalOptions="Fill"
+                              VerticalOptions="Fill"
+                              HeightRequest="45">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label VerticalTextAlignment="Center" Grid.Column="0" Text="{Binding Name}" />
+                        </Grid>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
