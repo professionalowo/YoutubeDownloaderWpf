@@ -2,19 +2,17 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                     xmlns:data="clr-namespace:YoutubeDownloader.Core.Data;assembly=YoutubeDownloader.Core">
     <DataTemplate x:Key="DownloadContextTemplate" x:DataType="data:DownloadContext">
-        <ViewCell>
-            <Grid VerticalOptions="Fill">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Text="{Binding Name}" VerticalOptions="Center" />
-                <ProgressBar Grid.Column="1" Progress="{Binding ProgressValue}" Background="White"
-                             VerticalOptions="Fill" ProgressColor="{StaticResource PrimaryDark}" />
-                <Label Grid.Column="2" Text="{Binding Size}" HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Grid>
-        </ViewCell>
+        <Grid VerticalOptions="Fill" HorizontalOptions="Fill" HeightRequest="45">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Text="{Binding Name}" VerticalOptions="Center" />
+            <ProgressBar Grid.Column="1" Progress="{Binding ProgressValue}" Background="White"
+                         VerticalOptions="Fill" ProgressColor="{StaticResource PrimaryDark}" />
+            <Label Grid.Column="2" Text="{Binding Size}" HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>

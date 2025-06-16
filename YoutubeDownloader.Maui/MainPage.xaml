@@ -44,7 +44,7 @@
                       VerticalOptions="Center"
                       IsChecked="{Binding Path=ForceMp3, Mode=TwoWay}" />
         </Grid>
-        <ListView Grid.Row="1"
+        <CollectionView Grid.Row="1"
                   VerticalOptions="Fill"
                   ItemTemplate="{StaticResource DownloadContextTemplate}"
                   ItemsSource="{Binding DownloadStatuses ,Mode=TwoWay}" />
