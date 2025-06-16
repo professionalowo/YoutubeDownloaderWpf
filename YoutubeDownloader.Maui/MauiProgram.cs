@@ -10,6 +10,7 @@ using YoutubeDownloader.Maui.Services;
 using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Services.Mp3Player;
 using YoutubeDownloader.Core.Util;
 using YoutubeDownloader.Maui.Util;
 using YoutubeExplode;
@@ -36,7 +37,8 @@ public static class MauiProgram
 #endif
         builder.Services.AddHttp()
             .AddDownloadServices()
-            .AddUpdaters();
+            .AddUpdaters()
+            .AddScoped<Mp3Player>();
         return builder.Build();
     }
 }
