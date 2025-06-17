@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                    xmlns:data="clr-namespace:YoutubeDownloader.Core.Data;assembly=YoutubeDownloader.Core">
+                    xmlns:data="clr-namespace:YoutubeDownloader.Core.Data;assembly=YoutubeDownloader.Core"
+                    xmlns:player="clr-namespace:YoutubeDownloader.Core.Services.Mp3Player;assembly=YoutubeDownloader.Core">
     <DataTemplate x:Key="DownloadContextTemplate" x:DataType="data:DownloadContext">
         <Grid VerticalOptions="Fill" HorizontalOptions="Fill" HeightRequest="45">
             <Grid.ColumnDefinitions>
@@ -13,6 +14,17 @@
                          VerticalOptions="Fill" ProgressColor="{StaticResource PrimaryDark}" />
             <Label Grid.Column="2" Text="{Binding Size}" HorizontalOptions="Center"
                    VerticalOptions="Center" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Mp3FileTemplate" x:DataType="player:Mp3File">
+        <Grid HorizontalOptions="Fill"
+              VerticalOptions="Fill"
+              HeightRequest="45">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label VerticalTextAlignment="Center" Grid.Column="0" Text="{Binding Name}" />
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

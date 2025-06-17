@@ -6,7 +6,7 @@
              x:DataType="player:Mp3Player"
              x:Class="YoutubeDownloader.Maui.PlayerPage">
     <ContentPage.Content>
-        <Grid Padding="30,15">
+        <Grid Padding="15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.1*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
@@ -21,22 +21,11 @@
                             HorizontalOptions="Fill"
                             VerticalOptions="Fill"
                             SelectionMode="Single"
-                            ItemsSource="{Binding Files, Mode=OneWay}">
+                            ItemsSource="{Binding Files, Mode=OneWay}"
+                            ItemTemplate="{StaticResource Mp3FileTemplate}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="player:Mp3File">
-                        <Grid HorizontalOptions="Fill"
-                              VerticalOptions="Fill"
-                              HeightRequest="45">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Label VerticalTextAlignment="Center" Grid.Column="0" Text="{Binding Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
     </ContentPage.Content>
