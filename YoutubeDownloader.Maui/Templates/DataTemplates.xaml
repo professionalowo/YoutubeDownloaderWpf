@@ -22,9 +22,11 @@
               VerticalOptions="Fill"
               HeightRequest="45">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label VerticalTextAlignment="Center" Grid.Column="0" Text="{Binding Name}" />
+            <Label Grid.Column="0"
+                   VerticalTextAlignment="Center"
+                   Text="{Binding Name}" />
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

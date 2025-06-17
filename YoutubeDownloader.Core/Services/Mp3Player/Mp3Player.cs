@@ -8,11 +8,21 @@ namespace YoutubeDownloader.Core.Services.Mp3Player;
 
 public class Mp3Player(IDirectory downloads, FfmpegDownloader.Config config) : INotifyPropertyChanged
 {
-    public const string SearchFilter = "*.mp3";
+    private const string searchFilter = "*.mp3";
+
+    public Mp3File? SelectedFile
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public ICollection<Mp3File> Files =>
     [
-        ..downloads.GetFiles(SearchFilter)
+        ..downloads.GetFiles(searchFilter)
             .Select(p => new Mp3File(p))
     ];
 

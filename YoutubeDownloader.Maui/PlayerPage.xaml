@@ -22,11 +22,25 @@
                             VerticalOptions="Fill"
                             SelectionMode="Single"
                             ItemsSource="{Binding Files, Mode=OneWay}"
-                            ItemTemplate="{StaticResource Mp3FileTemplate}">
+                            ItemTemplate="{StaticResource Mp3FileTemplate}"
+                            SelectedItem="{Binding SelectedFile}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
             </CollectionView>
+            <Grid Grid.Row="2" VerticalOptions="Fill" HorizontalOptions="Fill">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="Start"
+                       VerticalOptions="Fill"
+                       HorizontalOptions="Fill"
+                       LineBreakMode="WordWrap"
+                       Text="{Binding SelectedFile.Name, FallbackValue='Currently not playing'}" />
+                <Button Grid.Column="1" Text=">" />
+            </Grid>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
