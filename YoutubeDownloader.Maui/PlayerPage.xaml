@@ -30,8 +30,7 @@
                 </CollectionView.ItemsLayout>
             </CollectionView>
             <views:MediaElement Grid.Row="2"
-                                Source="{Binding SelectedFile.Source}"
-                                />
+                                Source="{Binding SelectedFile.Source}" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>
