@@ -1,17 +1,11 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Hosting;
-using Microsoft.Maui.Controls.Hosting;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Maui.Services;
-using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
-using YoutubeDownloader.Core.Services.Mp3Player;
-using YoutubeDownloader.Core.Util;
+using YoutubeDownloader.Maui.Services.Mp3Player;
 using YoutubeDownloader.Maui.Util;
 using YoutubeExplode;
 
@@ -26,6 +20,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit(options => { options.SetShouldEnableSnackbarOnWindows(true); })
+            .UseMauiCommunityToolkitMediaElement()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

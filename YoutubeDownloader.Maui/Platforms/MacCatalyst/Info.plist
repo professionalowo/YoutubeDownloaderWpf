@@ -28,8 +28,14 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>audio</string>
+		<string>bluetooth-central</string>
 	</array>
 	<key>NSDownloadsFolderUsageDescription</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>NSLocalNetworkUsageDescription</key>
 	<string></string>
 </dict>
 </plist>

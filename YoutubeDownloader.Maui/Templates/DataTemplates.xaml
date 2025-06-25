@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                     xmlns:data="clr-namespace:YoutubeDownloader.Core.Data;assembly=YoutubeDownloader.Core"
-                    xmlns:player="clr-namespace:YoutubeDownloader.Core.Services.Mp3Player;assembly=YoutubeDownloader.Core">
+                    xmlns:player="clr-namespace:YoutubeDownloader.Maui.Services.Mp3Player">
     <DataTemplate x:Key="DownloadContextTemplate" x:DataType="data:DownloadContext">
         <Grid VerticalOptions="Fill" HorizontalOptions="Fill" HeightRequest="45">
             <Grid.ColumnDefinitions>

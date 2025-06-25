@@ -1,4 +1,5 @@
 using Foundation;
+using Microsoft.Extensions.DependencyInjection;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 

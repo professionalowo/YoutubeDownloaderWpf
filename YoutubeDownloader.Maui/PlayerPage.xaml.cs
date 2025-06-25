@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeDownloader.Core.Services.Mp3Player;
+using Microsoft.Maui.Controls;
+using YoutubeDownloader.Maui.Services.Mp3Player;
 
 namespace YoutubeDownloader.Maui;
 

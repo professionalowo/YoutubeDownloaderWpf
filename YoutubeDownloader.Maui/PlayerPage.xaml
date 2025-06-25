@@ -2,8 +2,9 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:player="clr-namespace:YoutubeDownloader.Core.Services.Mp3Player;assembly=YoutubeDownloader.Core"
-             x:DataType="player:Mp3Player"
+             xmlns:mp3Player="clr-namespace:YoutubeDownloader.Maui.Services.Mp3Player"
+             xmlns:views="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="mp3Player:Mp3Player"
              x:Class="YoutubeDownloader.Maui.PlayerPage">
     <ContentPage.Content>
         <Grid Padding="15">
@@ -28,19 +29,9 @@
                     <LinearItemsLayout Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
             </CollectionView>
-            <Grid Grid.Row="2" VerticalOptions="Fill" HorizontalOptions="Fill">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" VerticalTextAlignment="Center"
-                       HorizontalTextAlignment="Start"
-                       VerticalOptions="Fill"
-                       HorizontalOptions="Fill"
-                       LineBreakMode="WordWrap"
-                       Text="{Binding SelectedFile.Name, FallbackValue='Currently not playing'}" />
-                <Button Grid.Column="1" Text=">" />
-            </Grid>
+            <views:MediaElement Grid.Row="2"
+                                Source="{Binding SelectedFile.Source}"
+                                />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

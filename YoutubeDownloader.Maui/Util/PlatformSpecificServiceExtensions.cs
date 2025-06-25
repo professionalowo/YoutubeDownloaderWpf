@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 
 namespace YoutubeDownloader.Maui.Util;
