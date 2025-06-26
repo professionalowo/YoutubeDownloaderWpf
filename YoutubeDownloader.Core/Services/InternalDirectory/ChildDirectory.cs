@@ -2,6 +2,6 @@
 {
     public class ChildDirectory(IDirectory parent,string name) : IDirectory
     {
-        public string FullPath => Path.Combine(parent.FullPath, name);
+        public string FullPath { get; } = Path.Combine(parent.FullPath, name);
     }
 }

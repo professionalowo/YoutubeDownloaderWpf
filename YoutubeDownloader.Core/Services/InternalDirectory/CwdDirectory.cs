@@ -2,5 +2,5 @@
 
 public class CwdDirectory(string name) : IDirectory
 {
-    public string FullPath { get; init; } = Path.Combine(Directory.GetCurrentDirectory(), name);
+    public string FullPath { get; } = Path.Combine(Directory.GetCurrentDirectory(), name);
 }
