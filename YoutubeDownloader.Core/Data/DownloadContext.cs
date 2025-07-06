@@ -35,8 +35,6 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
         DownloadFinished += OnDownloadFinished;
     }
 
-    #region Progress
-
     public IProgress<long> GetProgress()
         => new DownloadProgress(this);
 
@@ -60,10 +58,6 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     private sealed class MultiplierHandler(DownloadContext ctx)
         : Progress<double>(p => ctx.ProgressValue += p * ctx.ProgressMultiplier);
 
-    #endregion
-
-    #region DownloadFinished
-
     public event EventHandler<bool> DownloadFinished;
 
     public void InvokeDownloadFinished(object sender, bool finishedSuccessfully) =>
@@ -72,14 +66,8 @@ public class DownloadContext : INotifyPropertyChanged, IConverter<DownloadContex
     protected virtual void OnDownloadFinished(object? sender, bool e)
         => ProgressValue = 1 * ProgressMultiplier;
 
-    #endregion
-
-    #region INotifyPropertyChanged
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-    #endregion
 }
