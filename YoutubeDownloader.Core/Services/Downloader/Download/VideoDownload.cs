@@ -7,7 +7,7 @@ using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public class VideoDownload<TContext>(
+public sealed class VideoDownload<TContext>(
     YoutubeClient client,
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string url,

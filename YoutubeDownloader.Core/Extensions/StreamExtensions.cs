@@ -6,7 +6,7 @@ public static class StreamExtensions
         => new TrackedStream(inner, progress);
 }
 
-internal class TrackedStream(Stream inner, IProgress<long> progress) : Stream
+internal sealed class TrackedStream(Stream inner, IProgress<long> progress) : Stream
 {
     public override void Flush()
         => inner.Flush();

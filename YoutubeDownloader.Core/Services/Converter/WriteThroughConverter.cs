@@ -2,7 +2,7 @@
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class WriteThroughConverter<TContext>(string extension)
+public sealed class WriteThroughConverter<TContext>(string extension)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public async ValueTask Convert(Stream audioStream, string outPath, TContext context,

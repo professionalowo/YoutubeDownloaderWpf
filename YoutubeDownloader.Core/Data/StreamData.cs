@@ -1,3 +1,3 @@
 ﻿namespace YoutubeDownloader.Core.Data;
 
-public record StreamData(Stream Stream, string[] Segments);
+public sealed record StreamData(Stream Stream, string[] Segments);

@@ -2,7 +2,7 @@
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class ConverterFactory<TContext>(FfmpegDownloader.Config config)
+public sealed class ConverterFactory<TContext>(FfmpegDownloader.Config config)
     where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lazy<Mp3Converter<TContext>> _mp3Converter =

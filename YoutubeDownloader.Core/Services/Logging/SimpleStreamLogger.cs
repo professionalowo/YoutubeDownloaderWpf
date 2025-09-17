@@ -2,7 +2,7 @@
 
 namespace YoutubeDownloader.Core.Services.Logging;
 
-public class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, IDisposable
+public sealed class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, IDisposable
 {
     private readonly Lock _writerLock = new();
     private readonly StreamWriter _writer = new(outStream) { AutoFlush = true };
@@ -14,7 +14,6 @@ public class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, 
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
         _writer.Dispose();
     }
 
@@ -24,7 +23,7 @@ public class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        string formatted = $"[{loggerName}]({logLevel}): {formatter(state, exception)}";
+        var formatted = $"[{loggerName}]({logLevel}): {formatter(state, exception)}";
         lock (_writerLock)
         {
             _writer.WriteLine(formatted);

@@ -2,7 +2,7 @@
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : IDisposable, IAsyncDisposable
+public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : IDisposable, IAsyncDisposable
 {
     private readonly Lazy<Process> _ffmpegProcess
         = new(() => CreateProcess(ffmpegAbsolutePath, outPath));
