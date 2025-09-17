@@ -25,22 +25,14 @@ public abstract class ScopedResource(string path) : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public class File : ScopedResource
+    public sealed class File(string path) : ScopedResource(path)
     {
-        public File(string path) : base(path)
-        {
-        }
-
         protected override void CleanResource()
             => System.IO.File.Delete(FullPath);
     }
 
-    public class Directory : ScopedResource
+    public sealed class Directory(string path) : ScopedResource(path)
     {
-        public Directory(string path) : base(path)
-        {
-        }
-
         protected override void CleanResource()
             => System.IO.Directory.Delete(FullPath, true);
     }

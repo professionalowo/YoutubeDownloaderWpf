@@ -6,7 +6,7 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
-public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
+public sealed class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
 {
     public async ValueTask DownloadFfmpeg(CancellationToken token = default)
     {
@@ -42,7 +42,7 @@ public class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient clien
 
 
 
-    public record Config(IDirectory Folder, string FfmpegExeName = Config.FfmpegName)
+    public sealed record Config(IDirectory Folder, string FfmpegExeName = Config.FfmpegName)
     {
         public const string FfmpegName = "ffmpeg";
 

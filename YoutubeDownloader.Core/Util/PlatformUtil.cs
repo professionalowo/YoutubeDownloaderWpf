@@ -1,6 +1,6 @@
 namespace YoutubeDownloader.Core.Util;
 
-public class PlatformUtil
+public static class PlatformUtil
 {
     public static bool IsWindows() => OperatingSystem.IsWindows();
     public static bool IsLinux() => OperatingSystem.IsLinux();
