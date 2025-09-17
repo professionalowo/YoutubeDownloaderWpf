@@ -8,7 +8,7 @@ using YoutubeDownloader.Core.Services.InternalDirectory;
 
 namespace YoutubeDownloader.Maui.Services.Mp3Player;
 
-public class Mp3Player(IDirectory downloads) : INotifyPropertyChanged
+public sealed partial class Mp3Player(IDirectory downloads) : INotifyPropertyChanged
 {
     private const string searchFilter = "*.mp3";
     

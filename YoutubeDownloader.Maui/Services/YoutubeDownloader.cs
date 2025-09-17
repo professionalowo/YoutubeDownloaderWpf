@@ -10,7 +10,7 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Maui.Services;
 
-public partial class YoutubeDownloader
+public sealed partial class YoutubeDownloader
     : YoutubeDownloaderBase<DownloadContext>
 {
     public YoutubeDownloader(
