@@ -31,7 +31,7 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
         "-map_metadata", "0:s:0",
         "-map_metadata", "0",
         "-q:a", "2",
-        "-flush_packets", "0",
+        "-flush_packets", "1",
         "-y",
         outPath
     ];
@@ -46,7 +46,6 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     private void Dispose(bool disposing)
@@ -65,7 +64,6 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
     public async ValueTask DisposeAsync()
     {
         await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     private async ValueTask DisposeAsync(bool disposing)
