@@ -150,7 +150,13 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(SystemInfo.Cores);
+        var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(new BoundedChannelOptions(SystemInfo.Cores)
+        {
+            SingleWriter = false,
+            SingleReader = false,
+            AllowSynchronousContinuations = false,
+            FullMode = BoundedChannelFullMode.Wait
+        });
         var consumer = ProcessChannel(rx, token);
         await Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, tx.WriteAsync)
             .ConfigureAwait(false);
