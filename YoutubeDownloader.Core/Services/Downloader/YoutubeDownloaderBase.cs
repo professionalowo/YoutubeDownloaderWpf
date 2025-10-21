@@ -123,12 +123,16 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         [StringSyntax(StringSyntaxAttribute.Uri)]
         string url, CancellationToken token = default) => downloadFactory.Get(url, token);
 
-    private Task ProcessChannel(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
+    private Task ReadAllDownloads(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
         => Parallel.ForEachAsync(
             reader.ReadAllAsync(token),
             token,
             ProcessDownloadFactory(Converter)
         );
+
+    private Task WriteAllDownloads(ChannelWriter<VideoDownload<TContext>> writer, string url,
+        CancellationToken token = default)
+        => Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, writer.WriteAsync);
 
     private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(
         IConverter<TContext> converter)
@@ -157,9 +161,8 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.Wait
         });
-        var consumer = ProcessChannel(rx, token);
-        await Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, tx.WriteAsync)
-            .ConfigureAwait(false);
+        var consumer = ReadAllDownloads(rx, token);
+        await WriteAllDownloads(tx, url, token).ConfigureAwait(false);
         tx.Complete();
         await consumer.ConfigureAwait(false);
     }
@@ -178,8 +181,9 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         DownloadFinished?.Invoke(this, EventArgs.Empty);
         IsPrefetching = false;
     }
-    
+
     public event PropertyChangedEventHandler? PropertyChanged;
+
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
