@@ -38,7 +38,7 @@ jobs:
       - name: Sign Executable
         run: |
           $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
-          & $signtool sign /fd SHA256 /f "cert.pfx" /p ${{secrets.CERT_PASSWORD}} "publish\YoutubeDownloaderWpf.exe"
+          & $signtool sign /fd SHA256 /f "cert.pfx" /p ${{secrets.CERT_PASSWORD}} "publish\YoutubeDownloader.Wpf.exe"
 
 
       - name: Create ZIP Archive with 7-Zip
