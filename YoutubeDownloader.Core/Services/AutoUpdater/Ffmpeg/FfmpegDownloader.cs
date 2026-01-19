@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
-using System.IO.Compression;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
+using SharpCompress.Archives.SevenZip;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
@@ -15,11 +15,11 @@ public sealed class FfmpegDownloader(
     {
         var zipBytes = await client.GetByteArrayAsync(Config.Source, token);
         await using var memoryStream = new MemoryStream(zipBytes);
-        using var archive = new ZipArchive(memoryStream);
 
+        using var archive = SevenZipArchive.Open(memoryStream);
+        
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
-        var entry = archive.Entries.FirstOrDefault(e =>
-            e.FullName.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase));
+        var entry = archive.Entries.FirstOrDefault(e => e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false);
         if (entry == null)
         {
             logger.LogWarning("ffmpeg.exe not found in zip archive");
@@ -28,7 +28,7 @@ public sealed class FfmpegDownloader(
 
         var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
         Directory.CreateDirectory(config.Folder.FullPath);
-        await using var entryStream = entry.Open();
+        await using var entryStream = await entry.OpenEntryStreamAsync(token);
         await using var targetFile = File.Create(destinationPath);
         await entryStream.CopyToAsync(targetFile, token);
         logger.LogInformation("ffmpeg.exe downloaded successfully");
@@ -49,7 +49,7 @@ public sealed class FfmpegDownloader(
 
         [StringSyntax(StringSyntaxAttribute.Uri)]
         public const string Source =
-            "https://github.com/GyanD/codexffmpeg/releases/download/2025-02-06-git-6da82b4485/ffmpeg-2025-02-06-git-6da82b4485-essentials_build.zip";
+            "https://github.com/GyanD/codexffmpeg/releases/download/2026-01-19-git-43dbc011fa/ffmpeg-2026-01-19-git-43dbc011fa-essentials_build.7z";
 
         public static Config Default => new(new CwdDirectory(FfmpegName));
         public string FfmpegExeFullPath => Folder.ChildFileName(FfmpegExeName);
