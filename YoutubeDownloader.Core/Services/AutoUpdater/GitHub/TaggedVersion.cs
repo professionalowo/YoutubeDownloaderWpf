@@ -15,7 +15,7 @@ public record TaggedVersion(uint Major, uint Minor, uint Patch) : IComparable<Ta
     {
         if (tag.Split('.').Select(uint.Parse).Take(3).ToArray() is [uint major, uint minor, uint patch])
         {
-            return new(major, minor, patch);
+            return new TaggedVersion(major, minor, patch);
         }
         throw new ArgumentException("Tag did not conform to the pattern {major}.{minor}.{patch}");
     }
