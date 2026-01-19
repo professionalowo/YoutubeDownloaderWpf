@@ -30,7 +30,9 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
         "-preset", "fast",
         "-map_metadata", "0:s:0",
         "-map_metadata", "0",
-        "-q:a", "2",
+        "-id3v2_version", "3",
+        "-q:a", "0",
+        "-abr", "1",
         "-flush_packets", "1",
         "-y",
         outPath
