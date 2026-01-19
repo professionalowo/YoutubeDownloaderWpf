@@ -4,7 +4,7 @@ public static class StreamExtensions
 {
     extension(Stream inner)
     {
-        public Stream WithProgress(IProgress<long> progress)
+        public Stream Tracked(IProgress<long> progress)
             => new TrackedStream(inner, progress);
     }
 }
