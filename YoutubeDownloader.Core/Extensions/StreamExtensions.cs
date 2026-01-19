@@ -2,8 +2,11 @@
 
 public static class StreamExtensions
 {
-    public static Stream Tracked(this Stream inner, IProgress<long> progress)
-        => new TrackedStream(inner, progress);
+    extension(Stream inner)
+    {
+        public Stream Tracked(IProgress<long> progress)
+            => new TrackedStream(inner, progress);
+    }
 }
 
 internal sealed class TrackedStream(Stream inner, IProgress<long> progress) : Stream

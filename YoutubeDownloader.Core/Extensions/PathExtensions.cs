@@ -4,5 +4,9 @@ namespace YoutubeDownloader.Core.Extensions;
 
 public static class PathExtensions
 {
-    public static string ReplaceIllegalCharacters(this string path, char replacement = '_') => PathUtil.ReplaceIllegalCharacters(path, replacement);
+    extension(string path)
+    {
+        public string ReplaceIllegalCharacters(char replacement = '_') =>
+            PathUtil.ReplaceIllegalCharacters(path, replacement);
+    }
 }
