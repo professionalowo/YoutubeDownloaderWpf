@@ -87,7 +87,7 @@ static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new()
+        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new SocketsHttpHandler()
         {
             PooledConnectionLifetime = TimeSpan.FromMinutes(2),
             ConnectTimeout = TimeSpan.FromSeconds(10)
@@ -115,8 +115,8 @@ static class ServiceCollectionExtensions
     {
         serviceCollection.AddScoped<IUpdater, Updater.Noop>();
         serviceCollection.AddScoped<GitHubVersionClient>();
-        serviceCollection.AddSingleton<TaggedVersion>(_ => new(1, 0, 4));
-        serviceCollection.AddSingleton<FfmpegDownloader.Config>(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
+        serviceCollection.AddSingleton<TaggedVersion>(_ => new TaggedVersion(1, 0, 6));
+        serviceCollection.AddSingleton(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
             .ResolveConfig);
         serviceCollection.AddSingleton<FfmpegDownloader>();
         return serviceCollection;

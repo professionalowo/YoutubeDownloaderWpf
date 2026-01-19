@@ -7,11 +7,11 @@ namespace YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 public class GitHubVersionClient(HttpClient client)
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
-    private const string releasesUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases";
+    private const string ReleasesUrl = "https://github.com/professionalowo/YoutubeDownloaderWpf/releases";
 
     public async Task<TaggedVersion> GetNewestVersion(CancellationToken token = default)
     {
-        var latestUrl = UrlUtil.Combine(releasesUrl, "latest");
+        var latestUrl = UrlUtil.Combine(ReleasesUrl, "latest");
         using var response = await client.GetAsync(latestUrl, token);
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
@@ -31,7 +31,7 @@ public class GitHubVersionClient(HttpClient client)
     public async Task DownloadVersion(string downloadDir, TaggedVersion version, CancellationToken token = default)
     {
         var zipFileName = $"YoutubeDownloader-{version}.zip";
-        var fileUrl = UrlUtil.Combine(releasesUrl, "download", version.ToString(), zipFileName);
+        var fileUrl = UrlUtil.Combine(ReleasesUrl, "download", version.ToString(), zipFileName);
 
         using var response = await client.GetAsync(fileUrl, token);
         await using var readStream = await response.Content.ReadAsStreamAsync(token);
