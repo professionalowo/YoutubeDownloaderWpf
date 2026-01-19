@@ -17,9 +17,10 @@ public sealed class FfmpegDownloader(
         await using var memoryStream = new MemoryStream(zipBytes);
 
         using var archive = SevenZipArchive.Open(memoryStream);
-        
+
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
-        var entry = archive.Entries.FirstOrDefault(e => e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false);
+        var entry = archive.Entries.FirstOrDefault(e =>
+            e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false);
         if (entry == null)
         {
             logger.LogWarning("{Name} not found in zip archive", ffmpegExeName);
@@ -35,12 +36,8 @@ public sealed class FfmpegDownloader(
     }
 
     public bool DoesFfmpegExist()
-    {
-        var directory = config.Folder;
-        var fullPath = config.Folder.FullPath;
-        return Path.Exists(fullPath)
-               && directory.ContainsFile(PlatformUtil.AsExecutablePath(config.FfmpegExeName));
-    }
+        => Path.Exists(config.Folder.FullPath)
+           && config.Folder.ContainsFile(PlatformUtil.AsExecutablePath(config.FfmpegExeName));
 
 
     public sealed record Config(IDirectory Folder, string FfmpegExeName = Config.FfmpegName)
