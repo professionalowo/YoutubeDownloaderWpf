@@ -10,35 +10,27 @@ public static class PathExtensions
     {
         public string ReplaceIllegalCharacters(char replacement = '_')
         {
-            if (path.IndexOfAny(IllegalChars) == -1)
+            ReadOnlySpan<char> source = path;
+            var firstInvalidChar = source.IndexOfAny(IllegalChars);
+            if (firstInvalidChar == -1)
             {
                 return path;
             }
 
-            return string.Create(path.Length, (path, replacement), static (dest, state) =>
+            return string.Create(path.Length, (path, firstInvalidChar, replacement), static (dest, state) =>
             {
-                var currentSource = state.path.AsSpan();
-                var currentDest = dest;
+                state.path.AsSpan().CopyTo(dest);
+                var remainder = dest[state.firstInvalidChar..];
 
                 while (true)
                 {
-                    var index = currentSource.IndexOfAny(IllegalChars);
+                    var index = remainder.IndexOfAny(IllegalChars);
 
-                    if (index == -1)
-                    {
-                        currentSource.CopyTo(currentDest);
-                        break;
-                    }
+                    if (index == -1) break;
 
-                    if (index > 0)
-                    {
-                        currentSource[..index].CopyTo(currentDest);
-                    }
-
-                    currentDest[index] = state.replacement;
-
-                    currentSource = currentSource[(index + 1)..];
-                    currentDest = currentDest[(index + 1)..];
+                    remainder[index] = state.replacement;
+                    
+                    remainder = remainder[index..];
                 }
             });
         }
