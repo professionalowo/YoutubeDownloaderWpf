@@ -22,8 +22,8 @@ public sealed class FfmpegDownloader(
         var entry = archive.Entries.FirstOrDefault(e => e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false);
         if (entry == null)
         {
-            logger.LogWarning("ffmpeg.exe not found in zip archive");
-            throw new FileNotFoundException("ffmpeg.exe not found");
+            logger.LogWarning("{Name} not found in zip archive", ffmpegExeName);
+            throw new FileNotFoundException($"{ffmpegExeName} not found");
         }
 
         var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
