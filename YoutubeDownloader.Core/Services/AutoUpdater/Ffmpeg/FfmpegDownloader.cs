@@ -6,30 +6,32 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
-public sealed class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClient client, FfmpegDownloader.Config config)
+public sealed class FfmpegDownloader(
+    ILogger<FfmpegDownloader> logger,
+    HttpClient client,
+    FfmpegDownloader.Config config)
 {
     public async ValueTask DownloadFfmpeg(CancellationToken token = default)
     {
-        Directory.CreateDirectory(config.Folder.FullPath);
-        using var response = await client.GetAsync(Config.Source, token);
-        await using var readStream = await response.Content.ReadAsStreamAsync(token);
+        var zipBytes = await client.GetByteArrayAsync(Config.Source, token);
+        await using var memoryStream = new MemoryStream(zipBytes);
+        using var archive = new ZipArchive(memoryStream);
 
-        using ScopedResource.File zipSource = new(config.Folder.ChildFileName("source.zip"));
-        using ScopedResource.Directory sourceUnzipped = new(config.Folder.ChildFileName(Path.GetFileNameWithoutExtension(zipSource.FullPath)));
-
-        await using (var fileStream = new FileStream(zipSource.FullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+        var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
+        var entry = archive.Entries.FirstOrDefault(e =>
+            e.FullName.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase));
+        if (entry == null)
         {
-            await readStream.CopyToAsync(fileStream, token);
+            logger.LogWarning("ffmpeg.exe not found in zip archive");
+            throw new FileNotFoundException("ffmpeg.exe not found");
         }
 
-        ZipFile.ExtractToDirectory(zipSource.FullPath, sourceUnzipped.FullPath);
-        var executables = Directory.GetFiles(sourceUnzipped.FullPath, "*.exe", SearchOption.AllDirectories);
-
-        var ffmpegExe = Path.ChangeExtension(config.FfmpegExeName, "exe");
-        var ffmpegPathSource = executables.First(path => path.EndsWith(ffmpegExe));
-        File.Move(ffmpegPathSource, config.Folder.ChildFileName(ffmpegExe));
-
-        logger.LogInformation("Installed Ffmpeg");
+        var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
+        Directory.CreateDirectory(config.Folder.FullPath);
+        await using var entryStream = entry.Open();
+        await using var targetFile = File.Create(destinationPath);
+        await entryStream.CopyToAsync(targetFile, token);
+        logger.LogInformation("ffmpeg.exe downloaded successfully");
     }
 
     public bool DoesFfmpegExist()
@@ -37,9 +39,8 @@ public sealed class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClien
         var directory = config.Folder;
         var fullPath = config.Folder.FullPath;
         return Path.Exists(fullPath)
-            && directory.ContainsFile(PlatformUtil.AsExecutablePath(config.FfmpegExeName));
+               && directory.ContainsFile(PlatformUtil.AsExecutablePath(config.FfmpegExeName));
     }
-
 
 
     public sealed record Config(IDirectory Folder, string FfmpegExeName = Config.FfmpegName)
@@ -47,9 +48,10 @@ public sealed class FfmpegDownloader(ILogger<FfmpegDownloader> logger, HttpClien
         public const string FfmpegName = "ffmpeg";
 
         [StringSyntax(StringSyntaxAttribute.Uri)]
-        public const string Source = "https://github.com/GyanD/codexffmpeg/releases/download/2025-02-06-git-6da82b4485/ffmpeg-2025-02-06-git-6da82b4485-essentials_build.zip";
+        public const string Source =
+            "https://github.com/GyanD/codexffmpeg/releases/download/2025-02-06-git-6da82b4485/ffmpeg-2025-02-06-git-6da82b4485-essentials_build.zip";
+
         public static Config Default => new(new CwdDirectory(FfmpegName));
         public string FfmpegExeFullPath => Folder.ChildFileName(FfmpegExeName);
     }
 }
-
