@@ -15,8 +15,8 @@ public sealed class Mp3Converter<TContext>(string ffmpegPath)
     private async ValueTask ConvertAsync(Stream data, string outPath, TContext context,
         CancellationToken token = default)
     {
-        var mp3Path = $"{outPath}.mp3";
-        await using var conversion = new FfmpegMp3Conversion<TContext>(ffmpegPath, mp3Path, context);
+        await using var conversion =
+            new FfmpegMp3Conversion<TContext>(ffmpegPath, Path.ChangeExtension(outPath, ".mp3"), context);
         await using var tracked = conversion.WithProgress(context.GetProgress());
         await data.CopyToAsync(tracked, token);
         context.InvokeDownloadFinished(this, true);
