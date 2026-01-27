@@ -18,6 +18,7 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardInput = true,
+            
         };
         return Process.Start(info) ??
                throw new InvalidOperationException($"Unable to create {ffmpegAbsolutePath} process.");
@@ -25,11 +26,11 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
 
     private static ICollection<string> Args(string outPath, TContext context) =>
     [
+        "-thread_queue_size", "1024",
         "-i", "pipe:0",
 
         "-c:a", "libmp3lame",
-        "-q:a", "0",
-        "-preset", "veryfast",
+        "-q:a", "2",
         "-id3v2_version", "4",
 
         "-vn",
