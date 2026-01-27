@@ -16,6 +16,9 @@ jobs:
         with:
           dotnet-version: 10.0.x  # Update if using a different .NET version
 
+      - name: Install Workloads
+        run: dotnet workload restore
+        
       - name: Restore Dependencies
         run: dotnet restore
 
