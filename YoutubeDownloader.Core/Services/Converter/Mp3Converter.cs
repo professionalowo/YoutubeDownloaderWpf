@@ -24,8 +24,8 @@ public sealed class Mp3Converter<TContext>(string ffmpegPath)
     private void ConvertSync(Stream data, ReadOnlySpan<char> outPath, TContext context)
     {
         var mp3Path = $"{outPath}.mp3";
-        using var conversion = new FfmpegMp3Conversion(ffmpegPath, mp3Path);
-        using var tracked = conversion.Input.WithProgress(context.GetProgress());
+        using var conversion = new FfmpegMp3Conversion<TContext>(ffmpegPath, mp3Path, context);
+        using var tracked = conversion.WithProgress(context.GetProgress());
         data.CopyTo(tracked);
         context.InvokeDownloadFinished(this, true);
     }

@@ -5,6 +5,7 @@ public interface IConverter<in TContext> where TContext : IConverter<TContext>.I
 {
     public interface IConverterContext
     {
+        string Name { get; }
         IProgress<long> GetProgress();
         void InvokeDownloadFinished(object sender, bool finishedSuccessfully);
     }

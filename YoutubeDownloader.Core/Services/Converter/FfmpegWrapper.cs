@@ -2,16 +2,17 @@
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPath) : IDisposable, IAsyncDisposable
+public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, string outPath, TContext context)
+    : Stream where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lazy<Process> _ffmpegProcess
-        = new(() => CreateProcess(ffmpegAbsolutePath, outPath));
+        = new(() => CreateProcess(ffmpegAbsolutePath, outPath, context));
 
-    public Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
+    private Stream BaseInput => _ffmpegProcess.Value.StandardInput.BaseStream;
 
-    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath)
+    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, TContext context)
     {
-        var args = Args(outPath);
+        var args = Args(outPath, context);
         var info = new ProcessStartInfo(ffmpegAbsolutePath, args)
         {
             UseShellExecute = false,
@@ -22,21 +23,49 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
                throw new InvalidOperationException($"Unable to create {ffmpegAbsolutePath} process.");
     }
 
-    private static ICollection<string> Args(string outPath) =>
+    private static ICollection<string> Args(string outPath, TContext context) =>
     [
         "-i", "pipe:0",
-        "-vn",
+
         "-c:a", "libmp3lame",
-        "-preset", "fast",
-        "-map_metadata", "0:s:0",
-        "-map_metadata", "0",
-        "-id3v2_version", "3",
         "-q:a", "0",
-        "-abr", "1",
-        "-flush_packets", "1",
+        "-preset", "veryfast",
+        "-id3v2_version", "4",
+
+        "-vn",
+
+        "-map_metadata", "-1",
+        "-metadata", $"title={context.Name}",
+
         "-y",
         outPath
     ];
+
+    public override void Flush()
+        => BaseInput.Flush();
+
+    public override int Read(byte[] buffer, int offset, int count)
+        => BaseInput.Read(buffer, offset, count);
+
+    public override long Seek(long offset, SeekOrigin origin)
+        => BaseInput.Seek(offset, origin);
+
+    public override void SetLength(long value)
+        => BaseInput.SetLength(value);
+
+    public override void Write(byte[] buffer, int offset, int count)
+        => BaseInput.Write(buffer, offset, count);
+
+    public override bool CanRead => BaseInput.CanRead;
+    public override bool CanSeek => BaseInput.CanSeek;
+    public override bool CanWrite => BaseInput.CanWrite;
+    public override long Length => BaseInput.Length;
+
+    public override long Position
+    {
+        get => BaseInput.Position;
+        set => BaseInput.Position = value;
+    }
 
     #region IDisposable
 
@@ -44,26 +73,21 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
 
     private bool ShouldDispose(bool disposing) => !_disposedValue && disposing && _ffmpegProcess.IsValueCreated;
 
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-    }
 
-    private void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         if (!ShouldDispose(disposing)) return;
 
         var p = _ffmpegProcess.Value;
-        Input.Flush();
-        Input.Close();
+        BaseInput.Flush();
+        BaseInput.Close();
         p.WaitForExit();
         p.Dispose();
 
         _disposedValue = true;
     }
 
-    public async ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await DisposeAsync(disposing: true);
     }
@@ -73,8 +97,8 @@ public sealed class FfmpegMp3Conversion(string ffmpegAbsolutePath, string outPat
         if (!ShouldDispose(disposing)) return;
 
         var p = _ffmpegProcess.Value;
-        await Input.FlushAsync();
-        Input.Close();
+        await BaseInput.FlushAsync();
+        BaseInput.Close();
         await p.WaitForExitAsync();
         p.Dispose();
 
