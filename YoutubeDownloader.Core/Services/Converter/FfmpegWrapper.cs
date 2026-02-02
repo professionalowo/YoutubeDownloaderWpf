@@ -8,7 +8,8 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
     private readonly Lazy<Process> _ffmpegProcess
         = new(() => CreateProcess(ffmpegAbsolutePath, outPath, context));
 
-    private Stream BaseInput => _ffmpegProcess.Value.StandardInput.BaseStream;
+    private Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
+    private Stream Error => _ffmpegProcess.Value.StandardError.BaseStream;
 
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, TContext context)
     {
@@ -18,15 +19,17 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardInput = true,
-            
+            RedirectStandardOutput = false
         };
-        return Process.Start(info) ??
-               throw new InvalidOperationException($"Unable to create {ffmpegAbsolutePath} process.");
+        return Process.Start(info)!;
     }
 
     private static ICollection<string> Args(string outPath, TContext context) =>
     [
-        "-thread_queue_size", "1024",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel", "error",
+
         "-i", "pipe:0",
 
         "-c:a", "libmp3lame",
@@ -35,6 +38,7 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
 
         "-vn",
 
+        "-map", "0:a:0?",
         "-map_metadata", "-1",
         "-metadata", $"title={context.Name}",
 
@@ -43,29 +47,29 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
     ];
 
     public override void Flush()
-        => BaseInput.Flush();
+        => Input.Flush();
 
     public override int Read(byte[] buffer, int offset, int count)
-        => BaseInput.Read(buffer, offset, count);
+        => throw new NotSupportedException();
 
     public override long Seek(long offset, SeekOrigin origin)
-        => BaseInput.Seek(offset, origin);
+        => throw new NotSupportedException();
 
     public override void SetLength(long value)
-        => BaseInput.SetLength(value);
+        => Input.SetLength(value);
 
     public override void Write(byte[] buffer, int offset, int count)
-        => BaseInput.Write(buffer, offset, count);
+        => Input.Write(buffer, offset, count);
 
-    public override bool CanRead => BaseInput.CanRead;
-    public override bool CanSeek => BaseInput.CanSeek;
-    public override bool CanWrite => BaseInput.CanWrite;
-    public override long Length => BaseInput.Length;
+    public override bool CanRead => false;
+    public override bool CanSeek => false;
+    public override bool CanWrite => true;
+    public override long Length => throw new NotSupportedException();
 
     public override long Position
     {
-        get => BaseInput.Position;
-        set => BaseInput.Position = value;
+        get => throw new NotSupportedException();
+        set => throw new NotSupportedException();
     }
 
     #region IDisposable
@@ -80,8 +84,8 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
         if (!ShouldDispose(disposing)) return;
 
         var p = _ffmpegProcess.Value;
-        BaseInput.Flush();
-        BaseInput.Close();
+        Input.Flush();
+        Input.Close();
         p.WaitForExit();
         p.Dispose();
 
@@ -98,9 +102,11 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
         if (!ShouldDispose(disposing)) return;
 
         var p = _ffmpegProcess.Value;
-        await BaseInput.FlushAsync();
-        BaseInput.Close();
+        await Input.FlushAsync();
+        Input.Close();
+        Error.Close();
         await p.WaitForExitAsync();
+
         p.Dispose();
 
         _disposedValue = true;
