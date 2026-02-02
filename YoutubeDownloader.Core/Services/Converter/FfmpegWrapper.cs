@@ -1,8 +1,12 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, string outPath, TContext context)
+public sealed class FfmpegMp3Conversion<TContext>(
+    string ffmpegAbsolutePath,
+    string outPath,
+    TContext context)
     : Stream where TContext : IConverter<TContext>.IConverterContext
 {
     private readonly Lazy<Process> _ffmpegProcess
@@ -19,9 +23,12 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardInput = true,
-            RedirectStandardOutput = false
+            RedirectStandardError = true,
         };
-        return Process.Start(info)!;
+        var process = Process.Start(info)!;
+        process.ErrorDataReceived += (_, e) => Debug.WriteLine(e.Data, "[ffmpeg]");
+        process.BeginErrorReadLine();
+        return process;
     }
 
     private static ICollection<string> Args(string outPath, TContext context) =>
@@ -113,4 +120,14 @@ public sealed class FfmpegMp3Conversion<TContext>(string ffmpegAbsolutePath, str
     }
 
     #endregion
+}
+
+internal static class LoggerExtensions
+{
+    extension<TContext>(ILogger<FfmpegMp3Conversion<TContext>> logger)
+        where TContext : IConverter<TContext>.IConverterContext
+    {
+        public void LogFfmpegError(object? _, DataReceivedEventArgs args) =>
+            logger.LogError("[Ffmpeg]: {Message}", args.Data);
+    }
 }
