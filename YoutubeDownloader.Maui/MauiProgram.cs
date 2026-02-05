@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
+using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Maui.Services.Mp3Player;
@@ -30,7 +31,7 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services.AddHttp()
+        builder.Services
             .AddDownloadServices()
             .AddUpdaters()
             .AddScoped<Mp3Player>();
@@ -47,22 +48,6 @@ internal static class ServicesExtensions
         return new AbsoluteDirectory(path);
     });
 
-    public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
-        => serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new SocketsHttpHandler()
-        {
-            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-            ConnectTimeout = TimeSpan.FromSeconds(10)
-        }).AddScoped<HttpClient>();
-
-
-    public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
-        => serviceCollection.AddTransient<YoutubeClient>()
-            .AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
-            .AddTransient<Services.YoutubeDownloader>()
-            .AddSingleton(CreateDownloadDirectory)
-            .AddTransient<DownloadFactory<DownloadContext>>()
-            .AddSingleton<ConverterFactory<DownloadContext>>();
-
     private static IDirectory CreateDownloadDirectory(IServiceProvider _)
     {
         IDirectory child = new ChildDirectory(BaseDirectory.Value, "Downloads");
@@ -70,6 +55,49 @@ internal static class ServicesExtensions
         return child;
     }
 
-    public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
-        => serviceCollection.AddSingleton<FfmpegDownloader>();
+    extension(IHttpClientBuilder builder)
+    {
+        private IHttpClientBuilder UseDefaultHttpConfig(
+        )
+        {
+            return builder
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                    new SocketsHttpHandler
+                    {
+                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+                        ConnectTimeout = TimeSpan.FromSeconds(10),
+                    })
+                .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(30));
+        }
+    }
+
+    extension(IServiceCollection serviceCollection)
+    {
+        public IServiceCollection AddDownloadServices()
+        {
+            serviceCollection.AddTransient<YoutubeHttpHandler>();
+            serviceCollection.AddHttpClient<YoutubeClient>()
+                .UseDefaultHttpConfig()
+                .AddHttpMessageHandler<YoutubeHttpHandler>();
+            serviceCollection.AddTransient<YoutubeClient>(s =>
+            {
+                var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
+                return new YoutubeClient(httpClient);
+            });
+            serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
+                .AddTransient<Services.YoutubeDownloader>()
+                .AddSingleton(CreateDownloadDirectory)
+                .AddTransient<DownloadFactory<DownloadContext>>()
+                .AddSingleton<ConverterFactory<DownloadContext>>();
+            return serviceCollection;
+        }
+
+
+        public IServiceCollection AddUpdaters()
+        {
+            serviceCollection.AddHttpClient<FfmpegDownloader>()
+                .UseDefaultHttpConfig();
+            return serviceCollection;
+        }
+    }
 }

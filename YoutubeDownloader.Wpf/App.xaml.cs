@@ -13,6 +13,7 @@ using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 using YoutubeDownloader.Core.Services.Converter;
+using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
@@ -47,7 +48,6 @@ public partial class App : Application
     private static ServiceProvider InitializeServices()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddHttp();
         serviceCollection.AddDownloadServices();
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddLogging(builder =>
@@ -85,40 +85,58 @@ public partial class App : Application
 
 static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddHttp(this IServiceCollection serviceCollection)
+    extension(IHttpClientBuilder builder)
     {
-        serviceCollection.AddSingleton<SocketsHttpHandler>(_ => new SocketsHttpHandler()
+        private IHttpClientBuilder UseDefaultHttpConfig(
+        )
         {
-            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-            ConnectTimeout = TimeSpan.FromSeconds(10)
-        });
-        serviceCollection.AddScoped<HttpClient>();
-        return serviceCollection;
+            return builder
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                    new SocketsHttpHandler
+                    {
+                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+                        ConnectTimeout = TimeSpan.FromSeconds(10),
+                    })
+                .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(30));
+        }
     }
 
-    public static IServiceCollection AddDownloadServices(this IServiceCollection serviceCollection)
+    extension(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
-        serviceCollection.AddSingleton<IDirectory>(_ =>
+        public IServiceCollection AddDownloadServices()
         {
-            IDirectory dir = new CwdDirectory("Downloads");
-            dir.Init();
-            return dir;
-        });
-        serviceCollection.AddTransient<YoutubeClient>();
-        serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
-        serviceCollection.AddSingleton<ConverterFactory<DownloadStatusContext>>();
-        return serviceCollection;
-    }
+            serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
+            serviceCollection.AddSingleton<IDirectory>(_ =>
+            {
+                IDirectory dir = new CwdDirectory("Downloads");
+                dir.Init();
+                return dir;
+            });
+            serviceCollection.AddTransient<YoutubeHttpHandler>();
+            serviceCollection.AddHttpClient<YoutubeClient>()
+                .UseDefaultHttpConfig()
+                .AddHttpMessageHandler<YoutubeHttpHandler>();
+            serviceCollection.AddTransient<YoutubeClient>(s =>
+            {
+                var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
+                return new YoutubeClient(httpClient);
+            });
+            serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
+            serviceCollection.AddSingleton<ConverterFactory<DownloadStatusContext>>();
+            return serviceCollection;
+        }
 
-    public static IServiceCollection AddUpdaters(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddScoped<IUpdater, Updater.Noop>();
-        serviceCollection.AddScoped<GitHubVersionClient>();
-        serviceCollection.AddSingleton<TaggedVersion>(_ => new TaggedVersion(1, 0, 7));
-        serviceCollection.AddSingleton(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
-            .ResolveConfig);
-        serviceCollection.AddSingleton<FfmpegDownloader>();
-        return serviceCollection;
+        public IServiceCollection AddUpdaters()
+        {
+            serviceCollection.AddScoped<IUpdater, Updater.Noop>();
+            serviceCollection.AddHttpClient<GitHubVersionClient>()
+                .UseDefaultHttpConfig();
+            serviceCollection.AddSingleton<TaggedVersion>(_ => new TaggedVersion(1, 0, 7));
+            serviceCollection.AddSingleton(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
+                .ResolveConfig);
+            serviceCollection.AddHttpClient<FfmpegDownloader>()
+                .UseDefaultHttpConfig();
+            return serviceCollection;
+        }
     }
 }

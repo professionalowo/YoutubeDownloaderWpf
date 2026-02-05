@@ -7,8 +7,8 @@ using SharpCompress.Archives.SevenZip;
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 public sealed class FfmpegDownloader(
-    ILogger<FfmpegDownloader> logger,
     HttpClient client,
+    ILogger<FfmpegDownloader> logger,
     FfmpegDownloader.Config config)
 {
     public async ValueTask DownloadFfmpeg(CancellationToken token = default)
