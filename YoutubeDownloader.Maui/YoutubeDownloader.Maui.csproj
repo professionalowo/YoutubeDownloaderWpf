@@ -60,10 +60,10 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Maui" Version="12.0.0" />
-        <PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="6.0.2" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.80" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
+        <PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
+        <PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.31" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.2" />
     </ItemGroup>
 
     <ItemGroup>
