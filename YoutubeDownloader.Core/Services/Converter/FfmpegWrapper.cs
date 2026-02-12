@@ -3,20 +3,20 @@ using Microsoft.Extensions.Logging;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class FfmpegMp3Conversion<TContext>(
+public sealed class FfmpegMp3Conversion(
     string ffmpegAbsolutePath,
     string outPath,
-    TContext context)
-    : Stream where TContext : IConverter<TContext>.IConverterContext
+    Mp3Metadata metadata)
+    : Stream
 {
     private readonly Lazy<Process> _ffmpegProcess
-        = new(() => CreateProcess(ffmpegAbsolutePath, outPath, context));
+        = new(() => CreateProcess(ffmpegAbsolutePath, outPath, metadata));
 
     private Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
 
-    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, TContext context)
+    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, Mp3Metadata metadata)
     {
-        var args = Args(outPath, context);
+        var args = Args(outPath, metadata);
         var info = new ProcessStartInfo(ffmpegAbsolutePath, args)
         {
             UseShellExecute = false,
@@ -26,7 +26,7 @@ public sealed class FfmpegMp3Conversion<TContext>(
         return Process.Start(info)!;
     }
 
-    private static ICollection<string> Args(string outPath, TContext context) =>
+    private static ICollection<string> Args(string outPath, Mp3Metadata metadata) =>
     [
         "-nostdin",
         "-hide_banner",
@@ -41,7 +41,7 @@ public sealed class FfmpegMp3Conversion<TContext>(
 
         "-map", "0:a:0?",
         "-map_metadata", "-1",
-        "-metadata", $"title={context.Name}",
+        "-metadata", $"title={metadata.Name}",
 
         "-y",
         outPath
