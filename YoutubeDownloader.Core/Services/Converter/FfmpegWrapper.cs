@@ -13,7 +13,6 @@ public sealed class FfmpegMp3Conversion<TContext>(
         = new(() => CreateProcess(ffmpegAbsolutePath, outPath, context));
 
     private Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
-    private Stream Error => _ffmpegProcess.Value.StandardError.BaseStream;
 
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, TContext context)
     {
@@ -23,11 +22,8 @@ public sealed class FfmpegMp3Conversion<TContext>(
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardInput = true,
-            RedirectStandardError = true,
         };
         var process = Process.Start(info)!;
-        process.ErrorDataReceived += (_, e) => Debug.WriteLine(e.Data, "[ffmpeg]");
-        process.BeginErrorReadLine();
         return process;
     }
 
@@ -36,7 +32,6 @@ public sealed class FfmpegMp3Conversion<TContext>(
         "-nostdin",
         "-hide_banner",
         "-loglevel", "error",
-
         "-i", "pipe:0",
 
         "-c:a", "libmp3lame",
@@ -79,8 +74,6 @@ public sealed class FfmpegMp3Conversion<TContext>(
         set => throw new NotSupportedException();
     }
 
-    #region IDisposable
-
     private bool _disposedValue;
 
     private bool ShouldDispose(bool disposing) => !_disposedValue && disposing && _ffmpegProcess.IsValueCreated;
@@ -111,23 +104,10 @@ public sealed class FfmpegMp3Conversion<TContext>(
         var p = _ffmpegProcess.Value;
         await Input.FlushAsync();
         Input.Close();
-        Error.Close();
         await p.WaitForExitAsync();
 
         p.Dispose();
 
         _disposedValue = true;
-    }
-
-    #endregion
-}
-
-internal static class LoggerExtensions
-{
-    extension<TContext>(ILogger<FfmpegMp3Conversion<TContext>> logger)
-        where TContext : IConverter<TContext>.IConverterContext
-    {
-        public void LogFfmpegError(object? _, DataReceivedEventArgs args) =>
-            logger.LogError("[Ffmpeg]: {Message}", args.Data);
     }
 }
