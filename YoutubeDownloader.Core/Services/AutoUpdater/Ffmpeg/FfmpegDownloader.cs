@@ -16,7 +16,7 @@ public sealed class FfmpegDownloader(
         var zipBytes = await client.GetByteArrayAsync(Config.Source, token);
         await using var memoryStream = new MemoryStream(zipBytes);
 
-        using var archive = SevenZipArchive.Open(memoryStream);
+        using var archive = SevenZipArchive.OpenArchive(memoryStream);
 
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
         var entry = archive.Entries.FirstOrDefault(e =>
