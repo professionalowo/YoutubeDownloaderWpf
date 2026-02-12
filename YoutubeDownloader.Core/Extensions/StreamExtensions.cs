@@ -39,4 +39,12 @@ internal sealed class TrackedStream(Stream inner, IProgress<long> progress) : St
         get => inner.Position;
         set => inner.Position = value;
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            inner.Dispose();
+    }
+
+    public override ValueTask DisposeAsync() => inner.DisposeAsync();
 }

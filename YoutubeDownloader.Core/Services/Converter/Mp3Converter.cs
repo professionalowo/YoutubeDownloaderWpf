@@ -16,13 +16,13 @@ public sealed class Mp3Converter<TContext>(string ffmpegPath)
         CancellationToken token = default)
     {
         var mp3Path = $"{outPath}.mp3";
-        await using var conversion =
-            new FfmpegMp3Conversion(ffmpegPath, mp3Path, new Mp3Metadata(context.Name));
-        await using var tracked = conversion.WithProgress(context.GetProgress());
-        await data.CopyToAsync(tracked, token)
+        var metadata = new Mp3Metadata(context.Name);
+        await using var conversion = new FfmpegMp3Conversion(ffmpegPath, mp3Path, metadata)
+            .WithProgress(context.GetProgress());
+        await data.CopyToAsync(conversion, token)
             .ConfigureAwait(false);
         context.InvokeDownloadFinished(this, true);
     }
 }
 
-public sealed record Mp3Metadata(string Name);
+public readonly record struct Mp3Metadata(string Name);
