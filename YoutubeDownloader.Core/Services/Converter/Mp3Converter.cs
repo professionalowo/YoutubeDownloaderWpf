@@ -19,7 +19,8 @@ public sealed class Mp3Converter<TContext>(string ffmpegPath)
         await using var conversion =
             new FfmpegMp3Conversion<TContext>(ffmpegPath, mp3Path, context);
         await using var tracked = conversion.WithProgress(context.GetProgress());
-        await data.CopyToAsync(tracked, token);
+        await data.CopyToAsync(tracked, token)
+            .ConfigureAwait(false);
         context.InvokeDownloadFinished(this, true);
     }
 }
