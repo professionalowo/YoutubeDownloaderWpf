@@ -24,5 +24,3 @@ public sealed class Mp3Converter<TContext>(string ffmpegPath)
         context.InvokeDownloadFinished(this, true);
     }
 }
-
-public readonly record struct Mp3Metadata(string Name);
