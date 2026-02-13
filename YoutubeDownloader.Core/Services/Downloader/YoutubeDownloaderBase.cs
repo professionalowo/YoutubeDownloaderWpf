@@ -14,7 +14,7 @@ using YoutubeDownloader.Core.Util;
 namespace YoutubeDownloader.Core.Services.Downloader;
 
 public abstract partial class YoutubeDownloaderBase<TContext>(
-    ConverterFactory<TContext> converterFactory,
+    ConverterFactory converterFactory,
     ILogger<YoutubeDownloaderBase<TContext>> logger,
     DownloadFactory<TContext> downloadFactory,
     IDirectory downloads)
@@ -73,7 +73,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = new();
 
-    private IConverter<TContext> Converter => converterFactory.GetConverter(ForceMp3);
+    private IConverter<TContext> Converter => converterFactory.GetConverter<TContext>(ForceMp3);
 
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
 

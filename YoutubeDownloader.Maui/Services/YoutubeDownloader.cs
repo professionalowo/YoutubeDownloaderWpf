@@ -14,7 +14,7 @@ public sealed partial class YoutubeDownloader
     : YoutubeDownloaderBase<DownloadContext>
 {
     public YoutubeDownloader(
-        ConverterFactory<DownloadContext> converterFactory,
+        ConverterFactory converterFactory,
         ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
         DownloadFactory<DownloadContext> downloadFactory,
         IDirectory downloads) : base(converterFactory, logger, downloadFactory, downloads)

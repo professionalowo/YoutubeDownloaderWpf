@@ -88,7 +88,7 @@ internal static class ServicesExtensions
                 .AddTransient<Services.YoutubeDownloader>()
                 .AddSingleton(CreateDownloadDirectory)
                 .AddTransient<DownloadFactory<DownloadContext>>()
-                .AddSingleton<ConverterFactory<DownloadContext>>();
+                .AddSingleton<ConverterFactory>();
             return serviceCollection;
         }
 

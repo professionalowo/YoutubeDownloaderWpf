@@ -2,10 +2,10 @@
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class ConverterFactory<TContext>(FfmpegDownloader.Config config)
-    where TContext : IConverter<TContext>.IConverterContext
+public sealed class ConverterFactory(FfmpegDownloader.Config config)
 {
-    public IConverter<TContext> GetConverter(bool forceMp3) => forceMp3 switch
+    public IConverter<TContext> GetConverter<TContext>(bool forceMp3)
+        where TContext : IConverter<TContext>.IConverterContext => forceMp3 switch
     {
         true => new Mp3Converter<TContext>(config.FfmpegExeFullPath),
         false => new WriteThroughConverter<TContext>(".mp4"),

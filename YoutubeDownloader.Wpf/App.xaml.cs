@@ -122,7 +122,7 @@ static class ServiceCollectionExtensions
                 return new YoutubeClient(httpClient);
             });
             serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
-            serviceCollection.AddSingleton<ConverterFactory<DownloadStatusContext>>();
+            serviceCollection.AddSingleton<ConverterFactory>();
             return serviceCollection;
         }
 
