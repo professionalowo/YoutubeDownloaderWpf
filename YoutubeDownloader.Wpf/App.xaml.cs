@@ -21,6 +21,7 @@ using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
 using YoutubeDownloader.Core.Util;
 using YoutubeDownloader.Wpf.Controls;
+using YoutubeDownloader.Wpf.Services;
 using YoutubeDownloader.Wpf.Util;
 using YoutubeDownloader.Wpf.Services.Downloader;
 using YoutubeExplode;
@@ -60,37 +61,11 @@ public partial class App : Application
         return serviceCollection.BuildServiceProvider();
     }
 
-    private async Task CheckForAppUpdates()
-    {
-        try
-        {
-            var source = new GithubSource(GitHubVersionClient.url, null, false);
-            var mgr = new UpdateManager(source);
-
-            if (!mgr.IsInstalled)
-            {
-                return;
-            }
-
-            var newVersion = await mgr.CheckForUpdatesAsync();
-            if (newVersion is not null)
-            {
-                await mgr.DownloadUpdatesAsync(newVersion);
-                
-                mgr.ApplyUpdatesAndRestart(newVersion);
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log the error but let the app start anyway so the user isn't locked out
-            var logger = services.GetService<ILogger<App>>();
-            logger?.LogError(ex, "Failed to check for updates.");
-        }
-    }
-
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        await CheckForAppUpdates();
+        var updater = services.GetService<PackUpdater>()!;
+        await updater.CheckForAppUpdates()
+            .ConfigureAwait(false);
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
         if (!ffmpeg.DoesFfmpegExist())
         {
@@ -98,7 +73,8 @@ public partial class App : Application
                 MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (res == MessageBoxResult.OK)
             {
-                await ffmpeg.DownloadFfmpeg();
+                await ffmpeg.DownloadFfmpeg()
+                    .ConfigureAwait(false);
             }
         }
 
@@ -156,6 +132,7 @@ static class ServiceCollectionExtensions
                 .ResolveConfig);
             serviceCollection.AddHttpClient<FfmpegDownloader>()
                 .UseDefaultHttpConfig();
+            serviceCollection.AddTransient<PackUpdater>();
             return serviceCollection;
         }
     }
