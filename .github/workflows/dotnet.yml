@@ -55,9 +55,13 @@ jobs:
           & "C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 ..\YoutubeDownloader-${{github.ref_name}}.zip *
 
       - name: Velopack Pack
+        shell: pwsh
         run: |
-          vpk pack -u YoutubeDownloader -v ${{ github.ref_name }} -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader"
+          # Strip the 'v' prefix from the tag
+          $version = "${{ github.ref_name }}".TrimStart('v')
           
+          vpk pack -u YoutubeDownloader -v $version -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader"
+
       - name: Velopack Upload & GitHub Release
         run: |
           vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --publish --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --extraItem "YoutubeDownloader-${{github.ref_name}}.zip"
