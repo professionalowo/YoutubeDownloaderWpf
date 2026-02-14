@@ -16,11 +16,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
 
       - name: Install Workloads
         run: dotnet workload restore
@@ -49,30 +54,10 @@ jobs:
           Set-Location -Path publish
           & "C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 ..\YoutubeDownloader-${{github.ref_name}}.zip *
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: release-zip
-          path: YoutubeDownloader-${{github.ref_name}}.zip
-
-  release:
-    needs: build  # Run only after the build job
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: release-zip
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: YoutubeDownloader-${{github.ref_name}}.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+      - name: Velopack Pack
+        run: |
+          vpk pack -u YoutubeDownloader -v ${{ github.ref_name }} -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader"
+          
+      - name: Velopack Upload & GitHub Release
+        run: |
+          vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --publish --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --extraItem "YoutubeDownloader-${{github.ref_name}}.zip"

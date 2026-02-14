@@ -9,6 +9,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Velopack;
+using Velopack.Sources;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
@@ -58,15 +60,48 @@ public partial class App : Application
         return serviceCollection.BuildServiceProvider();
     }
 
+    private async Task CheckForAppUpdates()
+    {
+        try
+        {
+            var source = new GithubSource(GitHubVersionClient.url, null, false);
+            var mgr = new UpdateManager(source);
+
+            if (!mgr.IsInstalled)
+            {
+                return;
+            }
+
+            var newVersion = await mgr.CheckForUpdatesAsync();
+            if (newVersion is not null)
+            {
+                // 1. Ask for consent before downloading
+                var result = MessageBox.Show(
+                    $"A new version ({newVersion.TargetFullRelease.Version}) is available. Would you like to update now?",
+                    "Update Available",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Information);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+                await mgr.DownloadUpdatesAsync(newVersion);
+                
+                mgr.ApplyUpdatesAndRestart(newVersion);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the error but let the app start anyway so the user isn't locked out
+            var logger = services.GetService<ILogger<App>>();
+            logger?.LogError(ex, "Failed to check for updates.");
+        }
+    }
+
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        var updater = services.GetService<IUpdater>()!;
-        bool isNewVersion = await updater.IsNewVersionAvailable();
-        if (isNewVersion)
-        {
-            await updater.UpdateVersion(KnownFolders.GetDownloadsPath());
-        }
-
+        await CheckForAppUpdates();
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
         if (!ffmpeg.DoesFfmpegExist())
         {
@@ -128,10 +163,6 @@ static class ServiceCollectionExtensions
 
         public IServiceCollection AddUpdaters()
         {
-            serviceCollection.AddScoped<IUpdater, Updater.Noop>();
-            serviceCollection.AddHttpClient<GitHubVersionClient>()
-                .UseDefaultHttpConfig();
-            serviceCollection.AddSingleton<TaggedVersion>(_ => new TaggedVersion(1, 0, 7));
             serviceCollection.AddSingleton(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
                 .ResolveConfig);
             serviceCollection.AddHttpClient<FfmpegDownloader>()
