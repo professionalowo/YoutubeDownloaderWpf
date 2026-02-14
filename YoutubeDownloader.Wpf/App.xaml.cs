@@ -75,17 +75,6 @@ public partial class App : Application
             var newVersion = await mgr.CheckForUpdatesAsync();
             if (newVersion is not null)
             {
-                // 1. Ask for consent before downloading
-                var result = MessageBox.Show(
-                    $"A new version ({newVersion.TargetFullRelease.Version}) is available. Would you like to update now?",
-                    "Update Available",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Information);
-
-                if (result != MessageBoxResult.Yes)
-                {
-                    return;
-                }
                 await mgr.DownloadUpdatesAsync(newVersion);
                 
                 mgr.ApplyUpdatesAndRestart(newVersion);
