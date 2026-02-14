@@ -27,6 +27,12 @@ jobs:
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
 
+      - name: Install Workloads
+        run: dotnet workload restore YoutubeDownloader.Wpf/YoutubeDownloader.Wpf.csproj
+
+      - name: Restore dependencies
+        run: dotnet restore YoutubeDownloader.Wpf/YoutubeDownloader.Wpf.csproj
+
       - name: Publish
         run: dotnet publish YoutubeDownloader.Wpf --no-restore -c Release -r win-x64 -o publish /p:DebugType=None /p:DebugSymbols=false
 
@@ -37,24 +43,13 @@ jobs:
           $bytes = [System.Convert]::FromBase64String($cert)
           [System.IO.File]::WriteAllBytes("cert.pfx", $bytes)
 
-      - name: Sign Executable
-        run: |
-          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
-          & $signtool sign /fd SHA256 /f "cert.pfx" /p ${{secrets.CERT_PASSWORD}} "publish\YoutubeDownloader.Wpf.exe"
-
-
-      - name: Create ZIP Archive with 7-Zip
-        run: |
-          Set-Location -Path publish
-          & "C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 ..\YoutubeDownloader-${{github.ref_name}}.zip *
-
       - name: Velopack Pack
         shell: pwsh
         run: |
           # Strip the 'v' prefix from the tag
           $version = "${{ github.ref_name }}".TrimStart('v')
           
-          vpk pack -u YoutubeDownloader -v $version -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader"
+          vpk pack -u YoutubeDownloader -v $version -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader" --signParams "/fd SHA256 /f cert.pfx /p ${{secrets.CERT_PASSWORD}}"
 
       - name: Velopack Upload & GitHub Release
         run: |
