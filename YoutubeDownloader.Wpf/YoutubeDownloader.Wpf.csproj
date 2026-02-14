@@ -46,4 +46,9 @@
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ApplicationDefinition Remove="App.xaml" />
+	  <Page Include="App.xaml" />
+	</ItemGroup>
+
 </Project>
