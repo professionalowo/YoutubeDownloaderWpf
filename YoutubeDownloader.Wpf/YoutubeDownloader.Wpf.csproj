@@ -13,8 +13,6 @@
 		<ApplicationIcon>icon.ico</ApplicationIcon>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<LangVersion>preview</LangVersion>
-		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-		<DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 	</PropertyGroup>
 
 	<ItemGroup>
