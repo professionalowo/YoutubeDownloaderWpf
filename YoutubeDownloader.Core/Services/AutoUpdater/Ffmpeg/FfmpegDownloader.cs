@@ -14,10 +14,20 @@ public sealed class FfmpegDownloader(
 {
     public async ValueTask DownloadFfmpeg(IProgress<long> progress, CancellationToken token = default)
     {
-        var zipBytes = await client.GetByteArrayAsync(Config.Source, token);
-        await using var memoryStream = new MemoryStream(zipBytes);
+        using var response = await client.GetAsync(Config.Source, HttpCompletionOption.ResponseHeadersRead, token)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        var totalBytes = response.Content.Headers.ContentLength ?? 0;
 
-        using var archive = SevenZipArchive.OpenArchive(memoryStream);
+        await using var sourceStream = await response.Content.ReadAsStreamAsync(token)
+            .ConfigureAwait(false);
+        await using var memory = new MemoryStream((int)totalBytes)
+            .WithProgress(progress);
+
+        await sourceStream.CopyToAsync(memory, token)
+            .ConfigureAwait(false);
+
+        using var archive = SevenZipArchive.OpenArchive(memory);
 
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
         var entry = archive.Entries.FirstOrDefault(e =>
@@ -30,10 +40,12 @@ public sealed class FfmpegDownloader(
 
         var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
         Directory.CreateDirectory(config.Folder.FullPath);
-        await using var entryStream = await entry.OpenEntryStreamAsync(token);
+        await using var entryStream = await entry.OpenEntryStreamAsync(token)
+            .ConfigureAwait(false);
         await using var targetFile = File.Create(destinationPath)
             .WithProgress(progress);
-        await entryStream.CopyToAsync(targetFile, token);
+        await entryStream.CopyToAsync(targetFile, token)
+            .ConfigureAwait(false);
         logger.LogInformation("ffmpeg.exe downloaded successfully");
     }
 
