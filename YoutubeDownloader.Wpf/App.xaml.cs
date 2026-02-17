@@ -93,7 +93,7 @@ public partial class App : Application
     }
 }
 
-static class ServiceCollectionExtensions
+internal static class ServiceCollectionExtensions
 {
     extension(IHttpClientBuilder builder)
     {
