@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using Velopack;
 using Velopack.Sources;
 using YoutubeDownloader.Core.Data;
+using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 using YoutubeDownloader.Core.Services.Converter;
@@ -73,7 +74,7 @@ public partial class App : Application
                 MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (res == MessageBoxResult.OK)
             {
-                await ffmpeg.DownloadFfmpeg()
+                await ffmpeg.DownloadFfmpeg(IProgress<long>.Null)
                     .ConfigureAwait(false);
             }
         }

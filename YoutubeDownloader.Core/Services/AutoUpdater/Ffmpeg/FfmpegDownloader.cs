@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
 using SharpCompress.Archives.SevenZip;
+using YoutubeDownloader.Core.Extensions;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
@@ -11,7 +12,7 @@ public sealed class FfmpegDownloader(
     ILogger<FfmpegDownloader> logger,
     FfmpegDownloader.Config config)
 {
-    public async ValueTask DownloadFfmpeg(CancellationToken token = default)
+    public async ValueTask DownloadFfmpeg(IProgress<long> progress, CancellationToken token = default)
     {
         var zipBytes = await client.GetByteArrayAsync(Config.Source, token);
         await using var memoryStream = new MemoryStream(zipBytes);
@@ -30,7 +31,8 @@ public sealed class FfmpegDownloader(
         var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
         Directory.CreateDirectory(config.Folder.FullPath);
         await using var entryStream = await entry.OpenEntryStreamAsync(token);
-        await using var targetFile = File.Create(destinationPath);
+        await using var targetFile = File.Create(destinationPath)
+            .WithProgress(progress);
         await entryStream.CopyToAsync(targetFile, token);
         logger.LogInformation("ffmpeg.exe downloaded successfully");
     }

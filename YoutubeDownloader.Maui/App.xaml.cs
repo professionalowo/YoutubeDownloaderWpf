@@ -1,5 +1,6 @@
 ﻿using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Util;
 
@@ -8,6 +9,7 @@ namespace YoutubeDownloader.Maui;
 public partial class App : Application
 {
     private readonly FfmpegDownloader _ffmpegDownloader;
+
     public App(FfmpegDownloader ffmpegDownloader)
     {
         _ffmpegDownloader = ffmpegDownloader;
@@ -19,7 +21,7 @@ public partial class App : Application
         base.OnStart();
         if (!_ffmpegDownloader.DoesFfmpegExist() && !PlatformUtil.IsMacOs()) //can't do shit on mac
         {
-            await _ffmpegDownloader.DownloadFfmpeg()
+            await _ffmpegDownloader.DownloadFfmpeg(IProgress<long>.Null)
                 .ConfigureAwait(false);
         }
     }
