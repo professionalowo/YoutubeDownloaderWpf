@@ -1,6 +1,8 @@
-﻿namespace YoutubeDownloader.Core.Services.InternalDirectory;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public sealed class CwdDirectory(string name) : IDirectory
+namespace YoutubeDownloader.Core.Services.InternalDirectory;
+
+public sealed class CwdDirectory([StringSyntax(StringSyntaxAttribute.Uri)] string name) : IDirectory
 {
     public string FullPath { get; } = Path.Combine(Directory.GetCurrentDirectory(), name);
 }

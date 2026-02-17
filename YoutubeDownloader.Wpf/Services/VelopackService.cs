@@ -3,34 +3,39 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Velopack;
-using Velopack.Sources;
-using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
+using Velopack.Locators;
 
 namespace YoutubeDownloader.Wpf.Services;
 
-public sealed class PackUpdater(ILogger<PackUpdater> logger)
+public sealed class VelopackService(ILogger<VelopackService> logger, UpdateManager manager)
 {
-    private readonly UpdateManager _manager = new UpdateManager(new GithubSource(GitHubVersionClient.url, null, false));
-
     public ValueTask CheckForAppUpdates(CancellationToken token = default)
     {
         if (token.IsCancellationRequested) return ValueTask.FromCanceled(token);
-        return !_manager.IsInstalled ? ValueTask.CompletedTask : UpdateAsync(token);
+        return !manager.IsInstalled ? ValueTask.CompletedTask : UpdateAsync(token);
     }
 
     private async ValueTask UpdateAsync(CancellationToken token = default)
     {
         try
         {
-            var newVersion = await _manager.CheckForUpdatesAsync();
+            var newVersion = await manager.CheckForUpdatesAsync();
             if (newVersion is null) return;
 
-            await _manager.DownloadUpdatesAsync(newVersion, cancelToken: token);
-            _manager.ApplyUpdatesAndRestart(newVersion);
+            await manager.DownloadUpdatesAsync(newVersion, cancelToken: token);
+            manager.ApplyUpdatesAndRestart(newVersion);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to check for updates.");
         }
+    }
+}
+
+public static class UpdateManagerExtensions
+{
+    extension(UpdateManager manager)
+    {
+        public string? GetBasePath() => manager.IsInstalled ? VelopackLocator.Current.RootAppDir : null;
     }
 }

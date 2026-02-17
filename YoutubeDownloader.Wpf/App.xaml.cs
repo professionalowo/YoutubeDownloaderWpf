@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -59,13 +60,12 @@ public partial class App : Application
             builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)
         );
-        serviceCollection.AddUpdaters();
         return serviceCollection.BuildServiceProvider();
     }
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        var updater = services.GetService<PackUpdater>()!;
+        var updater = services.GetService<VelopackService>()!;
         await updater.CheckForAppUpdates();
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
         if (!ffmpeg.DoesFfmpegExist())
@@ -115,10 +115,19 @@ static class ServiceCollectionExtensions
     {
         public IServiceCollection AddDownloadServices()
         {
+            var manager =
+                new UpdateManager(new GithubSource(GitHubVersionClient.url, null, false));
+
+            IDirectory root = manager.GetBasePath() is string path
+                ? new AbsoluteDirectory(path)
+                : new CwdDirectory(".");
+
+            serviceCollection.AddTransient<UpdateManager>(_ => manager);
+            serviceCollection.AddTransient<VelopackService>();
             serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
             serviceCollection.AddSingleton<IDirectory>(_ =>
             {
-                IDirectory dir = new CwdDirectory("Downloads");
+                IDirectory dir = new ChildDirectory(root, "Downloads");
                 dir.Init();
                 return dir;
             });
@@ -133,16 +142,12 @@ static class ServiceCollectionExtensions
             });
             serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
             serviceCollection.AddSingleton<ConverterFactory>();
-            return serviceCollection;
-        }
-
-        public IServiceCollection AddUpdaters()
-        {
-            serviceCollection.AddSingleton(new FfmpegConfigFactory(FfmpegDownloader.Config.Default)
-                .ResolveConfig);
+            serviceCollection.AddSingleton(
+                new FfmpegConfigFactory(new FfmpegDownloader.Config(new ChildDirectory(root, "ffmpeg")))
+                    .ResolveConfig);
             serviceCollection.AddHttpClient<FfmpegDownloader>()
                 .UseDefaultHttpConfig();
-            serviceCollection.AddTransient<PackUpdater>();
+
             return serviceCollection;
         }
     }
