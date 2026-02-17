@@ -72,7 +72,7 @@ public sealed class FfmpegDownloader(
 
         [StringSyntax(StringSyntaxAttribute.Uri)]
         public const string Source =
-            "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z";
+            "https://github.com/GyanD/codexffmpeg/releases/download/2026-02-15-git-33b215d155/ffmpeg-2026-02-15-git-33b215d155-essentials_build.7z";
 
         public static Config Default => new(new CwdDirectory(FfmpegName));
         public string FfmpegExeFullPath => Folder.ChildFileName(FfmpegExeName);

@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:YoutubeDownloader.Wpf.View"
         mc:Ignorable="d"
         Title="Ffmpeg Download" Height="120" Width="400"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        >
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <StackPanel Margin="20">
-        <TextBlock Name="StatusText" Text="Downloading..." Margin="0,0,0,10" />
-        <ProgressBar Name="DownloadProgress" Height="20" Minimum="0" Maximum="1" />
+        <TextBlock Name="StatusText" Text="{Binding Message ,Mode=TwoWay}" Margin="0,0,0,10" />
+        <ProgressBar Value="{Binding ProgressValue, Mode=TwoWay}" Name="DownloadProgress" Height="20" Minimum="0"
+                     Maximum="1" />
     </StackPanel>
 </Window>

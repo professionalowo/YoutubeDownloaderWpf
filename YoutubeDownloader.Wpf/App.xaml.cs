@@ -79,8 +79,7 @@ public partial class App : Application
 
                 try
                 {
-                    await ffmpeg.DownloadFfmpeg(new Progress<double>(value =>
-                        progressWindow.DownloadProgress.Value = value));
+                    await ffmpeg.DownloadFfmpeg(progressWindow.Progress);
                 }
                 finally
                 {
