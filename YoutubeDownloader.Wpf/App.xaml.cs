@@ -65,17 +65,15 @@ public partial class App : Application
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
         var updater = services.GetService<PackUpdater>()!;
-        await updater.CheckForAppUpdates()
-            .ConfigureAwait(false);
+        await updater.CheckForAppUpdates();
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
         if (!ffmpeg.DoesFfmpegExist())
         {
-            var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Downlaod Ffmpeg",
+            var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Download Ffmpeg",
                 MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (res == MessageBoxResult.OK)
             {
-                await ffmpeg.DownloadFfmpeg(IProgress<double>.Null)
-                    .ConfigureAwait(false);
+                await ffmpeg.DownloadFfmpeg(IProgress<double>.Null);
             }
         }
 
