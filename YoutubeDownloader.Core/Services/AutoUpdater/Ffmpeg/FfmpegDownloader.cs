@@ -19,12 +19,10 @@ public sealed class FfmpegDownloader(
         response.EnsureSuccessStatusCode();
         var totalBytes = response.Content.Headers.ContentLength ?? 0;
 
-        var downloadProgress = new Progress<long>(read => progress.Report(0.8 * (read / (double)totalBytes)));
-
         await using var sourceStream = await response.Content.ReadAsStreamAsync(token)
             .ConfigureAwait(false);
         await using var memory = new MemoryStream((int)totalBytes)
-            .WithProgress(downloadProgress);
+            .WithProgress(new DownloadProgress(progress, (int)totalBytes));
 
         await sourceStream.CopyToAsync(memory, token)
             .ConfigureAwait(false);
@@ -44,12 +42,10 @@ public sealed class FfmpegDownloader(
         var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
         Directory.CreateDirectory(config.Folder.FullPath);
 
-        var extractProgress = new Progress<long>(written => progress.Report(0.8 + (double)written / entry.Size * 0.2));
-
         await using var entryStream = await entry.OpenEntryStreamAsync(token)
             .ConfigureAwait(false);
         await using var targetFile = File.Create(destinationPath)
-            .WithProgress(extractProgress);
+            .WithProgress(new ExtractionProgress(progress, entry.Size));
         await entryStream.CopyToAsync(targetFile, token)
             .ConfigureAwait(false);
         logger.LogInformation("ffmpeg.exe downloaded successfully");
@@ -72,3 +68,21 @@ public sealed class FfmpegDownloader(
         public string FfmpegExeFullPath => Folder.ChildFileName(FfmpegExeName);
     }
 }
+
+internal class WeightedProgress(IProgress<double> parent, long total, double weight, double start) : IProgress<long>
+{
+    private long _reported;
+
+    public void Report(long value)
+    {
+        _reported += value;
+        var toReport = _reported / (double)total;
+        parent.Report(toReport * weight + start);
+    }
+}
+
+internal sealed class DownloadProgress(IProgress<double> parent, long total)
+    : WeightedProgress(parent, total, 0.8, 0.0);
+
+internal sealed class ExtractionProgress(IProgress<double> parent, long total)
+    : WeightedProgress(parent, total, 0.2, 0.8);

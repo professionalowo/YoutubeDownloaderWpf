@@ -25,6 +25,7 @@ using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Wpf.Services;
 using YoutubeDownloader.Wpf.Util;
 using YoutubeDownloader.Wpf.Services.Downloader;
+using YoutubeDownloader.Wpf.View;
 using YoutubeExplode;
 
 namespace YoutubeDownloader.Wpf;
@@ -70,10 +71,21 @@ public partial class App : Application
         if (!ffmpeg.DoesFfmpegExist())
         {
             var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Download Ffmpeg",
-                MessageBoxButton.OKCancel, MessageBoxImage.Question);
-            if (res == MessageBoxResult.OK)
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (res == MessageBoxResult.Yes)
             {
-                await ffmpeg.DownloadFfmpeg(IProgress<double>.Null);
+                var progressWindow = new ProgressDialog();
+                progressWindow.Show();
+
+                try
+                {
+                    await ffmpeg.DownloadFfmpeg(new Progress<double>(value =>
+                        progressWindow.DownloadProgress.Value = value));
+                }
+                finally
+                {
+                    progressWindow.Close();
+                }
             }
         }
 
