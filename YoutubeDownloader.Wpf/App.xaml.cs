@@ -74,7 +74,7 @@ public partial class App : Application
                 MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (res == MessageBoxResult.OK)
             {
-                await ffmpeg.DownloadFfmpeg(IProgress<long>.Null)
+                await ffmpeg.DownloadFfmpeg(IProgress<double>.Null)
                     .ConfigureAwait(false);
             }
         }

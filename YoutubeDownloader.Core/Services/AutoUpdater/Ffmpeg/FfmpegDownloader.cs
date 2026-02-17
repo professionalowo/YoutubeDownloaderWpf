@@ -12,21 +12,24 @@ public sealed class FfmpegDownloader(
     ILogger<FfmpegDownloader> logger,
     FfmpegDownloader.Config config)
 {
-    public async ValueTask DownloadFfmpeg(IProgress<long> progress, CancellationToken token = default)
+    public async ValueTask DownloadFfmpeg(IProgress<double> progress, CancellationToken token = default)
     {
         using var response = await client.GetAsync(Config.Source, HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var totalBytes = response.Content.Headers.ContentLength ?? 0;
 
+        var downloadProgress = new Progress<long>(read => progress.Report(0.8 * (read / (double)totalBytes)));
+
         await using var sourceStream = await response.Content.ReadAsStreamAsync(token)
             .ConfigureAwait(false);
         await using var memory = new MemoryStream((int)totalBytes)
-            .WithProgress(progress);
+            .WithProgress(downloadProgress);
 
         await sourceStream.CopyToAsync(memory, token)
             .ConfigureAwait(false);
 
+        //Stream has to be downloaded fully to be searchable
         using var archive = SevenZipArchive.OpenArchive(memory);
 
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
@@ -40,10 +43,13 @@ public sealed class FfmpegDownloader(
 
         var destinationPath = config.Folder.ChildFileName(ffmpegExeName);
         Directory.CreateDirectory(config.Folder.FullPath);
+
+        var extractProgress = new Progress<long>(written => progress.Report(0.8 + (double)written / entry.Size * 0.2));
+
         await using var entryStream = await entry.OpenEntryStreamAsync(token)
             .ConfigureAwait(false);
         await using var targetFile = File.Create(destinationPath)
-            .WithProgress(progress);
+            .WithProgress(extractProgress);
         await entryStream.CopyToAsync(targetFile, token)
             .ConfigureAwait(false);
         logger.LogInformation("ffmpeg.exe downloaded successfully");
