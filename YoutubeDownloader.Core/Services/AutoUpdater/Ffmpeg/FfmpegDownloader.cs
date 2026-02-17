@@ -22,17 +22,19 @@ public sealed class FfmpegDownloader(
         await using var sourceStream = await response.Content.ReadAsStreamAsync(token)
             .ConfigureAwait(false);
         await using var memory = new MemoryStream((int)totalBytes)
-            .WithProgress(new DownloadProgress(progress, (int)totalBytes));
+            .WithProgress(new DownloadProgress(progress, totalBytes));
 
         await sourceStream.CopyToAsync(memory, token)
             .ConfigureAwait(false);
 
         //Stream has to be downloaded fully to be searchable
-        using var archive = SevenZipArchive.OpenArchive(memory);
+        await using var archive = await SevenZipArchive.OpenAsyncArchive(memory, cancellationToken: token)
+            .ConfigureAwait(false);
 
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
-        var entry = archive.Entries.FirstOrDefault(e =>
-            e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false);
+        var entry = await archive.EntriesAsync.FirstOrDefaultAsync(e =>
+                e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false, token)
+            .ConfigureAwait(false);
         if (entry == null)
         {
             logger.LogWarning("{Name} not found in zip archive", ffmpegExeName);
@@ -44,11 +46,18 @@ public sealed class FfmpegDownloader(
 
         await using var entryStream = await entry.OpenEntryStreamAsync(token)
             .ConfigureAwait(false);
-        await using var targetFile = File.Create(destinationPath)
+        await using var targetFile = new FileStream(
+                destinationPath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                81920,
+                true
+            )
             .WithProgress(new ExtractionProgress(progress, entry.Size));
         await entryStream.CopyToAsync(targetFile, token)
             .ConfigureAwait(false);
-        logger.LogInformation("ffmpeg.exe downloaded successfully");
+        logger.LogInformation("ffmpeg downloaded successfully");
     }
 
     public bool DoesFfmpegExist()
