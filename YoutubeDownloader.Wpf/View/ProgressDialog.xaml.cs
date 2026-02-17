@@ -35,16 +35,16 @@ public partial class ProgressDialog : Window, INotifyPropertyChanged
         Progress = new Progress<double>(v =>
         {
             ProgressValue = v;
-            Message = FormatMessage(v);
+            Message = v <= 0.8 ? FormatMessage("Downloading", v) : FormatMessage("Extracting", v);
         });
-        Message = FormatMessage(0);
+        Message = FormatMessage("Initializing", 0);
         InitializeComponent();
     }
 
-    private static string FormatMessage(double progress)
+    private static string FormatMessage(ReadOnlySpan<char> message, double progress)
     {
         var percentage = progress * 100;
-        return $"Downloading... ({percentage:##00.0}%)";
+        return $"{message}... ({percentage:##00.0}%)";
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
