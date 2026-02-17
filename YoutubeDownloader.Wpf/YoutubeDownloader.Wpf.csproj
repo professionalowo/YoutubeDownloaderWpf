@@ -3,17 +3,18 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net10.0-windows8.0</TargetFramework>
+		<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<PublishSingleFile>true</PublishSingleFile>
 		<SelfContained>false</SelfContained>
 		<DebugSymbols>false</DebugSymbols>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
-		<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<LangVersion>preview</LangVersion>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+		<DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 	</PropertyGroup>
 
 	<ItemGroup>
