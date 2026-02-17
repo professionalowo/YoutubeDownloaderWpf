@@ -30,6 +30,6 @@ public interface IDirectory
 
     bool ContainsFile(string name) => File.Exists(ChildFileName(name));
 
-    string[] GetFiles(string searchPattern = "*") =>
-        Directory.GetFiles(FullPath, searchPattern, SearchOption.AllDirectories);
+    IEnumerable<string> GetFiles(string searchPattern = "*") =>
+        Directory.EnumerateFiles(FullPath, searchPattern, SearchOption.AllDirectories);
 }
