@@ -2,14 +2,14 @@
 
 public static class StreamExtensions
 {
-    extension(Stream inner)
+    extension<TStream>(TStream inner) where TStream : Stream
     {
-        public Stream WithProgress(IProgress<long> progress)
-            => new TrackedStream(inner, progress);
+        public TrackedStream<TStream> WithProgress(IProgress<long> progress)
+            => new(inner, progress);
     }
 }
 
-internal sealed class TrackedStream(Stream inner, IProgress<long> progress) : Stream
+public sealed class TrackedStream<TStream>(TStream inner, IProgress<long> progress) : Stream where TStream : Stream
 {
     public override void Flush()
         => inner.Flush();
