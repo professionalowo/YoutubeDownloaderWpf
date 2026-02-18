@@ -1,7 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Diagnostics.CodeAnalysis;
-using SharpCompress.Archives;
-using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
 using SharpCompress.Archives.SevenZip;
 using YoutubeDownloader.Core.Extensions;
