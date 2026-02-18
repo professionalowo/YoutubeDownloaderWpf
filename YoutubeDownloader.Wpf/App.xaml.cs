@@ -143,7 +143,7 @@ internal static class ServiceCollectionExtensions
             serviceCollection.AddTransient<DownloadFactory<DownloadStatusContext>>();
             serviceCollection.AddSingleton<ConverterFactory>();
             serviceCollection.AddSingleton(
-                new FfmpegConfigFactory(new FfmpegDownloader.Config(new ChildDirectory(root, "ffmpeg")))
+                new FfmpegConfigFactory(new FfmpegConfig(new ChildDirectory(root, "ffmpeg")))
                     .ResolveConfig);
             serviceCollection.AddHttpClient<FfmpegDownloader>()
                 .UseDefaultHttpConfig();

@@ -7,7 +7,7 @@ public static partial class PlatformSpecificServiceExtensions
 {
     public static partial IServiceCollection AddFfmpeg(this IServiceCollection serviceCollection,IDirectory directory)
     {
-        serviceCollection.AddSingleton<FfmpegDownloader.Config>(new FfmpegConfigFactory(new(directory)).ResolveConfig);
+        serviceCollection.AddSingleton<FfmpegConfig>(new FfmpegConfigFactory(new FfmpegConfig(directory)).ResolveConfig);
         return serviceCollection;
     }
 }

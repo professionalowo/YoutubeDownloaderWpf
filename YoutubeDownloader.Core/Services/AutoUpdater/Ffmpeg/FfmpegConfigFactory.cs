@@ -3,12 +3,12 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
-public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
+public class FfmpegConfigFactory(FfmpegConfig defaultConfig)
 {
-    public FfmpegDownloader.Config ResolveConfig(IServiceProvider _)
-        => GetConfigFromSystemPath(FfmpegDownloader.Config.FfmpegName) ?? defaultConfig;
+    public FfmpegConfig ResolveConfig(IServiceProvider _)
+        => GetConfigFromSystemPath(FfmpegConfig.FfmpegName) ?? defaultConfig;
 
-    private static FfmpegDownloader.Config? GetConfigFromSystemPath(string exe)
+    private static FfmpegConfig? GetConfigFromSystemPath(string exe)
     {
         var replacedExe = PlatformUtil.AsExecutablePath(exe);
         string[] paths =
@@ -21,7 +21,7 @@ public class FfmpegConfigFactory(FfmpegDownloader.Config defaultConfig)
             .Where(p => File.Exists(Path.Combine(p, replacedExe)))
             .Select(Path.GetFullPath)
             .Select(p => new AbsoluteDirectory(p))
-            .Select(dir => new FfmpegDownloader.Config(dir, exe))
+            .Select(dir => new FfmpegConfig(dir, exe))
             .FirstOrDefault();
     }
 

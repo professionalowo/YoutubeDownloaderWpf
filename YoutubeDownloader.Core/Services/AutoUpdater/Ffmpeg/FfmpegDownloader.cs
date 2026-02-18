@@ -10,12 +10,12 @@ namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 public sealed class FfmpegDownloader(
     HttpClient client,
     ILogger<FfmpegDownloader> logger,
-    FfmpegDownloader.Config config)
+    FfmpegConfig config)
 {
     public async ValueTask DownloadFfmpeg(IProgress<double> progress, CancellationToken token = default)
     {
         using var response = await client
-            .GetAsync(new Uri(Config.Source), HttpCompletionOption.ResponseHeadersRead, token)
+            .GetAsync(new Uri(FfmpegConfig.Source), HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var totalBytes = response.Content.Headers.ContentLength ?? 0;
@@ -64,19 +64,6 @@ public sealed class FfmpegDownloader(
     public bool DoesFfmpegExist()
         => Path.Exists(config.Folder.FullPath)
            && config.Folder.ContainsFile(PlatformUtil.AsExecutablePath(config.FfmpegExeName));
-
-
-    public sealed record Config(IDirectory Folder, string FfmpegExeName = Config.FfmpegName)
-    {
-        public const string FfmpegName = "ffmpeg";
-
-        [StringSyntax(StringSyntaxAttribute.Uri)]
-        public const string Source =
-            "https://github.com/GyanD/codexffmpeg/releases/download/2026-02-15-git-33b215d155/ffmpeg-2026-02-15-git-33b215d155-essentials_build.7z";
-
-        public static Config Default => new(new CwdDirectory(FfmpegName));
-        public string FfmpegExeFullPath => Folder.ChildFileName(FfmpegExeName);
-    }
 }
 
 internal class WeightedProgress(IProgress<double> parent, long total, double weight, double start) : IProgress<long>
