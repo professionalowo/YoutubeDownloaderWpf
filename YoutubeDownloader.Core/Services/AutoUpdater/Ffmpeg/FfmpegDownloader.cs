@@ -44,7 +44,7 @@ public sealed class FfmpegDownloader(
         CancellationToken token = default)
     {
         using var response = await client
-            .GetAsync(new Uri(FfmpegConfig.Source), HttpCompletionOption.ResponseHeadersRead, token)
+            .GetAsync(config.Uri, HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var totalBytes = response.Content.Headers.ContentLength ?? 0;
