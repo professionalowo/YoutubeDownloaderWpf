@@ -12,9 +12,10 @@ public sealed class FfmpegDownloader(
 {
     public async ValueTask DownloadFfmpeg(IProgress<double> progress, CancellationToken token = default)
     {
-        await using var memory = await GetArchiveMemoryStream(progress, token);
-
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
+
+        await using var memory = await GetArchiveMemoryStream(progress, token)
+            .ConfigureAwait(false);
 
         await using var archive = await SevenZipArchive.OpenAsyncArchive(memory, cancellationToken: token)
             .ConfigureAwait(false);
