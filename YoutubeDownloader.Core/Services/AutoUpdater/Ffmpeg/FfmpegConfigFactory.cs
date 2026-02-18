@@ -21,7 +21,7 @@ public class FfmpegConfigFactory(FfmpegConfig defaultConfig)
             .Where(p => File.Exists(Path.Combine(p, replacedExe)))
             .Select(Path.GetFullPath)
             .Select(p => new AbsoluteDirectory(p))
-            .Select(dir => new FfmpegConfig(dir, exe))
+            .Select(dir => new FfmpegConfig(dir, FfmpegConfig.SourceUri, exe))
             .FirstOrDefault();
     }
 
