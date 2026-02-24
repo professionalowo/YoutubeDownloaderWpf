@@ -34,7 +34,7 @@ public class YoutubeDownloader : YoutubeDownloaderBase<DownloadStatusContext>
         : base(converterFactory, logger, downloadFactory, downloads)
         => DownloadFinished += OnDownloadFinished;
 
-    private void OnDownloadFinished(object? sender, EventArgs e)
+    private static void OnDownloadFinished(object? sender, DownloadFinishedEventArgs e)
         => new ToastContentBuilder()
             .AddText("Download Finished")
             .Show();

@@ -21,7 +21,7 @@ public sealed partial class YoutubeDownloader
         => DownloadFinished += OnDownloadFinished;
 
 
-    private void OnDownloadFinished(object? sender, EventArgs e)
+    private void OnDownloadFinished(object? sender, DownloadFinishedEventArgs e)
         => DispatchToUi(ShowFinishedToast)
             .ConfigureAwait(false)
             .GetAwaiter()

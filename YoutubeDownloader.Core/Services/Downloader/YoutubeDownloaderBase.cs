@@ -20,6 +20,8 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     IDirectory downloads)
     : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
 {
+    protected IDirectory Downloads => downloads;
+    
     private readonly Lock _cancellationSourceLock = new();
 
     [StringSyntax(StringSyntaxAttribute.Uri)]
@@ -108,7 +110,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
         finally
         {
-            OnDownloadFinished();
+            OnDownloadFinished(Url);
         }
     }
 
@@ -185,11 +187,11 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             DownloadStatuses.Add(context);
         }, token);
 
-    protected event EventHandler? DownloadFinished;
+    protected event EventHandler<DownloadFinishedEventArgs>? DownloadFinished;
 
-    private void OnDownloadFinished()
+    private void OnDownloadFinished(string url)
     {
-        DownloadFinished?.Invoke(this, EventArgs.Empty);
+        DownloadFinished?.Invoke(this, new DownloadFinishedEventArgs(url));
         IsPrefetching = false;
         IsDownloading = false;
     }
@@ -198,4 +200,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+
+    protected record DownloadFinishedEventArgs(string Url);
 }
