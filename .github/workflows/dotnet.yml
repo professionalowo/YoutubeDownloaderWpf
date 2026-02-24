@@ -48,8 +48,10 @@ jobs:
           $version = "${{ github.ref_name }}".TrimStart('v')
 
           $certPath = Resolve-Path "cert.pfx"
+          $certPass = "${{ secrets.CERT_PASSWORD }}"
+          $signParams = "/fd SHA256 /f `"$certPath`" /p `"$certPass`""
           
-          vpk pack -u YoutubeDownloader -v $version -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader" --verbose --signParams "/fd SHA256 /f `"$certPath`" /p '${{secrets.CERT_PASSWORD}}"'
+          vpk pack -u YoutubeDownloader -v $version -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader" --verbose --signParams $signParams
 
       - name: Velopack Upload & GitHub Release
         run: |
