@@ -45,7 +45,6 @@ public class YoutubeDownloader : YoutubeDownloaderBase<DownloadStatusContext>
     private static void OnDownloadFailed(object? sender, DownloadFailedEventArgs e)
         => new ToastContentBuilder()
             .AddText("Download Failed")
-            .AddText(e.Error.Message)
             .Show();
 
     protected override Task DispatchToUi(Action action, CancellationToken token = default)

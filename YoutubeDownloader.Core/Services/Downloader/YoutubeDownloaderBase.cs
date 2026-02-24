@@ -21,7 +21,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
 {
     protected IDirectory Downloads => downloads;
-    
+
     private readonly Lock _cancellationSourceLock = new();
 
     [StringSyntax(StringSyntaxAttribute.Uri)]
@@ -95,11 +95,11 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             .ConfigureAwait(false);
         IsDownloading = true;
         IsPrefetching = true;
-        Exception? error = null;
         try
         {
             await DownloadAction(Url, CancellationSource.Token)
                 .ConfigureAwait(false);
+            OnDownloadSuccess(Url);
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
         {
@@ -107,15 +107,10 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
         catch (Exception e)
         {
-            error = e;
             logger.LogError("{Error}", e);
-        }
-        finally
-        {
-            OnDownloadFinished(Url, error);
+            OnDownloadFailed(Url, e);
         }
     }
-
 
 
     private void ClearStatuses()
@@ -193,14 +188,22 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     protected event EventHandler<DownloadSuccessEventArgs>? DownloadSuccess;
     protected event EventHandler<DownloadFailedEventArgs>? DownloadFailed;
 
-    private void OnDownloadFinished(string url, Exception? error = null)
+    private void OnDownloadFinished()
     {
-        if (error is not null)
-            DownloadFailed?.Invoke(this, new DownloadFailedEventArgs(url, error));
-        else
-            DownloadSuccess?.Invoke(this, new DownloadSuccessEventArgs(url));
         IsPrefetching = false;
         IsDownloading = false;
+    }
+
+    private void OnDownloadSuccess(string url)
+    {
+        OnDownloadFinished();
+        DownloadSuccess?.Invoke(this, new DownloadSuccessEventArgs(url));
+    }
+
+    private void OnDownloadFailed(string url, Exception error)
+    {
+        OnDownloadFinished();
+        DownloadFailed?.Invoke(this, new DownloadFailedEventArgs(url, error));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -210,5 +213,6 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
 
     protected record DownloadSuccessEventArgs(string Url);
+
     protected record DownloadFailedEventArgs(string Url, Exception Error);
 }

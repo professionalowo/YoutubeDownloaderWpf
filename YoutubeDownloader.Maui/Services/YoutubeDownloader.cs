@@ -30,7 +30,7 @@ public sealed partial class YoutubeDownloader
             .GetResult();
 
     private void OnDownloadFailed(object? sender, DownloadFailedEventArgs e)
-        => DispatchToUi(() => ShowErrorToast(e.Error))
+        => DispatchToUi(ShowErrorToast)
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
@@ -42,9 +42,9 @@ public sealed partial class YoutubeDownloader
             .ConfigureAwait(false);
     }
 
-    private async Task ShowErrorToast(Exception error)
+    private async Task ShowErrorToast()
     {
-        using var toast = Toast.Make($"Download failed: {error.Message}", ToastDuration.Long);
+        using var toast = Toast.Make($"Download failed", ToastDuration.Long);
         await toast.Show(CancellationSource.Token)
             .ConfigureAwait(false);
     }
