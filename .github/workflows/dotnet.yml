@@ -71,6 +71,7 @@ jobs:
                    -v $version `
                    -p publish `
                    -e YoutubeDownloader.Wpf.exe `
+                   --verbose
                    --packTitle "Youtube Downloader" `
                    --signParams "/fd SHA256 /sha1 $env:CERT_THUMBPRINT"
 
