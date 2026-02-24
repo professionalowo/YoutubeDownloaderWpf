@@ -32,24 +32,21 @@ public class YoutubeDownloader : YoutubeDownloaderBase<DownloadStatusContext>
         DownloadFactory<DownloadStatusContext> downloadFactory,
         IDirectory downloads)
         : base(converterFactory, logger, downloadFactory, downloads)
-        => DownloadFinished += OnDownloadFinished;
-
-    private static void OnDownloadFinished(object? sender, DownloadFinishedEventArgs e)
     {
-        if (e.Error is not null)
-        {
-            new ToastContentBuilder()
-                .AddText("Download Failed")
-                .AddText(e.Error.Message)
-                .Show();
-        }
-        else
-        {
-            new ToastContentBuilder()
-                .AddText("Download Finished")
-                .Show();
-        }
+        DownloadSuccess += OnDownloadSuccess;
+        DownloadFailed += OnDownloadFailed;
     }
+
+    private static void OnDownloadSuccess(object? sender, DownloadSuccessEventArgs e)
+        => new ToastContentBuilder()
+            .AddText("Download Finished")
+            .Show();
+
+    private static void OnDownloadFailed(object? sender, DownloadFailedEventArgs e)
+        => new ToastContentBuilder()
+            .AddText("Download Failed")
+            .AddText(e.Error.Message)
+            .Show();
 
     protected override Task DispatchToUi(Action action, CancellationToken token = default)
         => Dispatch(action, token).Task;
