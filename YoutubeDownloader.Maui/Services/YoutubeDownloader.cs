@@ -18,11 +18,19 @@ public sealed partial class YoutubeDownloader
         ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
         DownloadFactory<DownloadContext> downloadFactory,
         IDirectory downloads) : base(converterFactory, logger, downloadFactory, downloads)
-        => DownloadFinished += OnDownloadFinished;
+    {
+        DownloadSuccess += OnDownloadSuccess;
+        DownloadFailed += OnDownloadFailed;
+    }
 
-
-    private void OnDownloadFinished(object? sender, DownloadFinishedEventArgs e)
+    private void OnDownloadSuccess(object? sender, DownloadSuccessEventArgs e)
         => DispatchToUi(ShowFinishedToast)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
+
+    private void OnDownloadFailed(object? sender, DownloadFailedEventArgs e)
+        => DispatchToUi(ShowErrorToast)
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
@@ -30,6 +38,13 @@ public sealed partial class YoutubeDownloader
     private async Task ShowFinishedToast()
     {
         using var toast = Toast.Make("Download finished", ToastDuration.Long);
+        await toast.Show(CancellationSource.Token)
+            .ConfigureAwait(false);
+    }
+
+    private async Task ShowErrorToast()
+    {
+        using var toast = Toast.Make($"Download failed", ToastDuration.Long);
         await toast.Show(CancellationSource.Token)
             .ConfigureAwait(false);
     }
