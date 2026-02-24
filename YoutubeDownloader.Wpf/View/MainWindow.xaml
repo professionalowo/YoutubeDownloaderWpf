@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:YoutubeDownloader.Wpf"
         xmlns:v="clr-namespace:YoutubeDownloader.Wpf.Controls.Validation"
         xmlns:c="clr-namespace:YoutubeDownloader.Wpf.Controls"
         mc:Ignorable="d"
@@ -17,8 +16,9 @@
                     <DataTrigger.EnterActions>
                         <BeginStoryboard x:Name="SpinAnimation">
                             <Storyboard RepeatBehavior="Forever">
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                                                 From="0" To="360" Duration="0:0:1" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                    From="0" To="360" Duration="0:0:1" />
                             </Storyboard>
                         </BeginStoryboard>
                     </DataTrigger.EnterActions>
@@ -51,7 +51,9 @@
                 </TextBox.Text>
             </TextBox>
             <Button Click="Button_Click" Width="150"
-                    IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBooleanConverter}}">Download</Button>
+                    IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBooleanConverter}}">
+                Download
+            </Button>
             <Label VerticalAlignment="Center">Force Mp3:</Label>
             <CheckBox IsChecked="{Binding ForceMp3, Mode=TwoWay}" VerticalAlignment="Center" />
         </DockPanel>
@@ -92,7 +94,7 @@
         <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1"
               Visibility="{Binding IsPrefetching, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="LightGray" />
-            <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="#FF3F51B5" StrokeDashArray="8 4"
+            <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="DarkSlateGray" StrokeDashArray="6 8"
                      Style="{StaticResource SpinnerArcStyle}">
                 <Ellipse.RenderTransform>
                     <RotateTransform CenterX="20" CenterY="20" />
