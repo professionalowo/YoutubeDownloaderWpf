@@ -12,6 +12,41 @@ jobs:
       contents: write  # Needed for GitHub Releases
 
     steps:
+      - name: Import Certificate to Windows OS
+        shell: pwsh
+        run: |
+          # 1. Decode the Base64 certificate
+          $certBase64 = "${{ secrets.CODE_SIGNING_CERT }}".Trim()
+          $bytes = [System.Convert]::FromBase64String($certBase64)
+          [System.IO.File]::WriteAllBytes("cert.pfx", $bytes)
+
+          # 2. Setup the password and flags
+          $certPass = "${{ secrets.CERT_PASSWORD }}"
+          $flags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
+          
+          # 3. Create the cert object
+          $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("cert.pfx", $certPass, $flags)
+          
+          # --- EXPIRATION CHECK ---
+          Write-Host "Certificate is valid until: $($pfx.NotAfter)"
+          if ((Get-Date) -gt $pfx.NotAfter) {
+              Write-Error "The code signing certificate has expired!"
+              exit 1
+          }
+          Write-Host "Certificate is active. Proceeding..."
+          # ------------------------
+          
+          # 4. Import it securely into the Windows CurrentUser Certificate Store
+          $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("My", "CurrentUser")
+          $store.Open("ReadWrite")
+          $store.Add($pfx)
+          $store.Close()
+
+          # 5. Grab the Thumbprint and save it to GitHub Environment Variables
+          $thumbprint = $pfx.Thumbprint
+          Write-Host "Certificate imported successfully! Thumbprint: $thumbprint"
+          echo "CERT_THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV
+
       - name: Checkout Repository
         uses: actions/checkout@v6
         with:
@@ -33,32 +68,6 @@ jobs:
 
       - name: Publish
         run: dotnet publish YoutubeDownloader.Wpf/YoutubeDownloader.Wpf.csproj -c Release -r win-x64 -o publish /p:DebugType=None /p:DebugSymbols=false
-
-      - name: Import Certificate to Windows OS
-        shell: pwsh
-        run: |
-          # 1. Decode the Base64 certificate
-          $certBase64 = "${{ secrets.CODE_SIGNING_CERT }}".Trim()
-          $bytes = [System.Convert]::FromBase64String($certBase64)
-          [System.IO.File]::WriteAllBytes("cert.pfx", $bytes)
-
-          # 2. Setup the password and flags (PersistKeySet ensures signtool can use the private key)
-          $certPass = "${{ secrets.CERT_PASSWORD }}"
-          $flags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
-          
-          # 3. Create the cert using the constructor (fixes the "immutable" error)
-          $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("cert.pfx", $certPass, $flags)
-          
-          # 4. Import it securely into the Windows CurrentUser Certificate Store
-          $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("My", "CurrentUser")
-          $store.Open("ReadWrite")
-          $store.Add($pfx)
-          $store.Close()
-
-          # 5. Grab the Thumbprint and save it to GitHub Environment Variables
-          $thumbprint = $pfx.Thumbprint
-          Write-Host "Certificate imported successfully! Thumbprint: $thumbprint"
-          echo "CERT_THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV
 
       - name: Velopack Pack
         shell: pwsh
