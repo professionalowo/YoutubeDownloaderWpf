@@ -12,8 +12,8 @@ public partial class ProgressDialog : Window, INotifyPropertyChanged
         get;
         set
         {
-            OnPropertyChanged();
             field = value;
+            OnPropertyChanged();
         }
     }
 
@@ -22,8 +22,8 @@ public partial class ProgressDialog : Window, INotifyPropertyChanged
         get;
         set
         {
-            OnPropertyChanged();
             field = value;
+            OnPropertyChanged();
         }
     }
 

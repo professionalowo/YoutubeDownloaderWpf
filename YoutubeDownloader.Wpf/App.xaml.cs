@@ -43,6 +43,7 @@ public partial class App : Application
     {
         services = InitializeServices();
         this.DispatcherUnhandledException += OnDispatcherUnhandledException;
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -68,6 +69,9 @@ public partial class App : Application
         var updater = services.GetService<VelopackService>()!;
         await updater.CheckForAppUpdates();
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
+
+        _mainWindow = services.GetService<MainWindow>();
+
         if (!ffmpeg.DoesFfmpegExist())
         {
             var res = MessageBox.Show("YoutubeDowloader wants to download ffmpeg.\nContinue?", "Download Ffmpeg",
@@ -88,7 +92,6 @@ public partial class App : Application
             }
         }
 
-        _mainWindow = services.GetService<MainWindow>();
         _mainWindow?.Show();
     }
 }
