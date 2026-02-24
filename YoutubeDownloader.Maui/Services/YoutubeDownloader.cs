@@ -22,10 +22,17 @@ public sealed partial class YoutubeDownloader
 
 
     private void OnDownloadFinished(object? sender, DownloadFinishedEventArgs e)
-        => DispatchToUi(ShowFinishedToast)
+        => DispatchToUi(() => e.Error is not null ? ShowErrorToast(e.Error) : ShowFinishedToast())
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
+
+    private async Task ShowErrorToast(Exception error)
+    {
+        using var toast = Toast.Make($"Download failed: {error.Message}", ToastDuration.Long);
+        await toast.Show(CancellationSource.Token)
+            .ConfigureAwait(false);
+    }
 
     private async Task ShowFinishedToast()
     {

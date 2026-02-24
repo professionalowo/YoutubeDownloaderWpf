@@ -95,6 +95,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             .ConfigureAwait(false);
         IsDownloading = true;
         IsPrefetching = true;
+        Exception? error = null;
         try
         {
             await DownloadAction(Url, CancellationSource.Token)
@@ -106,11 +107,12 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
         catch (Exception e)
         {
+            error = e;
             logger.LogError("{Error}", e);
         }
         finally
         {
-            OnDownloadFinished(Url);
+            OnDownloadFinished(Url, error);
         }
     }
 
@@ -189,9 +191,9 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     protected event EventHandler<DownloadFinishedEventArgs>? DownloadFinished;
 
-    private void OnDownloadFinished(string url)
+    private void OnDownloadFinished(string url, Exception? error = null)
     {
-        DownloadFinished?.Invoke(this, new DownloadFinishedEventArgs(url));
+        DownloadFinished?.Invoke(this, new DownloadFinishedEventArgs(url, error));
         IsPrefetching = false;
         IsDownloading = false;
     }
@@ -202,5 +204,5 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
 
-    protected record DownloadFinishedEventArgs(string Url);
+    protected record DownloadFinishedEventArgs(string Url, Exception? Error = null);
 }
