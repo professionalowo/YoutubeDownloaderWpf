@@ -14,6 +14,7 @@ using System.Windows.Threading;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Toolkit.Uwp.Notifications;
 using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
@@ -23,13 +24,21 @@ using YoutubeDownloader.Core.Services.Downloader;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;
 
-public class YoutubeDownloader(
-    ConverterFactory converterFactory,
-    ILogger<YoutubeDownloader> logger,
-    DownloadFactory<DownloadStatusContext> downloadFactory,
-    IDirectory downloads)
-    : YoutubeDownloaderBase<DownloadStatusContext>(converterFactory, logger, downloadFactory, downloads)
+public class YoutubeDownloader : YoutubeDownloaderBase<DownloadStatusContext>
 {
+    public YoutubeDownloader(
+        ConverterFactory converterFactory,
+        ILogger<YoutubeDownloader> logger,
+        DownloadFactory<DownloadStatusContext> downloadFactory,
+        IDirectory downloads)
+        : base(converterFactory, logger, downloadFactory, downloads)
+        => DownloadFinished += OnDownloadFinished;
+
+    private void OnDownloadFinished(object? sender, EventArgs e)
+        => new ToastContentBuilder()
+            .AddText("Download Finished")
+            .Show();
+
     protected override Task DispatchToUi(Action action, CancellationToken token = default)
         => Dispatch(action, token).Task;
 
