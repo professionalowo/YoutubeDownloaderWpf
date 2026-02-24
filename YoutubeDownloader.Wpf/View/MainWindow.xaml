@@ -51,7 +51,7 @@
                 </TextBox.Text>
             </TextBox>
             <Button Click="Button_Click" Width="150"
-                    IsEnabled="{Binding IsPrefetching, Converter={StaticResource InverseBooleanConverter}}">Download</Button>
+                    IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBooleanConverter}}">Download</Button>
             <Label VerticalAlignment="Center">Force Mp3:</Label>
             <CheckBox IsChecked="{Binding ForceMp3, Mode=TwoWay}" VerticalAlignment="Center" />
         </DockPanel>
