@@ -34,24 +34,41 @@ jobs:
       - name: Publish
         run: dotnet publish YoutubeDownloader.Wpf/YoutubeDownloader.Wpf.csproj -c Release -r win-x64 -o publish /p:DebugType=None /p:DebugSymbols=false
 
-      - name: Decode Certificate
-        shell: powershell
+      - name: Import Certificate to Windows OS
+        shell: pwsh
         run: |
-          $cert = "${{ secrets.CODE_SIGNING_CERT }}"
-          $bytes = [System.Convert]::FromBase64String($cert)
+          # 1. Decode the Base64 certificate
+          $certBase64 = "${{ secrets.CODE_SIGNING_CERT }}".Trim()
+          $bytes = [System.Convert]::FromBase64String($certBase64)
           [System.IO.File]::WriteAllBytes("cert.pfx", $bytes)
+
+          # 2. Import it securely into the Windows CurrentUser Certificate Store
+          $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+          $pfx.Import("cert.pfx", "${{ secrets.CERT_PASSWORD }}", [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::DefaultKeySet)
+          
+          $store = New-Object System.Security.Cryptography.X509Certificates.X509Store([System.Security.Cryptography.X509Certificates.StoreName]::My, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+          $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+          $store.Add($pfx)
+          $store.Close()
+
+          # 3. Grab the Thumbprint and save it to GitHub Environment Variables
+          $thumbprint = $pfx.Thumbprint
+          Write-Host "Certificate imported successfully! Thumbprint: $thumbprint"
+          echo "CERT_THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV
 
       - name: Velopack Pack
         shell: pwsh
         run: |
-          # Strip the 'v' prefix from the tag
           $version = "${{ github.ref_name }}".TrimStart('v')
-
-          $certPath = Resolve-Path "cert.pfx"
-          $certPass = "${{ secrets.CERT_PASSWORD }}"
-          $signParams = "/fd SHA256 /f `"$certPath`" /p `"$certPass`""
           
-          vpk pack -u YoutubeDownloader -v $version -p publish -e YoutubeDownloader.Wpf.exe --packTitle "Youtube Downloader" --verbose --signParams $signParams
+          # Notice we use /sha1 instead of /f and /p. 
+          # Signtool will pull the cert directly from the Windows OS, bypassing all path/password bugs.
+          vpk pack -u YoutubeDownloader `
+                   -v $version `
+                   -p publish `
+                   -e YoutubeDownloader.Wpf.exe `
+                   --packTitle "Youtube Downloader" `
+                   --signParams "/fd SHA256 /sha1 $env:CERT_THUMBPRINT"
 
       - name: Velopack Upload & GitHub Release
         run: |
