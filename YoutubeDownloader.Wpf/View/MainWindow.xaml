@@ -3,10 +3,32 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:YoutubeDownloader.Wpf"
         xmlns:v="clr-namespace:YoutubeDownloader.Wpf.Controls.Validation"
+        xmlns:c="clr-namespace:YoutubeDownloader.Wpf.Controls"
         mc:Ignorable="d"
         Title="Downloader" Height="450" Width="800" MinHeight="200" MinWidth="550">
+    <Window.Resources>
+        <c:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="SpinnerArcStyle" TargetType="Ellipse">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPrefetching}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard x:Name="SpinAnimation">
+                            <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                    From="0" To="360" Duration="0:0:1" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="SpinAnimation" />
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -28,7 +50,10 @@
                     </Binding>
                 </TextBox.Text>
             </TextBox>
-            <Button Click="Button_Click" Width="150">Download</Button>
+            <Button Click="Button_Click" Width="150"
+                    IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBooleanConverter}}">
+                Download
+            </Button>
             <Label VerticalAlignment="Center">Force Mp3:</Label>
             <CheckBox IsChecked="{Binding ForceMp3, Mode=TwoWay}" VerticalAlignment="Center" />
         </DockPanel>
@@ -66,6 +91,16 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1"
+              Visibility="{Binding IsPrefetching, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="LightGray" />
+            <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="DarkSlateGray" StrokeDashArray="6 8"
+                     Style="{StaticResource SpinnerArcStyle}">
+                <Ellipse.RenderTransform>
+                    <RotateTransform CenterX="20" CenterY="20" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Grid>
         <DockPanel HorizontalAlignment="Center" Grid.Row="3">
             <Button Background="White" Click="Button_Click_Open_Downloads">
                 <Span BaselineAlignment="Center">

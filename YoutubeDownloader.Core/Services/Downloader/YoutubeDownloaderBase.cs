@@ -53,6 +53,16 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = false;
 
+    public bool IsDownloading
+    {
+        get;
+        private set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = false;
+
     public ObservableCollection<TContext> DownloadStatuses { get; } = [];
 
     protected CancellationTokenSource CancellationSource
@@ -81,6 +91,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     {
         await DispatchToUi(ClearStatuses)
             .ConfigureAwait(false);
+        IsDownloading = true;
         IsPrefetching = true;
         try
         {
@@ -180,6 +191,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     {
         DownloadFinished?.Invoke(this, EventArgs.Empty);
         IsPrefetching = false;
+        IsDownloading = false;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
