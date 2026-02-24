@@ -11,6 +11,23 @@
     <Window.Resources>
         <c:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="SpinnerArcStyle" TargetType="Ellipse">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPrefetching}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard x:Name="SpinAnimation">
+                            <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                 From="0" To="360" Duration="0:0:1" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="SpinAnimation" />
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -72,8 +89,16 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <ProgressBar Grid.Row="2" IsIndeterminate="True" Height="10" VerticalAlignment="Center"
-                     Visibility="{Binding IsPrefetching, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1"
+              Visibility="{Binding IsPrefetching, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="LightGray" />
+            <Ellipse Width="40" Height="40" StrokeThickness="4" Stroke="#FF3F51B5" StrokeDashArray="8 4"
+                     Style="{StaticResource SpinnerArcStyle}">
+                <Ellipse.RenderTransform>
+                    <RotateTransform CenterX="20" CenterY="20" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Grid>
         <DockPanel HorizontalAlignment="Center" Grid.Row="3">
             <Button Background="White" Click="Button_Click_Open_Downloads">
                 <Span BaselineAlignment="Center">
