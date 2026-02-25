@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:v="clr-namespace:YoutubeDownloader.Wpf.Controls.Validation"
         xmlns:c="clr-namespace:YoutubeDownloader.Wpf.Controls"
+        xmlns:downloader="clr-namespace:YoutubeDownloader.Wpf.Services.Downloader"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=downloader:YoutubeDownloader, IsDesignTimeCreatable=True}"
         Title="Downloader" Height="450" Width="800" MinHeight="200" MinWidth="550">
     <Window.Resources>
         <c:InverseBooleanConverter x:Key="InverseBooleanConverter" />
