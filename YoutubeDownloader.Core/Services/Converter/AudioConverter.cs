@@ -1,8 +1,9 @@
-﻿using YoutubeDownloader.Core.Extensions;
+﻿using YoutubeDownloader.Core.Container;
+using YoutubeDownloader.Core.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class Mp3Converter<TContext>(string ffmpegPath)
+public sealed class AudioConverter<TContext>(string ffmpegPath, IMediaContainer target)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
     public ValueTask Convert(Stream audioStream, string outPath, TContext context,
@@ -15,9 +16,9 @@ public sealed class Mp3Converter<TContext>(string ffmpegPath)
     private async ValueTask ConvertAsync(Stream data, string outPath, TContext context,
         CancellationToken token = default)
     {
-        var mp3Path = $"{outPath}.mp3";
-        var metadata = new Mp3Metadata(context.Name);
-        await using var conversion = new FfmpegMp3Conversion(ffmpegPath, mp3Path, metadata)
+        var mp3Path = $"{outPath}.{target.Extension}";
+        var metadata = new AudioMetadata(context.Name);
+        await using var conversion = new FfmpegAudioConversion(ffmpegPath, mp3Path, target, metadata)
             .WithProgress(context.GetProgress());
         await data.CopyToAsync(conversion, token)
             .ConfigureAwait(false);

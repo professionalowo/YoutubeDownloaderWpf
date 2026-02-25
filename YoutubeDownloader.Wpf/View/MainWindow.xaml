@@ -56,6 +56,7 @@
                     IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBooleanConverter}}">
                 Download
             </Button>
+            <Label VerticalContentAlignment="Center">Container:</Label>
             <ComboBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ItemsSource="{Binding AvailableContainers}" 
                       SelectedItem="{Binding SelectedContainer}" />
         </DockPanel>

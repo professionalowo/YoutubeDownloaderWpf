@@ -1,22 +1,24 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.Logging;
+using YoutubeDownloader.Core.Container;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class FfmpegMp3Conversion(
+public sealed class FfmpegAudioConversion(
     string ffmpegAbsolutePath,
     string outPath,
-    Mp3Metadata metadata)
+    IMediaContainer target,
+    AudioMetadata metadata)
     : Stream
 {
     private readonly Lazy<Process> _ffmpegProcess
-        = new(() => CreateProcess(ffmpegAbsolutePath, outPath, metadata));
+        = new(() => CreateProcess(ffmpegAbsolutePath, outPath, metadata, target));
 
     private Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
 
-    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, Mp3Metadata metadata)
+    private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, AudioMetadata metadata,
+        IMediaContainer target)
     {
-        var args = Args(outPath, metadata);
+        var args = Args(outPath, metadata, target);
         var info = new ProcessStartInfo(ffmpegAbsolutePath, args)
         {
             UseShellExecute = false,
@@ -26,16 +28,15 @@ public sealed class FfmpegMp3Conversion(
         return Process.Start(info)!;
     }
 
-    private static ICollection<string> Args(string outPath, Mp3Metadata metadata) =>
+    private static ICollection<string> Args(string outPath, AudioMetadata metadata, IMediaContainer target) =>
     [
         "-nostdin",
         "-hide_banner",
         "-loglevel", "error",
         "-i", "pipe:0",
 
-        "-c:a", "libmp3lame",
-        "-q:a", "2",
-        "-id3v2_version", "4",
+        "-c:a", target.FfmpegCodec,
+        ..target.FfmpegCodecFlags,
 
         "-vn",
 

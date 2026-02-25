@@ -1,4 +1,6 @@
-﻿namespace YoutubeDownloader.Core.Services.Converter;
+﻿using YoutubeDownloader.Core.Container;
+
+namespace YoutubeDownloader.Core.Services.Converter;
 
 
 public interface IConverter<in TContext> where TContext : IConverter<TContext>.IConverterContext
