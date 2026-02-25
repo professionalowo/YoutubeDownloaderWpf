@@ -8,11 +8,11 @@ public interface IMediaContainer
     Codec FfmpegCodec { get; }
     Codec.Flags FfmpegCodecFlags { get; }
     
-    record struct FileExtension(string Extension);
+    readonly record struct FileExtension(string Extension);
 
-    record struct Codec(string FfmpegCodec)
+    readonly record struct Codec(string FfmpegCodec)
     {
-        public record struct Flags(ICollection<string> FfmpegCodecFlags) : ICollection<string>
+        public readonly record struct Flags(ICollection<string> FfmpegCodecFlags) : ICollection<string>
         {
             public IEnumerator<string> GetEnumerator()
             {
