@@ -1,49 +1,39 @@
 ﻿namespace YoutubeDownloader.Core.Container;
 
-public abstract record MediaContainerKind : IMediaContainer
+internal sealed record Mp3 : IMediaContainer
 {
-    public abstract string Extension { get; }
-    public abstract string FfmpegCodec { get; }
-    public virtual IEnumerable<string> FfmpegCodecFlags => [];
+    public override string ToString() => "Mp3 Audio";
 
-    private MediaContainerKind()
-    {
-        // Prevent external classes from inheriting this base
-    }
+    public string Extension => "mp3";
+    public string FfmpegCodec => "libmp3lame";
 
-    private sealed record Mp3 : MediaContainerKind
-    {
-        public override string ToString() => "Mp3 Audio";
+    public ICollection<string> FfmpegCodecFlags =>
+    [
+        "-q:a", "2",
+        "-id3v2_version", "4",
+    ];
+}
 
-        public override string Extension => "mp3";
-        public override string FfmpegCodec => "libmp3lame";
+internal sealed record Wav : IMediaContainer
+{
+    public override string ToString() => "Wav Audio";
+    public string Extension => "wav";
+    public string FfmpegCodec => "pcm_s16le";
 
-        public override IEnumerable<string> FfmpegCodecFlags =>
-        [
-            "-q:a", "2",
-            "-id3v2_version", "4",
-        ];
-    };
+    public ICollection<string> FfmpegCodecFlags => ["-ar", "48000", "-ac", "2"];
+}
 
-    private sealed record Wav : MediaContainerKind
-    {
-        public override string ToString() => "Wav Audio";
-        public override string Extension => "wav";
-        public override string FfmpegCodec => "pcm_s16le";
+internal sealed record Opus : IMediaContainer
+{
+    public override string ToString() => "Opus Audio";
+    public string Extension => "opus";
+    public string FfmpegCodec => "libopus";
 
-        public override IEnumerable<string> FfmpegCodecFlags => ["-ar", "48000", "-ac", "2"];
-    };
+    public ICollection<string> FfmpegCodecFlags => ["-b:a", "128k", "-vbr", "on", "-compression_level", "10"];
+}
 
-    private sealed record Opus : MediaContainerKind
-    {
-        public override string ToString() => "Opus Audio";
-        public override string Extension => "opus";
-        public override string FfmpegCodec => "libopus";
-
-        public override IEnumerable<string> FfmpegCodecFlags =>
-            ["-b:a", "128k", "-vbr", "on", "-compression_level", "10"];
-    }
-
+public static class MediaContainers
+{
     public static IReadOnlyList<IMediaContainer> All { get; } =
     [
         new Mp3(),

@@ -37,7 +37,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = string.Empty;
 
-    public IReadOnlyList<IMediaContainer> AvailableContainers => MediaContainerKind.All;
+    public IReadOnlyList<IMediaContainer> AvailableContainers => MediaContainers.All;
 
     public IMediaContainer SelectedContainer
     {
@@ -47,7 +47,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             field = value;
             OnPropertyChanged();
         }
-    } = MediaContainerKind.All[0];
+    } = MediaContainers.All[0];
 
     public bool IsPrefetching
     {
