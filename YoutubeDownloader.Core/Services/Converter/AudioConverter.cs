@@ -16,7 +16,7 @@ public sealed class AudioConverter<TContext>(string ffmpegPath, IMediaContainer 
     private async ValueTask ConvertAsync(Stream data, string outPath, TContext context,
         CancellationToken token = default)
     {
-        var mp3Path = $"{outPath}.{target.Extension}";
+        var mp3Path = $"{outPath}.{target.Extension.Extension}";
         var metadata = new AudioMetadata(context.Name);
         await using var conversion = new FfmpegAudioConversion(ffmpegPath, mp3Path, target, metadata)
             .WithProgress(context.GetProgress());

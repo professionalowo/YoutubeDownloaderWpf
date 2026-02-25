@@ -35,7 +35,7 @@ public sealed class FfmpegAudioConversion(
         "-loglevel", "error",
         "-i", "pipe:0",
 
-        "-c:a", target.FfmpegCodec,
+        "-c:a", target.FfmpegCodec.FfmpegCodec,
         ..target.FfmpegCodecFlags,
 
         "-vn",
