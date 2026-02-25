@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
+using YoutubeDownloader.Core.Container;
 using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
+using IContainer = System.ComponentModel.IContainer;
 
 
 namespace YoutubeDownloader.Core.Services.Downloader;
@@ -35,7 +37,9 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = string.Empty;
 
-    public bool ForceMp3
+    public IReadOnlyList<IMediaContainer> AvailableContainers => MediaContainerKind.All;
+
+    public IMediaContainer SelectedContainer
     {
         get;
         set
@@ -43,7 +47,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             field = value;
             OnPropertyChanged();
         }
-    } = true;
+    } = MediaContainerKind.All[0];
 
     public bool IsPrefetching
     {
@@ -85,7 +89,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = new();
 
-    private IConverter<TContext> Converter => converterFactory.GetConverter<TContext>(ForceMp3);
+    private IConverter<TContext> Converter => converterFactory.GetConverter<TContext>(SelectedContainer);
 
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
 

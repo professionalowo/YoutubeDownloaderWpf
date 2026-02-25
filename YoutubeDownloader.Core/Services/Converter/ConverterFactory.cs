@@ -1,13 +1,16 @@
-﻿using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
+﻿using System.ComponentModel;
+using YoutubeDownloader.Core.Container;
+using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
 public sealed class ConverterFactory(FfmpegConfig config)
 {
-    public IConverter<TContext> GetConverter<TContext>(bool forceMp3)
-        where TContext : IConverter<TContext>.IConverterContext => forceMp3 switch
+    public IConverter<TContext> GetConverter<TContext>(IMediaContainer kind)
+        where TContext : IConverter<TContext>.IConverterContext => kind switch
     {
-        true => new Mp3Converter<TContext>(config.FfmpegExeFullPath),
-        false => new WriteThroughConverter<TContext>(".mp4"),
+        MediaContainerKind.Mp3 => new Mp3Converter<TContext>(config.FfmpegExeFullPath),
+        MediaContainerKind.Wav => new WriteThroughConverter<TContext>(".mp4"),
+        _ => new WriteThroughConverter<TContext>(".mp4")
     };
 }

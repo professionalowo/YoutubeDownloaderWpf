@@ -38,11 +38,10 @@
                     Text="Download"
                     Clicked="Download_OnClicked" />
             <Label Grid.Column="3"
-                   Text="Force Mp3"
+                   Text="Container:"
                    VerticalOptions="Center" />
-            <CheckBox Grid.Column="4"
-                      VerticalOptions="Center"
-                      IsChecked="{Binding Path=ForceMp3, Mode=TwoWay}" />
+            <Picker Grid.Column="4" ItemsSource="{Binding AvailableContainers}" 
+                      SelectedItem="{Binding SelectedContainer}" />
         </Grid>
         <CollectionView Grid.Row="1"
                   VerticalOptions="Fill"

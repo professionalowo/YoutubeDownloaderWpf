@@ -37,7 +37,7 @@
             <RowDefinition Height="25" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center" Width="auto">
+        <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Stretch" >
             <Label VerticalAlignment="Center">Url:</Label>
             <TextBox Name="UrlTextBox" Width="450" VerticalContentAlignment="Center"
                      Style="{StaticResource textBoxInError}"
@@ -54,8 +54,8 @@
                     IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBooleanConverter}}">
                 Download
             </Button>
-            <Label VerticalAlignment="Center">Force Mp3:</Label>
-            <CheckBox IsChecked="{Binding ForceMp3, Mode=TwoWay}" VerticalAlignment="Center" />
+            <ComboBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ItemsSource="{Binding AvailableContainers}" 
+                      SelectedItem="{Binding SelectedContainer}" />
         </DockPanel>
         <Grid Grid.Row="1" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
