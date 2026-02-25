@@ -1,31 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Velopack;
 using Velopack.Sources;
-using YoutubeDownloader.Core.Data;
-using YoutubeDownloader.Core.Extensions;
+using YoutubeDownloader.Core.Services.AutoUpdater;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Core.Services.AutoUpdater.GitHub;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
-using YoutubeDownloader.Core.Util;
 using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Wpf.Services;
-using YoutubeDownloader.Wpf.Util;
-using YoutubeDownloader.Wpf.Services.Downloader;
 using YoutubeDownloader.Wpf.View;
 using YoutubeExplode;
 
@@ -119,7 +108,7 @@ internal static class ServiceCollectionExtensions
         public IServiceCollection AddDownloadServices()
         {
             var manager =
-                new UpdateManager(new GithubSource(GitHubVersionClient.url, null, false));
+                new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
 
             IDirectory root = manager.GetBasePath() is string path
                 ? new AbsoluteDirectory(path)
