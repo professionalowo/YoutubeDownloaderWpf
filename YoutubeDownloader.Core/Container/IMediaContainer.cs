@@ -12,24 +12,26 @@ public interface IMediaContainer
 
     readonly record struct Codec(string FfmpegCodec)
     {
-        public readonly struct Flags(ICollection<string> inner) : ICollection<string>
+        public sealed class Flags : ICollection<string>
         {
-            public IEnumerator<string> GetEnumerator() => inner.GetEnumerator();
+            private readonly List<string> _inner = [];
+
+            public IEnumerator<string> GetEnumerator() => _inner.GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            public void Add(string item) => inner.Add(item);
+            public void Add(string item) => _inner.Add(item);
 
-            public void Clear() => inner.Clear();
+            public void Clear() => _inner.Clear();
 
-            public bool Contains(string item) => inner.Contains(item);
+            public bool Contains(string item) => _inner.Contains(item);
 
-            public void CopyTo(string[] array, int arrayIndex) => inner.CopyTo(array, arrayIndex);
+            public void CopyTo(string[] array, int arrayIndex) => _inner.CopyTo(array, arrayIndex);
 
-            public bool Remove(string item) => inner.Remove(item);
+            public bool Remove(string item) => _inner.Remove(item);
 
-            public int Count => inner.Count;
-            public bool IsReadOnly => inner.IsReadOnly;
+            public int Count => _inner.Count;
+            public bool IsReadOnly => false;
         }
     }
 }
