@@ -7,50 +7,29 @@ public interface IMediaContainer
     FileExtension Extension { get; }
     Codec FfmpegCodec { get; }
     Codec.Flags FfmpegCodecFlags { get; }
-    
+
     readonly record struct FileExtension(string Extension);
 
     readonly record struct Codec(string FfmpegCodec)
     {
-        public readonly record struct Flags(ICollection<string> FfmpegCodecFlags) : ICollection<string>
+        public readonly struct Flags(ICollection<string> inner) : ICollection<string>
         {
-            public IEnumerator<string> GetEnumerator()
-            {
-                return FfmpegCodecFlags.GetEnumerator();
-            }
+            public IEnumerator<string> GetEnumerator() => inner.GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            public void Add(string item)
-            {
-                FfmpegCodecFlags.Add(item);
-            }
+            public void Add(string item) => inner.Add(item);
 
-            public void Clear()
-            {
-                FfmpegCodecFlags.Clear();
-            }
+            public void Clear() => inner.Clear();
 
-            public bool Contains(string item)
-            {
-                return FfmpegCodecFlags.Contains(item);
-            }
+            public bool Contains(string item) => inner.Contains(item);
 
-            public void CopyTo(string[] array, int arrayIndex)
-            {
-                FfmpegCodecFlags.CopyTo(array, arrayIndex);
-            }
+            public void CopyTo(string[] array, int arrayIndex) => inner.CopyTo(array, arrayIndex);
 
-            public bool Remove(string item)
-            {
-                return FfmpegCodecFlags.Remove(item);
-            }
+            public bool Remove(string item) => inner.Remove(item);
 
-            public int Count => FfmpegCodecFlags.Count;
-            public bool IsReadOnly => FfmpegCodecFlags.IsReadOnly;
+            public int Count => inner.Count;
+            public bool IsReadOnly => inner.IsReadOnly;
         }
     }
 }
