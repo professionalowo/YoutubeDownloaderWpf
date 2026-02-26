@@ -6,29 +6,41 @@ internal sealed record Mp3 : IMediaContainer
 
     public IMediaContainer.FileExtension Extension => new("mp3");
     public IMediaContainer.Codec FfmpegCodec => new("libmp3lame");
+
     public IMediaContainer.Codec.Flags FfmpegCodecFlags =>
     [
-        "-q:a", "2",
-        "-id3v2_version", "4",
+        IMediaContainer.Codec.Flag.Create("q:a", 2),
+        IMediaContainer.Codec.Flag.Create("id3v2_version", 4),
     ];
 }
 
 internal sealed record Wav : IMediaContainer
 {
     public override string ToString() => "Wav Audio";
-    
+
     public IMediaContainer.FileExtension Extension => new("wav");
     public IMediaContainer.Codec FfmpegCodec => new("pcm_s16le");
-    public IMediaContainer.Codec.Flags FfmpegCodecFlags => ["-ar", "48000", "-ac", "2"];
+
+    public IMediaContainer.Codec.Flags FfmpegCodecFlags =>
+    [
+        IMediaContainer.Codec.Flag.Create("ar", 48000),
+        IMediaContainer.Codec.Flag.Create("ac", 2)
+    ];
 }
 
 internal sealed record Opus : IMediaContainer
 {
     public override string ToString() => "Opus Audio";
-    
+
     public IMediaContainer.FileExtension Extension => new("opus");
     public IMediaContainer.Codec FfmpegCodec => new("libopus");
-    public IMediaContainer.Codec.Flags FfmpegCodecFlags => ["-b:a", "128k", "-vbr", "on", "-compression_level", "10"];
+
+    public IMediaContainer.Codec.Flags FfmpegCodecFlags =>
+    [
+        IMediaContainer.Codec.Flag.Create("b:a", "128k"),
+        IMediaContainer.Codec.Flag.Create("vbr", "on"),
+        IMediaContainer.Codec.Flag.Create("compression_level", 10)
+    ];
 }
 
 public static class MediaContainers
