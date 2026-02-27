@@ -16,7 +16,7 @@ public sealed partial class YoutubeDownloader
     public YoutubeDownloader(
         ConverterFactory converterFactory,
         ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
-        DownloadFactory<DownloadContext> downloadFactory,
+        DownloadFactory downloadFactory,
         IDirectory downloads) : base(converterFactory, logger, downloadFactory, downloads)
     {
         DownloadSuccess += OnDownloadSuccess;

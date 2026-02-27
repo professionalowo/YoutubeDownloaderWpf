@@ -5,7 +5,5 @@ namespace YoutubeDownloader.Core.Services.Converter;
 
 public sealed class ConverterFactory(FfmpegConfig config)
 {
-    public IConverter<TContext> GetConverter<TContext>(IMediaContainer target)
-        where TContext : IConverter<TContext>.IConverterContext =>
-        new AudioConverter<TContext>(config.FfmpegExeFullPath, target);
+    public AudioConverter GetConverter(IMediaContainer target) => new(config.FfmpegExeFullPath, target);
 }

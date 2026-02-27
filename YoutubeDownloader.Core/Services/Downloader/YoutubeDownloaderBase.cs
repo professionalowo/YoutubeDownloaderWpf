@@ -18,12 +18,10 @@ namespace YoutubeDownloader.Core.Services.Downloader;
 public abstract partial class YoutubeDownloaderBase<TContext>(
     ConverterFactory converterFactory,
     ILogger<YoutubeDownloaderBase<TContext>> logger,
-    DownloadFactory<TContext> downloadFactory,
+    DownloadFactory downloadFactory,
     IDirectory downloads)
-    : IDownloader<TContext>, INotifyPropertyChanged where TContext : IConverter<TContext>.IConverterContext
+    : IDownloader, INotifyPropertyChanged
 {
-    protected IDirectory Downloads => downloads;
-
     private readonly Lock _cancellationSourceLock = new();
 
     [StringSyntax(StringSyntaxAttribute.Uri)]
@@ -69,7 +67,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = false;
 
-    public ObservableCollection<TContext> DownloadStatuses { get; } = [];
+    public ObservableCollection<IConverter.IConverterContext> DownloadStatuses { get; } = [];
 
     protected CancellationTokenSource CancellationSource
     {
@@ -89,13 +87,13 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         }
     } = new();
 
-    private IConverter<TContext> Converter => converterFactory.GetConverter<TContext>(SelectedContainer);
+    private AudioConverter Converter => converterFactory.GetConverter(SelectedContainer);
 
     protected abstract Task DispatchToUi(Action action, CancellationToken token = default);
 
     public async Task Download()
     {
-        await DispatchToUi(ClearStatuses)
+        await DispatchToUi(ClearStatuses, CancellationSource.Token)
             .ConfigureAwait(false);
         IsDownloading = true;
         IsPrefetching = true;
@@ -132,28 +130,28 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         CancellationSource = new CancellationTokenSource();
     }
 
-    protected abstract TContext ContextFactory(string name, double size);
+    protected abstract IConverter.IConverterContext ContextFactory(string name, double size);
 
-    private IAsyncEnumerable<VideoDownload<TContext>> GetDownloadsAsync(
+    private IAsyncEnumerable<VideoDownload> GetDownloadsAsync(
         [StringSyntax(StringSyntaxAttribute.Uri)]
         string url, CancellationToken token = default) => downloadFactory.Get(url, token);
 
-    private Task ReadAllDownloads(ChannelReader<VideoDownload<TContext>> reader, CancellationToken token = default)
+    private Task ReadAllDownloads(ChannelReader<VideoDownload> reader, CancellationToken token = default)
         => Parallel.ForEachAsync(
             reader.ReadAllAsync(token),
             token,
             ProcessDownloadFactory(Converter)
         );
 
-    private Task WriteAllDownloads(ChannelWriter<VideoDownload<TContext>> writer, string url,
+    private Task WriteAllDownloads(ChannelWriter<VideoDownload> writer, string url,
         CancellationToken token = default)
         => Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, writer.WriteAsync);
 
-    private Func<VideoDownload<TContext>, CancellationToken, ValueTask> ProcessDownloadFactory(
-        IConverter<TContext> converter)
+    private Func<VideoDownload, CancellationToken, ValueTask> ProcessDownloadFactory(
+        IConverter converter)
         => (download, token) => ProcessDownload(converter, download, token);
 
-    private async ValueTask ProcessDownload(IConverter<TContext> converter, VideoDownload<TContext> download,
+    private async ValueTask ProcessDownload(IConverter converter, VideoDownload download,
         CancellationToken token = default)
     {
         var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
@@ -169,7 +167,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var (rx, tx) = Channel.CreateBounded<VideoDownload<TContext>>(new BoundedChannelOptions(SystemInfo.Cores)
+        var (rx, tx) = Channel.CreateBounded<VideoDownload>(new BoundedChannelOptions(SystemInfo.Cores)
         {
             SingleWriter = false,
             SingleReader = false,
@@ -182,7 +180,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
         await consumer.ConfigureAwait(false);
     }
 
-    private Task AddDownloadStatus(TContext context, CancellationToken token = default) =>
+    private Task AddDownloadStatus(IConverter.IConverterContext context, CancellationToken token = default) =>
         DispatchToUi(() =>
         {
             IsPrefetching = false;

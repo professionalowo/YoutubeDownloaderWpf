@@ -7,14 +7,14 @@ using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class VideoDownload<TContext>(
+public sealed class VideoDownload(
     YoutubeClient client,
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string url,
-    string path = "") where TContext : IConverter<TContext>.IConverterContext
+    string path = "")
 {
-    public async ValueTask<DownloadData<TContext>> GetStreamAsync(
-        Func<string, double, TContext> contextFactory, CancellationToken token = default)
+    public async ValueTask<DownloadData> GetStreamAsync(
+        Func<string, double, IConverter.IConverterContext> contextFactory, CancellationToken token = default)
     {
         var nameTask = GetName(token);
         var streamInfo = await GetStreamInfo(token)
@@ -28,7 +28,7 @@ public sealed class VideoDownload<TContext>(
             .ConfigureAwait(false);
 
         var data = new StreamData(stream, [path, name]);
-        return new DownloadData<TContext>(data, statusContext);
+        return new DownloadData(data, statusContext);
     }
 
     private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)

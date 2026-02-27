@@ -2,5 +2,4 @@
 
 namespace YoutubeDownloader.Core.Data;
 
-public sealed record DownloadData<TContext>(StreamData Data, TContext Context)
-    where TContext : IConverter<TContext>.IConverterContext;
+public sealed record DownloadData(StreamData Data, IConverter.IConverterContext Context);

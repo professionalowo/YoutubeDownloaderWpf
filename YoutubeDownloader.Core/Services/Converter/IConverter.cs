@@ -2,8 +2,7 @@
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-
-public interface IConverter<in TContext> where TContext : IConverter<TContext>.IConverterContext
+public interface IConverter
 {
     public interface IConverterContext
     {
@@ -12,6 +11,6 @@ public interface IConverter<in TContext> where TContext : IConverter<TContext>.I
         void InvokeDownloadFinished(object sender, bool finishedSuccessfully);
     }
 
-    public Task Convert(Stream audioStream, string outPath, TContext context,
+    public Task Convert(Stream audioStream, string outPath, IConverterContext context,
         CancellationToken token = default);
 }

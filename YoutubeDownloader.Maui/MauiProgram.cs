@@ -87,7 +87,7 @@ internal static class ServicesExtensions
             serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
                 .AddTransient<Services.YoutubeDownloader>()
                 .AddSingleton(CreateDownloadDirectory)
-                .AddTransient<DownloadFactory<DownloadContext>>()
+                .AddTransient<DownloadFactory>()
                 .AddSingleton<ConverterFactory>();
             return serviceCollection;
         }

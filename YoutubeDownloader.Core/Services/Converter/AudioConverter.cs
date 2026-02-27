@@ -3,10 +3,9 @@ using YoutubeDownloader.Core.Extensions;
 
 namespace YoutubeDownloader.Core.Services.Converter;
 
-public sealed class AudioConverter<TContext>(string ffmpegPath, IMediaContainer target)
-    : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
+public sealed class AudioConverter(string ffmpegPath, IMediaContainer target) : IConverter
 {
-    public async Task Convert(Stream data, string outPath, TContext context,
+    public async Task Convert(Stream data, string outPath, IConverter.IConverterContext context,
         CancellationToken token = default)
     {
         var mp3Path = $"{outPath}.{target.Extension.Extension}";

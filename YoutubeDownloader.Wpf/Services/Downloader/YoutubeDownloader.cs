@@ -29,7 +29,7 @@ public class YoutubeDownloader : YoutubeDownloaderBase<DownloadStatusContext>
     public YoutubeDownloader(
         ConverterFactory converterFactory,
         ILogger<YoutubeDownloader> logger,
-        DownloadFactory<DownloadStatusContext> downloadFactory,
+        DownloadFactory downloadFactory,
         IDirectory downloads)
         : base(converterFactory, logger, downloadFactory, downloads)
     {

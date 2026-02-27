@@ -6,14 +6,14 @@ using YoutubeExplode;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class PlaylistDownload<TContext>(
+public sealed class PlaylistDownload(
     YoutubeClient client,
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string url,
     IDirectory downloads)
-    : IAsyncEnumerable<VideoDownload<TContext>> where TContext : IConverter<TContext>.IConverterContext
+    : IAsyncEnumerable<VideoDownload>
 {
-    public async IAsyncEnumerator<VideoDownload<TContext>> GetAsyncEnumerator(
+    public async IAsyncEnumerator<VideoDownload> GetAsyncEnumerator(
         CancellationToken token = default)
     {
         var playlist = await client.Playlists.GetAsync(url, token)
@@ -24,7 +24,7 @@ public sealed class PlaylistDownload<TContext>(
             .ConfigureAwait(false);
         await foreach (var video in enumerable)
         {
-            yield return new VideoDownload<TContext>(client, video.Url, dir.Name);
+            yield return new VideoDownload(client, video.Url, dir.Name);
         }
     }
 }

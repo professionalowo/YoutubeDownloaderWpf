@@ -4,11 +4,12 @@ using YoutubeDownloader.Core.Services.Converter;
 
 namespace YoutubeDownloader.Core.Services.Downloader;
 
-public interface IDownloader<TContext> where TContext : IConverter<TContext>.IConverterContext
+public interface IDownloader
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string Url { get; }
-    ObservableCollection<TContext> DownloadStatuses { get; }
+
+    ObservableCollection<IConverter.IConverterContext> DownloadStatuses { get; }
     Task Cancel();
     Task Download();
 }
