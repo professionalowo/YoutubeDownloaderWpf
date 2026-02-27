@@ -6,7 +6,6 @@ using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
-using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Maui.Services;
 

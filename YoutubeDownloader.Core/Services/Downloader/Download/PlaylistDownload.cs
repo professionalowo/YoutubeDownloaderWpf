@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using YoutubeDownloader.Core.Extensions;
-using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 

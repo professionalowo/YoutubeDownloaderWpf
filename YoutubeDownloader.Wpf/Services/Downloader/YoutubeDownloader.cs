@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
 using System.Windows;
-using System.IO;
 using System.Windows.Threading;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Toolkit.Uwp.Notifications;
 using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
-using YoutubeDownloader.Core.Util;
 using YoutubeDownloader.Core.Services.Downloader;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;

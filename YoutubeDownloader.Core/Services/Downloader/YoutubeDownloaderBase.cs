@@ -10,7 +10,6 @@ using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Util;
-using IContainer = System.ComponentModel.IContainer;
 
 
 namespace YoutubeDownloader.Core.Services.Downloader;

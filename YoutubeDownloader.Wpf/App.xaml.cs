@@ -13,7 +13,6 @@ using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
-using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Wpf.Services;
 using YoutubeDownloader.Wpf.View;
 using YoutubeExplode;

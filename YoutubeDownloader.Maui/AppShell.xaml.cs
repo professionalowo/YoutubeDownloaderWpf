@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-
-namespace YoutubeDownloader.Maui;
+﻿namespace YoutubeDownloader.Maui;
 
 public partial class AppShell : Shell
 {

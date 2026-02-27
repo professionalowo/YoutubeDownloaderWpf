@@ -1,9 +1,5 @@
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using CommunityToolkit.Maui.Views;
-using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 
 namespace YoutubeDownloader.Maui.Services.Mp3Player;

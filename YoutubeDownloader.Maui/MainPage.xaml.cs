@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Maui.Accessibility;
-using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Services.InternalDirectory;
+﻿using YoutubeDownloader.Core.Services.InternalDirectory;
 
 namespace YoutubeDownloader.Maui;
 

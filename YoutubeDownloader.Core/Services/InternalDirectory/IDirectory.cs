@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.InternalDirectory;

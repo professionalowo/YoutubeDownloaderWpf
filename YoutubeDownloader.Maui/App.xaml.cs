@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using YoutubeDownloader.Core.Extensions;
+﻿using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Util;
 
