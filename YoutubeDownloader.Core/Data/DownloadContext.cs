@@ -6,7 +6,7 @@ using YoutubeDownloader.Core.Services.Converter;
 namespace YoutubeDownloader.Core.Data;
 
 [DebuggerDisplay("Name = {Name}, Size = {Size}")]
-public class DownloadContext : INotifyPropertyChanged, IConverter.IConverterContext
+public class DownloadContext : INotifyPropertyChanged, IAudioConversionContext
 {
     public string Name { get; }
 

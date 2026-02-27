@@ -9,7 +9,7 @@ public interface IDownloader
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string Url { get; }
 
-    ObservableCollection<IConverter.IConverterContext> DownloadStatuses { get; }
+    ObservableCollection<IAudioConversionContext> DownloadStatuses { get; }
     Task Cancel();
     Task Download();
 }

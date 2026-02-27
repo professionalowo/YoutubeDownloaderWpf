@@ -14,7 +14,7 @@ public sealed class VideoDownload(
     string path = "")
 {
     public async ValueTask<DownloadData> GetStreamAsync(
-        Func<string, double, IConverter.IConverterContext> contextFactory, CancellationToken token = default)
+        Func<string, double, IAudioConversionContext> contextFactory, CancellationToken token = default)
     {
         var nameTask = GetName(token);
         var streamInfo = await GetStreamInfo(token)
