@@ -6,14 +6,7 @@ namespace YoutubeDownloader.Core.Services.Converter;
 public sealed class AudioConverter<TContext>(string ffmpegPath, IMediaContainer target)
     : IConverter<TContext> where TContext : IConverter<TContext>.IConverterContext
 {
-    public ValueTask Convert(Stream audioStream, string outPath, TContext context,
-        CancellationToken token = default)
-        => token.IsCancellationRequested
-            ? ValueTask.FromCanceled(token)
-            : ConvertAsync(audioStream, outPath, context, token);
-
-
-    private async ValueTask ConvertAsync(Stream data, string outPath, TContext context,
+    public async Task Convert(Stream data, string outPath, TContext context,
         CancellationToken token = default)
     {
         var mp3Path = $"{outPath}.{target.Extension.Extension}";
