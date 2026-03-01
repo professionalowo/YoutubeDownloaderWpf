@@ -10,13 +10,14 @@ using YoutubeDownloader.Core.Services.InternalDirectory;
 namespace YoutubeDownloader.Maui.Services;
 
 public sealed partial class YoutubeDownloader
-    : YoutubeDownloaderBase<DownloadContext>
+    : YoutubeDownloaderBase
 {
     public YoutubeDownloader(
         DownloadFactory downloadFactory,
+        VideoDownloadService downloadService,
         ConverterFactory converterFactory,
-        ILogger<YoutubeDownloaderBase<DownloadContext>> logger,
-        IDirectory downloads) : base(downloadFactory, converterFactory, logger, downloads)
+        ILogger<YoutubeDownloaderBase> logger) : base(downloadFactory, downloadService,
+        converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using YoutubeDownloader.Core.Container;
+using YoutubeDownloader.Core.Data.Download;
 using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
@@ -14,11 +15,11 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.Downloader;
 
-public abstract partial class YoutubeDownloaderBase<TContext>(
+public abstract partial class YoutubeDownloaderBase(
     DownloadFactory downloadFactory,
+    VideoDownloadService downloadService,
     ConverterFactory converterFactory,
-    ILogger<YoutubeDownloaderBase<TContext>> logger,
-    IDirectory downloads)
+    ILogger<YoutubeDownloaderBase> logger)
     : IDownloader, INotifyPropertyChanged
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]
@@ -114,18 +115,18 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     protected abstract IAudioConversionContext ContextFactory(string name, double size);
 
-    private IAsyncEnumerable<VideoDownload> GetDownloadsAsync(
+    private IAsyncEnumerable<IVideoDownload> GetDownloadsAsync(
         [StringSyntax(StringSyntaxAttribute.Uri)]
         string url, CancellationToken token = default) => downloadFactory.Get(url, token);
 
-    private Task ReadAllDownloads(ChannelReader<VideoDownload> reader, CancellationToken token = default)
+    private Task ReadAllDownloads(ChannelReader<IVideoDownload> reader, CancellationToken token = default)
         => Parallel.ForEachAsync(
             reader.ReadAllAsync(token),
             token,
             ProcessDownloadFactory(Converter)
         );
 
-    private Task WriteAllDownloads(ChannelWriter<VideoDownload> writer, string url,
+    private Task WriteAllDownloads(ChannelWriter<IVideoDownload> writer, string url,
         CancellationToken token = default)
         => Parallel.ForEachAsync(
             GetDownloadsAsync(url, token),
@@ -133,18 +134,19 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             writer.WriteAsync
         );
 
-    private Func<VideoDownload, CancellationToken, ValueTask> ProcessDownloadFactory(
+    private Func<IVideoDownload, CancellationToken, ValueTask> ProcessDownloadFactory(
         AudioConverter converter)
         => (download, token) => ProcessDownload(converter, download, token);
 
-    private async ValueTask ProcessDownload(AudioConverter converter, VideoDownload download,
+    private async ValueTask ProcessDownload(AudioConverter converter, IVideoDownload download,
         CancellationToken token = default)
     {
-        var ((stream, segments), context) = await download.GetStreamAsync(ContextFactory, token)
-            .ConfigureAwait(false);
+        var named = await downloadService.GetName(download, token);
+        var info = await downloadService.GetStreamInfo(named.Download, token);
+        var context = ContextFactory(named.Title, info.Size.MegaBytes);
         var uiTask = AddDownloadStatus(context, token);
-        var fileName = downloads.ChildFileName(segments);
-        await using var mediaStream = stream;
+        var fileName = downloadService.GetFileName(named);
+        await using var mediaStream = await downloadService.GetStream(info, token);
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);
@@ -153,7 +155,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     private async Task DownloadAction([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
     {
-        var (rx, tx) = Channel.CreateBounded<VideoDownload>(new BoundedChannelOptions(SystemInfo.Cores)
+        var (rx, tx) = Channel.CreateBounded<IVideoDownload>(new BoundedChannelOptions(SystemInfo.Cores)
         {
             SingleWriter = false,
             SingleReader = false,

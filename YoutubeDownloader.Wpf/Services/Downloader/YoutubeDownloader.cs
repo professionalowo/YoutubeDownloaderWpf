@@ -13,14 +13,14 @@ using YoutubeDownloader.Core.Services.Downloader;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;
 
-public class YoutubeDownloader : YoutubeDownloaderBase<DownloadStatusContext>
+public class YoutubeDownloader : YoutubeDownloaderBase
 {
     public YoutubeDownloader(
         DownloadFactory downloadFactory,
+        VideoDownloadService downloadService,
         ConverterFactory converterFactory,
-        ILogger<YoutubeDownloader> logger,
-        IDirectory downloads)
-        : base(downloadFactory, converterFactory, logger, downloads)
+        ILogger<YoutubeDownloader> logger)
+        : base(downloadFactory, downloadService, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;

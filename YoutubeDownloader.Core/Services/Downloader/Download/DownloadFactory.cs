@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using YoutubeDownloader.Core.Data.Download;
 using YoutubeDownloader.Core.Extensions;
-using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
+public sealed class DownloadFactory(YoutubeClient client)
 {
     private static bool IsVideo([StringSyntax(StringSyntaxAttribute.Uri)] ReadOnlySpan<char> url)
     {
@@ -20,26 +20,26 @@ public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
     }
 
 
-    public IAsyncEnumerable<VideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
+    public IAsyncEnumerable<IVideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
         => IsVideo(url)
-            ? AsyncEnumerable.FromSingle(new VideoDownload(client, url), token)
+            ? AsyncEnumerable.FromSingle(new SingleVideoDownload(url), token)
             : GetPlaylist(url, token);
 
 
-    private async IAsyncEnumerable<VideoDownload> GetPlaylist([StringSyntax(StringSyntaxAttribute.Uri)] string url,
+    private async IAsyncEnumerable<PlaylistVideoDownload> GetPlaylist(
+        [StringSyntax(StringSyntaxAttribute.Uri)]
+        string url,
         [EnumeratorCancellation] CancellationToken token = default)
     {
         var enumerable = client.Playlists.GetVideosAsync(url, token)
             .ConfigureAwait(false);
         var playlist = await client.Playlists.GetAsync(url, token)
             .ConfigureAwait(false);
-        var directoryName = playlist.Title.ReplaceIllegalCharacters();
-        var dir = await downloads.CreateSubDirectoryAsync(directoryName)
-            .ConfigureAwait(false);
+        var title = playlist.Title.ReplaceIllegalCharacters();
         await foreach (var video in enumerable)
         {
-            yield return new VideoDownload(client, video.Url, dir.Name);
+            yield return new PlaylistVideoDownload(title, video.Url);
         }
     }
 }

@@ -18,8 +18,8 @@ public interface IDirectory
         Process.Start(PlatformUtil.GetExplorer(), FullPath);
     }
 
-    string ChildFileName(params string[] fileNames) =>
-        Path.Combine([FullPath, .. fileNames.Where(s => !string.IsNullOrEmpty(s))]);
+    string ChildFileName(string fileName) =>
+        Path.Join(FullPath, fileName);
 
     DirectoryInfo CreateSubDirectory(ReadOnlySpan<char> segment) =>
         Directory.CreateDirectory(Path.Join(FullPath, segment));
