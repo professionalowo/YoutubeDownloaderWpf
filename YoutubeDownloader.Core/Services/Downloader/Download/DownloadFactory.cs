@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 
@@ -18,12 +19,15 @@ public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
         }
         else
         {
-            var playlist = new PlaylistDownload(client, url, downloads)
-                .WithCancellation(token)
+            var playlist = await client.Playlists.GetAsync(url, token)
                 .ConfigureAwait(false);
-            await foreach (var download in playlist)
+            var dir = await downloads.CreateSubDirectoryAsync(playlist.Title.ReplaceIllegalCharacters())
+                .ConfigureAwait(false);
+            var enumerable = client.Playlists.GetVideosAsync(url, token)
+                .ConfigureAwait(false);
+            await foreach (var video in enumerable)
             {
-                yield return download;
+                yield return new VideoDownload(client, video.Url, dir.Name);
             }
         }
     }
