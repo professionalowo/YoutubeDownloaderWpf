@@ -8,7 +8,6 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader.Download;
-using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Downloader;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;

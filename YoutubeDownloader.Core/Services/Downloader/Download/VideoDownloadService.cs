@@ -16,9 +16,15 @@ public sealed class VideoDownloadService(YoutubeClient client, IDirectory downlo
         return new NamedVideoDownload(download, name);
     }
 
-    public string GetFileName(NamedVideoDownload download)
+    public string GetFileName(NamedVideoDownload named)
     {
-        var formatted = download.Download.FormatName(download.Title);
+        var (download, title) = named;
+        var formatted = download.FormatName(title);
+        if (download is PlaylistVideoDownload p)
+        {
+            downloads.CreateSubDirectory(p.PlaylistName);
+        }
+
         return downloads.ChildFileName(formatted);
     }
 
