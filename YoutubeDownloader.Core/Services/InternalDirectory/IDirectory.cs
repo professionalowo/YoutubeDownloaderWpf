@@ -21,11 +21,11 @@ public interface IDirectory
     string ChildFileName(params string[] fileNames) =>
         Path.Combine([FullPath, .. fileNames.Where(s => !string.IsNullOrEmpty(s))]);
 
-    DirectoryInfo CreateSubDirectory(params string[] segments) =>
-        Directory.CreateDirectory(Path.Combine([FullPath, .. segments.Where(s => !string.IsNullOrEmpty(s))]));
+    DirectoryInfo CreateSubDirectory(ReadOnlySpan<char> segment) =>
+        Directory.CreateDirectory(Path.Join(FullPath, segment));
 
-    ValueTask<DirectoryInfo> CreateSubDirectoryAsync(params string[] segments) =>
-        ValueTask.FromResult(CreateSubDirectory(segments));
+    ValueTask<DirectoryInfo> CreateSubDirectoryAsync(ReadOnlySpan<char> segment) =>
+        ValueTask.FromResult(CreateSubDirectory(segment));
 
     bool ContainsFile(string name) => File.Exists(ChildFileName(name));
 
