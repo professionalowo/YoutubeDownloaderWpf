@@ -21,8 +21,6 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
     IDirectory downloads)
     : IDownloader, INotifyPropertyChanged
 {
-    private readonly Lock _cancellationSourceLock = new();
-
     [StringSyntax(StringSyntaxAttribute.Uri)]
     public string Url
     {
@@ -68,23 +66,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     public ObservableCollection<IAudioConversionContext> DownloadStatuses { get; } = [];
 
-    protected CancellationTokenSource CancellationSource
-    {
-        get
-        {
-            lock (_cancellationSourceLock)
-            {
-                return field;
-            }
-        }
-        private set
-        {
-            lock (_cancellationSourceLock)
-            {
-                field = value;
-            }
-        }
-    } = new();
+    protected CancellationTokenSource CancellationSource { get; private set; } = new();
 
     private AudioConverter Converter => converterFactory.GetConverter(SelectedContainer);
 
@@ -126,6 +108,8 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             .ConfigureAwait(false);
         await DispatchToUi(ClearStatuses)
             .ConfigureAwait(false);
+        IsDownloading = false;
+        IsPrefetching = false;
         CancellationSource = new CancellationTokenSource();
     }
 
