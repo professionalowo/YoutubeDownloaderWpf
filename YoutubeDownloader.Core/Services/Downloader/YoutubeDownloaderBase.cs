@@ -144,7 +144,11 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
 
     private Task WriteAllDownloads(ChannelWriter<VideoDownload> writer, string url,
         CancellationToken token = default)
-        => Parallel.ForEachAsync(GetDownloadsAsync(url, token), token, writer.WriteAsync);
+        => Parallel.ForEachAsync(
+            GetDownloadsAsync(url, token),
+            token,
+            writer.WriteAsync
+        );
 
     private Func<VideoDownload, CancellationToken, ValueTask> ProcessDownloadFactory(
         AudioConverter converter)
