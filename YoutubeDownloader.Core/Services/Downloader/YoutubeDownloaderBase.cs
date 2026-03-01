@@ -108,8 +108,7 @@ public abstract partial class YoutubeDownloaderBase<TContext>(
             .ConfigureAwait(false);
         await DispatchToUi(ClearStatuses)
             .ConfigureAwait(false);
-        IsDownloading = false;
-        IsPrefetching = false;
+        OnDownloadFinished();
         CancellationSource = new CancellationTokenSource();
     }
 
