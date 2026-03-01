@@ -13,7 +13,7 @@ public sealed class VideoDownload(
     string url,
     string path = "")
 {
-    public async ValueTask<DownloadData> GetStreamAsync(
+    public async Task<DownloadData> GetStreamAsync(
         Func<string, double, IAudioConversionContext> contextFactory, CancellationToken token = default)
     {
         var nameTask = GetName(token);
@@ -31,7 +31,7 @@ public sealed class VideoDownload(
         return new DownloadData(data, statusContext);
     }
 
-    private async ValueTask<IStreamInfo> GetStreamInfo(CancellationToken token = default)
+    private async Task<IStreamInfo> GetStreamInfo(CancellationToken token = default)
     {
         var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token)
             .ConfigureAwait(false);
@@ -40,7 +40,7 @@ public sealed class VideoDownload(
         return streamInfo;
     }
 
-    private async ValueTask<string> GetName(CancellationToken token = default)
+    private async Task<string> GetName(CancellationToken token = default)
     {
         var video = await client.Videos.GetAsync(url, token)
             .ConfigureAwait(false);
