@@ -15,9 +15,9 @@ using YoutubeDownloader.Core.Util;
 namespace YoutubeDownloader.Core.Services.Downloader;
 
 public abstract partial class YoutubeDownloaderBase<TContext>(
+    DownloadFactory downloadFactory,
     ConverterFactory converterFactory,
     ILogger<YoutubeDownloaderBase<TContext>> logger,
-    DownloadFactory downloadFactory,
     IDirectory downloads)
     : IDownloader, INotifyPropertyChanged
 {
