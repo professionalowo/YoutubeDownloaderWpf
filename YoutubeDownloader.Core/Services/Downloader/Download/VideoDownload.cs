@@ -35,9 +35,8 @@ public sealed class VideoDownload(
     {
         var streamManifest = await client.Videos.Streams.GetManifestAsync(url, token)
             .ConfigureAwait(false);
-        var streamInfo = streamManifest.GetAudioStreams()
+        return streamManifest.GetAudioStreams()
             .GetWithHighestBitrate();
-        return streamInfo;
     }
 
     private async Task<string> GetName(CancellationToken token = default)
