@@ -2,11 +2,12 @@
 using System.Runtime.CompilerServices;
 using YoutubeDownloader.Core.Data.Download;
 using YoutubeDownloader.Core.Extensions;
+using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class DownloadFactory(YoutubeClient client)
+public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
 {
     private static bool IsVideo([StringSyntax(StringSyntaxAttribute.Uri)] ReadOnlySpan<char> url)
     {
@@ -37,6 +38,7 @@ public sealed class DownloadFactory(YoutubeClient client)
         var playlist = await client.Playlists.GetAsync(url, token)
             .ConfigureAwait(false);
         var title = playlist.Title.ReplaceIllegalCharacters();
+        await downloads.CreateSubDirectoryAsync(title);
         await foreach (var video in enumerable)
         {
             yield return new PlaylistVideoDownload(title, video.Url);

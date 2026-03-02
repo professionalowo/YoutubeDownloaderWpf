@@ -20,11 +20,6 @@ public sealed class VideoDownloadService(YoutubeClient client, IDirectory downlo
     {
         var (download, title) = named;
         var formatted = download.FormatName(title);
-        if (download is PlaylistVideoDownload p)
-        {
-            downloads.CreateSubDirectory(p.PlaylistName);
-        }
-
         return downloads.ChildFileName(formatted);
     }
 
