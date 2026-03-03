@@ -142,7 +142,7 @@ public abstract partial class YoutubeDownloaderBase(
     {
         var named = await downloadService.GetName(download, token);
         var info = await downloadService.GetStreamInfo(named.Download, token);
-        var context = ContextFactory(named.Title, info.Size.MegaBytes);
+        var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
         var fileName = downloadService.GetFileName(named);
         await using var mediaStream = await downloadService.GetStream(info, token);

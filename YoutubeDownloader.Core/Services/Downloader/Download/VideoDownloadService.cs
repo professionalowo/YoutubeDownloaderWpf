@@ -23,16 +23,17 @@ public sealed class VideoDownloadService(YoutubeClient client, IDirectory downlo
         return downloads.ChildFileName(formatted);
     }
 
-    public async Task<Stream> GetStream(IStreamInfo info, CancellationToken token = default)
-        => await client.Videos.Streams.GetAsync(info, token)
+    public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
+        => await client.Videos.Streams.GetAsync(download.Info, token)
             .ConfigureAwait(false);
 
 
-    public async Task<IStreamInfo> GetStreamInfo(IVideoDownload download, CancellationToken token = default)
+    public async Task<StreamVideoDownload> GetStreamInfo(IVideoDownload download, CancellationToken token = default)
     {
         var streamManifest = await client.Videos.Streams.GetManifestAsync(download.Url, token)
             .ConfigureAwait(false);
-        return streamManifest.GetAudioStreams()
+        var info = streamManifest.GetAudioStreams()
             .GetWithHighestBitrate();
+        return new StreamVideoDownload(download, info);
     }
 }
