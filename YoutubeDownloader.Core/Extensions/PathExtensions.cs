@@ -8,7 +8,7 @@ public static class PathExtensions
 
     extension(string path)
     {
-        public string ReplaceIllegalCharacters(char replacement = '_')
+        public string ReplaceIllegalFileNameCharacters(char replacement = '_')
         {
             var firstInvalidChar = path.IndexOfAny(IllegalChars);
             if (firstInvalidChar == -1)

@@ -37,7 +37,7 @@ public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
             .ConfigureAwait(false);
         var playlist = await client.Playlists.GetAsync(url, token)
             .ConfigureAwait(false);
-        var title = playlist.Title.ReplaceIllegalCharacters();
+        var title = playlist.Title.ReplaceIllegalFileNameCharacters();
         await downloads.CreateSubDirectoryAsync(title);
         await foreach (var video in enumerable)
         {
