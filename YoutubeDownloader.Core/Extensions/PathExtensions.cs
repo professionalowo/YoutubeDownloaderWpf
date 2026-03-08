@@ -21,12 +21,10 @@ public static class PathExtensions
                 state.path.CopyTo(dest);
                 var remainder = dest[state.firstInvalidChar..];
 
-                while (true)
+                for (var index = remainder.IndexOfAny(IllegalChars);
+                     index >= 0;
+                     index = remainder.IndexOfAny(IllegalChars))
                 {
-                    var index = remainder.IndexOfAny(IllegalChars);
-
-                    if (index == -1) break;
-
                     remainder[index] = state.replacement;
 
                     remainder = remainder[index..];
