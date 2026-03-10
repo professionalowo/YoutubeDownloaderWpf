@@ -109,9 +109,9 @@ internal static class ServicesExtensions
                 .AddTransient<YoutubePlatformService>()
                 .AddSingleton<ConverterFactory>();
 
-            serviceCollection.AddHttpClient<SoundCloudClient>()
+            serviceCollection.AddTransient<SoundCloudClient>();
+            serviceCollection.AddHttpClient<SoundCloudPlatformService>()
                 .UseDefaultHttpConfig();
-            serviceCollection.AddTransient<SoundCloudPlatformService>();
 
             serviceCollection.AddTransient<PlatformServiceDispatcher>();
             return serviceCollection;
