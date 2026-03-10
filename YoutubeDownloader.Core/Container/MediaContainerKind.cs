@@ -1,6 +1,6 @@
 ﻿namespace YoutubeDownloader.Core.Container;
 
-internal sealed record Mp3 : IMediaContainer
+internal sealed class Mp3 : IMediaContainer
 {
     public override string ToString() => "Mp3 Audio";
 
@@ -14,7 +14,7 @@ internal sealed record Mp3 : IMediaContainer
     ];
 }
 
-internal sealed record Wav : IMediaContainer
+internal sealed class Wav : IMediaContainer
 {
     public override string ToString() => "Wav Audio";
 
@@ -28,7 +28,7 @@ internal sealed record Wav : IMediaContainer
     ];
 }
 
-internal sealed record Opus : IMediaContainer
+internal sealed class Opus : IMediaContainer
 {
     public override string ToString() => "Opus Audio";
 
@@ -43,12 +43,28 @@ internal sealed record Opus : IMediaContainer
     ];
 }
 
+internal sealed class Flac : IMediaContainer
+{
+    public override string ToString() => "Flac Audio";
+    public IMediaContainer.FileExtension Extension => new("flac");
+    public IMediaContainer.Codec FfmpegCodec => new("flac");
+
+    public IMediaContainer.Codec.Flags FfmpegCodecFlags =>
+    [
+        IMediaContainer.Codec.Flag.Create("compression_level", 5),
+        IMediaContainer.Codec.Flag.Create("sample_fmt", "s32"),
+        IMediaContainer.Codec.Flag.Create("compression_level", 12),
+        IMediaContainer.Codec.Flag.Create("ar", 96000),
+    ];
+}
+
 public static class MediaContainers
 {
     public static IReadOnlyList<IMediaContainer> All { get; } =
     [
         new Mp3(),
         new Wav(),
-        new Opus()
+        new Opus(),
+        new Flac()
     ];
 }
