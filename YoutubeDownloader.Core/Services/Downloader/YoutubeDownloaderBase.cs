@@ -15,8 +15,7 @@ using YoutubeDownloader.Core.Util;
 namespace YoutubeDownloader.Core.Services.Downloader;
 
 public abstract partial class YoutubeDownloaderBase(
-    DownloadFactory downloadFactory,
-    VideoDownloadService downloadService,
+    YoutubePlatformService youtube,
     ConverterFactory converterFactory,
     ILogger<YoutubeDownloaderBase> logger)
     : IDownloader, INotifyPropertyChanged
@@ -116,7 +115,7 @@ public abstract partial class YoutubeDownloaderBase(
 
     private IAsyncEnumerable<IVideoDownload> GetDownloadsAsync(
         [StringSyntax(StringSyntaxAttribute.Uri)]
-        string url, CancellationToken token = default) => downloadFactory.Get(url, token);
+        string url, CancellationToken token = default) => youtube.Get(url, token);
 
     private Task ReadAllDownloads(ChannelReader<IVideoDownload> reader, CancellationToken token = default)
         => Parallel.ForEachAsync(
@@ -140,12 +139,12 @@ public abstract partial class YoutubeDownloaderBase(
     private async ValueTask ProcessDownload(AudioConverter converter, IVideoDownload download,
         CancellationToken token = default)
     {
-        var named = await downloadService.GetName(download, token);
-        var info = await downloadService.GetStreamInfo(named.Download, token);
+        var named = await youtube.GetName(download, token);
+        var info = await youtube.GetStreamInfo(named.Download, token);
         var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
-        var fileName = downloadService.GetFileName(named);
-        await using var mediaStream = await downloadService.GetStream(info, token);
+        var fileName = youtube.GetFileName(named);
+        await using var mediaStream = await youtube.GetStream(info, token);
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);

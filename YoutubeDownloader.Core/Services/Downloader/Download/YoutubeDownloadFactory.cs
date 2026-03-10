@@ -7,7 +7,7 @@ using YoutubeExplode;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
+public sealed class YoutubeDownloadFactory(YoutubeClient client, IDirectory downloads)
 {
     private static bool IsVideo([StringSyntax(StringSyntaxAttribute.Uri)] ReadOnlySpan<char> url)
     {

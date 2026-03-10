@@ -149,8 +149,9 @@ internal static class ServiceCollectionExtensions
                 var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
                 return new YoutubeClient(httpClient);
             });
-            serviceCollection.AddTransient<DownloadFactory>();
-            serviceCollection.AddTransient<VideoDownloadService>();
+            serviceCollection.AddTransient<YoutubeDownloadFactory>();
+            serviceCollection.AddTransient<YoutubeVideoDownloadService>();
+            serviceCollection.AddTransient<YoutubePlatformService>();
             serviceCollection.AddSingleton<ConverterFactory>();
             serviceCollection.AddSingleton(
                 new FfmpegConfigFactory(new FfmpegConfig(new ChildDirectory(root, "ffmpeg"), FfmpegConfig.SourceUri))

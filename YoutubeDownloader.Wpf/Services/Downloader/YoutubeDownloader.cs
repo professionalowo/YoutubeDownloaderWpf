@@ -15,11 +15,10 @@ namespace YoutubeDownloader.Wpf.Services.Downloader;
 public class YoutubeDownloader : YoutubeDownloaderBase
 {
     public YoutubeDownloader(
-        DownloadFactory downloadFactory,
-        VideoDownloadService downloadService,
+        YoutubePlatformService youtube,
         ConverterFactory converterFactory,
         ILogger<YoutubeDownloader> logger)
-        : base(downloadFactory, downloadService, converterFactory, logger)
+        : base(youtube, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;

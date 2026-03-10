@@ -6,7 +6,7 @@ using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class VideoDownloadService(YoutubeClient client, IDirectory downloads)
+public sealed class YoutubeVideoDownloadService(YoutubeClient client, IDirectory downloads)
 {
     public async Task<NamedVideoDownload> GetName(IVideoDownload download, CancellationToken token = default)
     {

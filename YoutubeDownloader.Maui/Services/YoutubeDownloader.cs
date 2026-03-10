@@ -12,11 +12,9 @@ public sealed partial class YoutubeDownloader
     : YoutubeDownloaderBase
 {
     public YoutubeDownloader(
-        DownloadFactory downloadFactory,
-        VideoDownloadService downloadService,
+        YoutubePlatformService youtube,
         ConverterFactory converterFactory,
-        ILogger<YoutubeDownloaderBase> logger) : base(downloadFactory, downloadService,
-        converterFactory, logger)
+        ILogger<YoutubeDownloaderBase> logger) : base(youtube, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;
