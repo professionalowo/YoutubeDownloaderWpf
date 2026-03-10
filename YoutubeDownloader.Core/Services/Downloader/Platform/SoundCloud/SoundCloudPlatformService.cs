@@ -69,14 +69,41 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
         return downloads.ChildFileName(formatted);
     }
 
-    public Task<StreamVideoDownload> GetStreamInfo(IVideoDownload download, CancellationToken token = default)
+    private sealed record SoundCloudPlatformStreamInfo(double SizeInMb, string Url) : IPlatformStreamInfo
     {
-        throw new NotImplementedException();
+        public object Underlying => Url;
+    }
+
+    public async Task<StreamVideoDownload> GetStreamInfo(IVideoDownload download, CancellationToken token = default)
+    {
+        var downloadUrl = await client.Tracks.GetDownloadUrlAsync(download.Url, token)
+            .ConfigureAwait(false);
+
+        if (downloadUrl is null)
+            throw new InvalidOperationException("This track is not downloadable");
+
+        using var headReq = new HttpRequestMessage(HttpMethod.Head, downloadUrl);
+        using var response = await http.SendAsync(headReq, HttpCompletionOption.ResponseHeadersRead, token)
+            .ConfigureAwait(false);
+
+        var contentLength = response.Content.Headers.ContentLength;
+
+        if (contentLength is null)
+        {
+            using var getResp = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, token)
+                .ConfigureAwait(false);
+            getResp.EnsureSuccessStatusCode();
+            contentLength = getResp.Content.Headers.ContentLength;
+        }
+
+        var sizeMb = (contentLength ?? 0) / 1024.0 / 1024.0;
+        return new StreamVideoDownload(download, new SoundCloudPlatformStreamInfo(sizeMb, downloadUrl));
     }
 
     public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
     {
-        var downloadUrl = await client.Tracks.GetDownloadUrlAsync(download.Download.Url, token)
+        var downloadUrl = (string?)download.Info.Underlying ?? await client.Tracks
+            .GetDownloadUrlAsync(download.Download.Url, token)
             .ConfigureAwait(false);
 
         if (downloadUrl is null)

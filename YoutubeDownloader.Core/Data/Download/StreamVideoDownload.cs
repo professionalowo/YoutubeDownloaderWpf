@@ -1,8 +1,6 @@
-﻿using YoutubeExplode.Videos.Streams;
+﻿namespace YoutubeDownloader.Core.Data.Download;
 
-namespace YoutubeDownloader.Core.Data.Download;
-
-public record StreamVideoDownload(IVideoDownload Download, IStreamInfo Info)
+public record StreamVideoDownload(IVideoDownload Download, IPlatformStreamInfo Info)
 {
-    public double SizeInMb => Info.Size.MegaBytes;
+    public double SizeInMb => Info.SizeInMb;
 }

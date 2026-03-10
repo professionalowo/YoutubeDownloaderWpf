@@ -62,10 +62,20 @@ public class YoutubePlatformService(YoutubeClient client, IDirectory downloads)
         return downloads.ChildFileName(formatted);
     }
 
-    public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
-        => await client.Videos.Streams.GetAsync(download.Info, token)
-            .ConfigureAwait(false);
+    private sealed record YoutubePlatformStreamInfo(IStreamInfo Info) : IPlatformStreamInfo
+    {
+        public double SizeInMb => Info.Size.MegaBytes;
+        public object Underlying => Info;
+    }
 
+    public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
+    {
+        if (download.Info.Underlying is IStreamInfo ytInfo)
+            return await client.Videos.Streams.GetAsync(ytInfo, token)
+                .ConfigureAwait(false);
+
+        throw new ArgumentException("Invalid stream info", nameof(download));
+    }
 
     public async Task<StreamVideoDownload> GetStreamInfo(IVideoDownload download, CancellationToken token = default)
     {
@@ -73,6 +83,6 @@ public class YoutubePlatformService(YoutubeClient client, IDirectory downloads)
             .ConfigureAwait(false);
         var info = streamManifest.GetAudioStreams()
             .GetWithHighestBitrate();
-        return new StreamVideoDownload(download, info);
+        return new StreamVideoDownload(download, new YoutubePlatformStreamInfo(info));
     }
 }
