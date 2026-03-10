@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Net;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
@@ -65,8 +66,20 @@ internal static class ServicesExtensions
                     {
                         PooledConnectionLifetime = TimeSpan.FromMinutes(2),
                         ConnectTimeout = TimeSpan.FromSeconds(10),
+
+                        EnableMultipleHttp2Connections = true,
+                        EnableMultipleHttp3Connections = true,
+
+                        MaxConnectionsPerServer = 10,
+
+                        InitialHttp2StreamWindowSize = 1024 * 1024
                     })
-                .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(30));
+                .ConfigureHttpClient(client =>
+                {
+                    client.DefaultRequestVersion = HttpVersion.Version30;
+                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+                    client.Timeout = Timeout.InfiniteTimeSpan;
+                });
         }
     }
 

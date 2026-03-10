@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Velopack;
@@ -97,8 +99,20 @@ internal static class ServiceCollectionExtensions
                     {
                         PooledConnectionLifetime = TimeSpan.FromMinutes(2),
                         ConnectTimeout = TimeSpan.FromSeconds(10),
+
+                        EnableMultipleHttp2Connections = true,
+                        EnableMultipleHttp3Connections = true,
+
+                        MaxConnectionsPerServer = 10,
+                        
+                        InitialHttp2StreamWindowSize = 1024 * 1024
                     })
-                .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(30));
+                .ConfigureHttpClient(client =>
+                {
+                    client.DefaultRequestVersion = HttpVersion.Version30;
+                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+                    client.Timeout = Timeout.InfiniteTimeSpan;
+                });
         }
     }
 
