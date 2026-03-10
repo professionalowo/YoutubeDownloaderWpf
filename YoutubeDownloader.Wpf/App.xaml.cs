@@ -97,15 +97,19 @@ internal static class ServiceCollectionExtensions
                 .ConfigurePrimaryHttpMessageHandler(() =>
                     new SocketsHttpHandler
                     {
-                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-                        ConnectTimeout = TimeSpan.FromSeconds(10),
-
+                        MaxConnectionsPerServer = 10,
                         EnableMultipleHttp2Connections = true,
                         EnableMultipleHttp3Connections = true,
 
-                        MaxConnectionsPerServer = 10,
-                        
-                        InitialHttp2StreamWindowSize = 1024 * 1024
+                        AutomaticDecompression = DecompressionMethods.All,
+                        InitialHttp2StreamWindowSize = 1024 * 1024,
+
+                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+                        ConnectTimeout = TimeSpan.FromSeconds(10),
+
+                        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
+                        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
+                        KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always
                     })
                 .ConfigureHttpClient(client =>
                 {
