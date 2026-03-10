@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using YoutubeDownloader.Core.Data.Download;
 
-namespace YoutubeDownloader.Core.Services.Downloader.Download;
+namespace YoutubeDownloader.Core.Services.Downloader.Platform;
 
 public interface IPlatformDownloadService
 {

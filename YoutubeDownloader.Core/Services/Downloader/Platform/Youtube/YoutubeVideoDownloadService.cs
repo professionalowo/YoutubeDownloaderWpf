@@ -4,7 +4,7 @@ using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
-namespace YoutubeDownloader.Core.Services.Downloader.Download;
+namespace YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 
 public sealed class YoutubeVideoDownloadService(YoutubeClient client, IDirectory downloads)
 {

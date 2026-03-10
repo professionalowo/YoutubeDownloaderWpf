@@ -15,4 +15,8 @@
       <PackageReference Include="YoutubeExplode" Version="6.5.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\Downloader\Platform\SoundCloud\" />
+    </ItemGroup>
+
 </Project>

@@ -8,7 +8,7 @@ using YoutubeDownloader.Core.Container;
 using YoutubeDownloader.Core.Data.Download;
 using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Services.Downloader.Download;
+using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 using YoutubeDownloader.Core.Util;
 
 

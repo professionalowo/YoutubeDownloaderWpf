@@ -12,7 +12,7 @@ using YoutubeDownloader.Core.Services.AutoUpdater;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
-using YoutubeDownloader.Core.Services.Downloader.Download;
+using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
 using YoutubeDownloader.Wpf.Services;
