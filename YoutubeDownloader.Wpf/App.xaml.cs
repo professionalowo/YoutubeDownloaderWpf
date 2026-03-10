@@ -6,12 +6,15 @@ using System.Net.Http;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using SoundCloudExplode;
 using Velopack;
 using Velopack.Sources;
 using YoutubeDownloader.Core.Services.AutoUpdater;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
+using YoutubeDownloader.Core.Services.Downloader.Platform;
+using YoutubeDownloader.Core.Services.Downloader.Platform.SoundCloud;
 using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
@@ -149,9 +152,11 @@ internal static class ServiceCollectionExtensions
                 var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
                 return new YoutubeClient(httpClient);
             });
-            serviceCollection.AddTransient<YoutubeDownloadFactory>();
-            serviceCollection.AddTransient<YoutubeVideoDownloadService>();
             serviceCollection.AddTransient<YoutubePlatformService>();
+            serviceCollection.AddHttpClient<SoundCloudClient>()
+                .UseDefaultHttpConfig();
+            serviceCollection.AddTransient<SoundCloudPlatformService>();
+            serviceCollection.AddTransient<PlatformServiceDispatcher>();
             serviceCollection.AddSingleton<ConverterFactory>();
             serviceCollection.AddSingleton(
                 new FfmpegConfigFactory(new FfmpegConfig(new ChildDirectory(root, "ffmpeg"), FfmpegConfig.SourceUri))

@@ -8,6 +8,7 @@ using YoutubeDownloader.Core.Container;
 using YoutubeDownloader.Core.Data.Download;
 using YoutubeDownloader.Core.Extensions;
 using YoutubeDownloader.Core.Services.Converter;
+using YoutubeDownloader.Core.Services.Downloader.Platform;
 using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 using YoutubeDownloader.Core.Util;
 
@@ -15,7 +16,7 @@ using YoutubeDownloader.Core.Util;
 namespace YoutubeDownloader.Core.Services.Downloader;
 
 public abstract partial class DownloaderBase(
-    YoutubePlatformService youtube,
+    PlatformServiceDispatcher platformServiceDispatcher,
     ConverterFactory converterFactory,
     ILogger<DownloaderBase> logger)
     : IDownloader, INotifyPropertyChanged
@@ -113,38 +114,42 @@ public abstract partial class DownloaderBase(
 
     protected abstract IAudioConversionContext ContextFactory(string name, double size);
 
-    private IAsyncEnumerable<IVideoDownload> GetDownloadsAsync(
+    private static IAsyncEnumerable<IVideoDownload> GetDownloadsAsync(
         [StringSyntax(StringSyntaxAttribute.Uri)]
-        string url, CancellationToken token = default) => youtube.Get(url, token);
+        IPlatformService platform, string url, CancellationToken token = default) =>
+        platform.Get(url, token);
 
-    private Task ReadAllDownloads(ChannelReader<IVideoDownload> reader, CancellationToken token = default)
+    private Task ReadAllDownloads(ChannelReader<IVideoDownload> reader, IPlatformService platform,
+        CancellationToken token = default)
         => Parallel.ForEachAsync(
             reader.ReadAllAsync(token),
             token,
-            ProcessDownloadFactory(Converter)
+            ProcessDownloadFactory(Converter, platform)
         );
 
-    private Task WriteAllDownloads(ChannelWriter<IVideoDownload> writer, string url,
+    private Task WriteAllDownloads(ChannelWriter<IVideoDownload> writer, IPlatformService platform,
+        string url,
         CancellationToken token = default)
         => Parallel.ForEachAsync(
-            GetDownloadsAsync(url, token),
+            GetDownloadsAsync(platform, url, token),
             token,
             writer.WriteAsync
         );
 
     private Func<IVideoDownload, CancellationToken, ValueTask> ProcessDownloadFactory(
-        AudioConverter converter)
-        => (download, token) => ProcessDownload(converter, download, token);
+        AudioConverter converter, IPlatformService service)
+        => (download, token) => ProcessDownload(converter, service, download, token);
 
-    private async ValueTask ProcessDownload(AudioConverter converter, IVideoDownload download,
+    private async ValueTask ProcessDownload(AudioConverter converter, IPlatformService platform,
+        IVideoDownload download,
         CancellationToken token = default)
     {
-        var named = await youtube.GetName(download, token);
-        var info = await youtube.GetStreamInfo(named.Download, token);
+        var named = await platform.GetName(download, token);
+        var info = await platform.GetStreamInfo(named.Download, token);
         var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
-        var fileName = youtube.GetFileName(named);
-        await using var mediaStream = await youtube.GetStream(info, token);
+        var fileName = platform.GetFileName(named);
+        await using var mediaStream = await platform.GetStream(info, token);
         await converter.Convert(mediaStream, fileName, context, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);
@@ -160,8 +165,9 @@ public abstract partial class DownloaderBase(
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.Wait
         });
-        var consumer = ReadAllDownloads(rx, token);
-        await WriteAllDownloads(tx, url, token).ConfigureAwait(false);
+        var platform = platformServiceDispatcher.GetServiceForUrl(url);
+        var consumer = ReadAllDownloads(rx, platform, token);
+        await WriteAllDownloads(tx, platform, url, token).ConfigureAwait(false);
         tx.Complete();
         await consumer.ConfigureAwait(false);
     }

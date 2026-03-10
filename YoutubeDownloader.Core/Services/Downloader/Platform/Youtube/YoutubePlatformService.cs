@@ -1,24 +1,78 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using YoutubeDownloader.Core.Data.Download;
+using YoutubeDownloader.Core.Extensions;
+using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeExplode;
+using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 
-public class YoutubePlatformService(YoutubeDownloadFactory factory, YoutubeVideoDownloadService downloader)
-    : IPlatformDownloadService
+public class YoutubePlatformService(YoutubeClient client, IDirectory downloads)
+    : IPlatformService
 {
-    public IAsyncEnumerable<IVideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
-        CancellationToken token = default) => factory.Get(url, token);
+    private static bool IsVideo([StringSyntax(StringSyntaxAttribute.Uri)] ReadOnlySpan<char> url)
+    {
+        var lastSlashIdx = url.LastIndexOf('/');
 
-    public async Task<NamedVideoDownload> GetName(IVideoDownload download, CancellationToken token = default) =>
-        await downloader.GetName(download, token);
+        if (lastSlashIdx == -1 || lastSlashIdx == url.Length - 1)
+            throw new ArgumentException("Invalid url", nameof(url));
+
+        var charAfterLastSlash = url[lastSlashIdx + 1];
+        return charAfterLastSlash == 'w';
+    }
+
+
+    public IAsyncEnumerable<IVideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
+        CancellationToken token = default)
+        => IsVideo(url)
+            ? AsyncEnumerable.FromSingle(new SingleVideoDownload(url), token)
+            : GetPlaylist(url, token);
+
+
+    private async IAsyncEnumerable<PlaylistVideoDownload> GetPlaylist(
+        [StringSyntax(StringSyntaxAttribute.Uri)]
+        string url,
+        [EnumeratorCancellation] CancellationToken token = default)
+    {
+        var enumerable = client.Playlists.GetVideosAsync(url, token)
+            .ConfigureAwait(false);
+        var playlist = await client.Playlists.GetAsync(url, token)
+            .ConfigureAwait(false);
+        var title = playlist.Title.ReplaceIllegalFileNameCharacters();
+        await downloads.CreateSubDirectoryAsync(title);
+        await foreach (var video in enumerable)
+        {
+            yield return new PlaylistVideoDownload(title, video.Url);
+        }
+    }
+
+    public async Task<NamedVideoDownload> GetName(IVideoDownload download, CancellationToken token = default)
+    {
+        var video = await client.Videos.GetAsync(download.Url, token)
+            .ConfigureAwait(false);
+        var name = video.Title.ReplaceIllegalFileNameCharacters();
+        return new NamedVideoDownload(download, name);
+    }
 
     public string GetFileName(NamedVideoDownload named)
-        => downloader.GetFileName(named);
+    {
+        var (download, title) = named;
+        var formatted = download.FormatName(title);
+        return downloads.ChildFileName(formatted);
+    }
 
     public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
-        => await downloader.GetStream(download, token);
+        => await client.Videos.Streams.GetAsync(download.Info, token)
+            .ConfigureAwait(false);
 
 
     public async Task<StreamVideoDownload> GetStreamInfo(IVideoDownload download, CancellationToken token = default)
-        => await downloader.GetStreamInfo(download, token);
+    {
+        var streamManifest = await client.Videos.Streams.GetManifestAsync(download.Url, token)
+            .ConfigureAwait(false);
+        var info = streamManifest.GetAudioStreams()
+            .GetWithHighestBitrate();
+        return new StreamVideoDownload(download, info);
+    }
 }

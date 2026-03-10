@@ -8,6 +8,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using YoutubeDownloader.Wpf.Controls;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
+using YoutubeDownloader.Core.Services.Downloader.Platform;
 using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;
@@ -15,10 +16,10 @@ namespace YoutubeDownloader.Wpf.Services.Downloader;
 public class Downloader : DownloaderBase
 {
     public Downloader(
-        YoutubePlatformService youtube,
+        PlatformServiceDispatcher platformServiceDispatcher,
         ConverterFactory converterFactory,
         ILogger<Downloader> logger)
-        : base(youtube, converterFactory, logger)
+        : base(platformServiceDispatcher, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;

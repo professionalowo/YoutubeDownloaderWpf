@@ -3,7 +3,7 @@ using YoutubeDownloader.Core.Data.Download;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Platform;
 
-public interface IPlatformDownloadService
+public interface IPlatformService
 {
     public IAsyncEnumerable<IVideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default);

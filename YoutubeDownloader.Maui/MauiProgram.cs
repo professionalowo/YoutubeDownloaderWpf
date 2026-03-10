@@ -1,9 +1,12 @@
 ﻿using System.Net;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using SoundCloudExplode;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
+using YoutubeDownloader.Core.Services.Downloader.Platform;
+using YoutubeDownloader.Core.Services.Downloader.Platform.SoundCloud;
 using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Maui.Services.Mp3Player;
@@ -102,11 +105,15 @@ internal static class ServicesExtensions
             });
             serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
                 .AddTransient<Services.Downloader>()
-                .AddTransient<YoutubeVideoDownloadService>()
                 .AddSingleton(CreateDownloadDirectory)
-                .AddTransient<YoutubeDownloadFactory>()
                 .AddTransient<YoutubePlatformService>()
                 .AddSingleton<ConverterFactory>();
+
+            serviceCollection.AddHttpClient<SoundCloudClient>()
+                .UseDefaultHttpConfig();
+            serviceCollection.AddTransient<SoundCloudPlatformService>();
+
+            serviceCollection.AddTransient<PlatformServiceDispatcher>();
             return serviceCollection;
         }
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
+using YoutubeDownloader.Core.Services.Downloader.Platform;
 using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 
 namespace YoutubeDownloader.Maui.Services;
@@ -12,9 +13,9 @@ public sealed partial class Downloader
     : DownloaderBase
 {
     public Downloader(
-        YoutubePlatformService youtube,
+        PlatformServiceDispatcher platformServiceDispatcher,
         ConverterFactory converterFactory,
-        ILogger<DownloaderBase> logger) : base(youtube, converterFactory, logger)
+        ILogger<DownloaderBase> logger) : base(platformServiceDispatcher, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;
