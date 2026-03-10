@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using SoundCloudExplode;
 using SoundCloudExplode.Common;
@@ -49,7 +50,10 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
         await downloads.CreateSubDirectoryAsync(title);
         await foreach (var track in enumerable)
         {
-            yield return new PlaylistVideoDownload(title, track.Uri!.ToString());
+            var trackUrl = track.Uri?.ToString();
+            if (trackUrl is null) continue;
+            if (await client.Tracks.IsUrlValidAsync(trackUrl, token))
+                yield return new PlaylistVideoDownload(title, track.Uri!.ToString());
         }
     }
 
@@ -102,7 +106,7 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
 
     public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
     {
-        var downloadUrl = (string?)download.Info.Underlying ?? await client.Tracks
+        var downloadUrl = download.Info.Underlying as string ?? await client.Tracks
             .GetDownloadUrlAsync(download.Download.Url, token)
             .ConfigureAwait(false);
 
@@ -111,8 +115,10 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
 
         var response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
+
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStreamAsync(token)
+        var inner = await response.Content.ReadAsStreamAsync(token)
             .ConfigureAwait(false);
+        return new ResponseBackedStream(inner, response);
     }
 }
