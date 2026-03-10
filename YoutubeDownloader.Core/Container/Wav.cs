@@ -2,8 +2,6 @@
 
 internal sealed class Wav() : AbstractMediaContainer("Wav Audio", "wav", "pcm_s16le")
 {
-    public override string ToString() => "Wav Audio";
-
     public override IMediaContainer.Codec.Flags FfmpegCodecFlags =>
     [
         IMediaContainer.Codec.Flag.Create("ar", 48000),

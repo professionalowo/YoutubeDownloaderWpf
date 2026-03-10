@@ -2,11 +2,18 @@
 
 public static class MediaContainers
 {
-    public static IReadOnlyList<IMediaContainer> All { get; } =
+    internal static IReadOnlyList<IMediaContainer> Containers { get; } =
     [
         new Mp3(),
         new Wav(),
         new Opus(),
-        new Flac()
+        new Flac(),
+        new Aac(),
+        new Ogg()
     ];
+
+    extension(IMediaContainer)
+    {
+        public static IReadOnlyList<IMediaContainer> All => Containers;
+    }
 }

@@ -8,7 +8,7 @@
         xmlns:downloader="clr-namespace:YoutubeDownloader.Wpf.Services.Downloader"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=downloader:YoutubeDownloader, IsDesignTimeCreatable=True}"
-        Title="Downloader" Height="450" Width="800" MinHeight="200" MinWidth="550">
+        Title="Downloader" Height="500" Width="850" MinHeight="200" MinWidth="550">
     <Window.Resources>
         <c:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -39,7 +39,7 @@
             <RowDefinition Height="25" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Stretch" >
+        <DockPanel Grid.Row="0" LastChildFill="False" HorizontalAlignment="Center">
             <Label VerticalAlignment="Center">Url:</Label>
             <TextBox Name="UrlTextBox" Width="450" VerticalContentAlignment="Center"
                      Style="{StaticResource textBoxInError}"
