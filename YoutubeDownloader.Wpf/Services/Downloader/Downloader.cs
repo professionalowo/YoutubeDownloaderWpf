@@ -12,12 +12,12 @@ using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 
 namespace YoutubeDownloader.Wpf.Services.Downloader;
 
-public class YoutubeDownloader : YoutubeDownloaderBase
+public class Downloader : DownloaderBase
 {
-    public YoutubeDownloader(
+    public Downloader(
         YoutubePlatformService youtube,
         ConverterFactory converterFactory,
-        ILogger<YoutubeDownloader> logger)
+        ILogger<Downloader> logger)
         : base(youtube, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;

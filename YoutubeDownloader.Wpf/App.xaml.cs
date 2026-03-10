@@ -133,7 +133,7 @@ internal static class ServiceCollectionExtensions
 
             serviceCollection.AddTransient<UpdateManager>(_ => manager);
             serviceCollection.AddTransient<VelopackService>();
-            serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
+            serviceCollection.AddTransient<Services.Downloader.Downloader>();
             serviceCollection.AddSingleton<IDirectory>(_ =>
             {
                 IDirectory dir = new ChildDirectory(root, "Downloads");

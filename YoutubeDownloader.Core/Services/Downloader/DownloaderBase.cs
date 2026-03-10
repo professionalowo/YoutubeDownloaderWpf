@@ -14,10 +14,10 @@ using YoutubeDownloader.Core.Util;
 
 namespace YoutubeDownloader.Core.Services.Downloader;
 
-public abstract partial class YoutubeDownloaderBase(
+public abstract partial class DownloaderBase(
     YoutubePlatformService youtube,
     ConverterFactory converterFactory,
-    ILogger<YoutubeDownloaderBase> logger)
+    ILogger<DownloaderBase> logger)
     : IDownloader, INotifyPropertyChanged
 {
     [StringSyntax(StringSyntaxAttribute.Uri)]

@@ -8,9 +8,9 @@ namespace YoutubeDownloader.Wpf;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public Services.Downloader.YoutubeDownloader Downloader { get; private set; }
+    public Services.Downloader.Downloader Downloader { get; private set; }
     private readonly IDirectory downloads;
-    public MainWindow(Services.Downloader.YoutubeDownloader downloader, IDirectory downloads)
+    public MainWindow(Services.Downloader.Downloader downloader, IDirectory downloads)
     {
         this.downloads = downloads;
         this.Downloader = downloader;

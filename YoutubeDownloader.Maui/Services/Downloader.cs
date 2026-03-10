@@ -8,13 +8,13 @@ using YoutubeDownloader.Core.Services.Downloader.Platform.Youtube;
 
 namespace YoutubeDownloader.Maui.Services;
 
-public sealed partial class YoutubeDownloader
-    : YoutubeDownloaderBase
+public sealed partial class Downloader
+    : DownloaderBase
 {
-    public YoutubeDownloader(
+    public Downloader(
         YoutubePlatformService youtube,
         ConverterFactory converterFactory,
-        ILogger<YoutubeDownloaderBase> logger) : base(youtube, converterFactory, logger)
+        ILogger<DownloaderBase> logger) : base(youtube, converterFactory, logger)
     {
         DownloadSuccess += OnDownloadSuccess;
         DownloadFailed += OnDownloadFailed;

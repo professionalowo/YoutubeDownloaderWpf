@@ -6,10 +6,10 @@ using Microsoft.Maui.Controls;
 
 public partial class MainPage : ContentPage
 {
-    private readonly Services.YoutubeDownloader _downloader;
+    private readonly Services.Downloader _downloader;
     private readonly IDirectory _downloads;
 
-    public MainPage(Services.YoutubeDownloader downloader, IDirectory downloads)
+    public MainPage(Services.Downloader downloader, IDirectory downloads)
     {
         _downloader = downloader;
         _downloads = downloads;
