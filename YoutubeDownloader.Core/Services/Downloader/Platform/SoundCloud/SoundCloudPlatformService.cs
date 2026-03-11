@@ -46,14 +46,15 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
             .ConfigureAwait(false);
         var playlist = await client.Playlists.GetAsync(url, false, token);
 
-        var title = playlist.Title!.ReplaceIllegalFileNameCharacters();
-        await downloads.CreateSubDirectoryAsync(title);
+        var title = playlist.Title ?? throw new InvalidOperationException();
+        var name = title.ReplaceIllegalFileNameCharacters();
+        await downloads.CreateSubDirectoryAsync(name);
         await foreach (var track in enumerable)
         {
             var trackUrl = track.Uri?.ToString();
             if (trackUrl is null) continue;
             if (await client.Tracks.IsUrlValidAsync(trackUrl, token))
-                yield return new PlaylistVideoDownload(title, track.Uri!.ToString());
+                yield return new PlaylistVideoDownload(name, trackUrl);
         }
     }
 
