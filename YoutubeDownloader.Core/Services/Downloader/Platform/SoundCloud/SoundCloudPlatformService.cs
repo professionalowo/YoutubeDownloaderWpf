@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using SoundCloudExplode;
 using SoundCloudExplode.Common;
 using YoutubeDownloader.Core.Data.Download;
@@ -27,34 +25,22 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
                 break;
             case Kind.Playlist or Kind.Album:
             {
-                await foreach (var track in GetPlaylist(url, token))
+                var playlist = await client.Playlists.GetAsync(url, false, token);
+                var title = playlist.Title ?? throw new InvalidOperationException();
+                var name = title.ReplaceIllegalFileNameCharacters();
+                await downloads.CreateSubDirectoryAsync(name);
+                var enumerable = client.Playlists.GetTracksAsync(url, token)
+                    .ConfigureAwait(false);
+                await foreach (var track in enumerable)
                 {
-                    yield return track;
+                    var trackUrl = track.Uri?.ToString();
+                    if (trackUrl is null) continue;
+                    if (await client.Tracks.IsUrlValidAsync(trackUrl, token))
+                        yield return new PlaylistVideoDownload(name, trackUrl);
                 }
 
                 break;
             }
-        }
-    }
-
-    private async IAsyncEnumerable<PlaylistVideoDownload> GetPlaylist(
-        [StringSyntax(StringSyntaxAttribute.Uri)]
-        string url,
-        [EnumeratorCancellation] CancellationToken token = default)
-    {
-        var enumerable = client.Playlists.GetTracksAsync(url, token)
-            .ConfigureAwait(false);
-        var playlist = await client.Playlists.GetAsync(url, false, token);
-
-        var title = playlist.Title ?? throw new InvalidOperationException();
-        var name = title.ReplaceIllegalFileNameCharacters();
-        await downloads.CreateSubDirectoryAsync(name);
-        await foreach (var track in enumerable)
-        {
-            var trackUrl = track.Uri?.ToString();
-            if (trackUrl is null) continue;
-            if (await client.Tracks.IsUrlValidAsync(trackUrl, token))
-                yield return new PlaylistVideoDownload(name, trackUrl);
         }
     }
 
@@ -87,19 +73,13 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
         if (downloadUrl is null)
             throw new InvalidOperationException("This track is not downloadable");
 
-        using var headReq = new HttpRequestMessage(HttpMethod.Head, downloadUrl);
-        using var response = await http.SendAsync(headReq, HttpCompletionOption.ResponseHeadersRead, token)
+
+        using var response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
 
-        var contentLength = response.Content.Headers.ContentLength;
+        response.EnsureSuccessStatusCode();
 
-        if (contentLength is null)
-        {
-            using var getResp = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, token)
-                .ConfigureAwait(false);
-            getResp.EnsureSuccessStatusCode();
-            contentLength = getResp.Content.Headers.ContentLength;
-        }
+        var contentLength = response.Content.Headers.ContentLength;
 
         var sizeMb = (contentLength ?? 0) / 1024.0 / 1024.0;
         return new StreamVideoDownload(download, new SoundCloudPlatformStreamInfo(sizeMb, downloadUrl));
@@ -107,8 +87,7 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
 
     public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)
     {
-        var downloadUrl = download.Info.Underlying as string ?? await client.Tracks
-            .GetDownloadUrlAsync(download.Download.Url, token)
+        var downloadUrl = await client.Tracks.GetDownloadUrlAsync(download.Download.Url, token)
             .ConfigureAwait(false);
 
         if (downloadUrl is null)
@@ -116,10 +95,7 @@ public class SoundCloudPlatformService(HttpClient http, SoundCloudClient client,
 
         var response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
-
-        response.EnsureSuccessStatusCode();
-        var inner = await response.Content.ReadAsStreamAsync(token)
+        return await ResponseBackedStream.CreateAsync(response)
             .ConfigureAwait(false);
-        return new ResponseBackedStream(inner, response);
     }
 }

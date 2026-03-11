@@ -153,7 +153,18 @@ internal static class ServiceCollectionExtensions
                 return new YoutubeClient(httpClient);
             });
             serviceCollection.AddTransient<YoutubePlatformService>();
-            serviceCollection.AddTransient<SoundCloudClient>();
+            serviceCollection.AddHttpClient("SoundCloud", client =>
+            {
+                // Apply your browser config here or via .UseDefaultHttpConfig()
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
+            }).UseDefaultHttpConfig();
+            serviceCollection.AddTransient<SoundCloudClient>(sp =>
+            {
+                var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+                var httpClient = httpClientFactory.CreateClient("SoundCloud");
+                return new SoundCloudClient(httpClient);
+            });
             serviceCollection.AddHttpClient<SoundCloudPlatformService>()
                 .UseDefaultHttpConfig();
             serviceCollection.AddTransient<PlatformServiceDispatcher>();
