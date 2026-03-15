@@ -1,25 +1,28 @@
 ﻿using YoutubeDownloader.Core.Data.Download;
 using YoutubeDownloader.Core.Extensions;
+using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class VideoDownloadService(YoutubeClient client, IDirectory downloads)
+public sealed class VideoDownloadService(HttpClient http, YoutubeClient client, IDirectory downloads)
 {
     public async Task<NamedVideoDownload> GetName(IVideoDownload download, CancellationToken token = default)
     {
         var video = await client.Videos.GetAsync(download.Url, token)
             .ConfigureAwait(false);
+
+        var thumbnail = video.Thumbnails[0].Url;
         var name = video.Title.ReplaceIllegalFileNameCharacters();
         var author = video.Author.ChannelTitle.ReplaceIllegalFileNameCharacters();
-        return new NamedVideoDownload(download, name, author);
+        return new NamedVideoDownload(download, name, author, thumbnail);
     }
 
     public string GetFileName(NamedVideoDownload named)
     {
-        var (download, title, _) = named;
+        var (download, title, _, _) = named;
         var formatted = download.FormatName(title);
         return downloads.ChildFileName(formatted);
     }
@@ -36,5 +39,10 @@ public sealed class VideoDownloadService(YoutubeClient client, IDirectory downlo
         var info = streamManifest.GetAudioStreams()
             .GetWithHighestBitrate();
         return new StreamVideoDownload(download, info);
+    }
+
+    public async Task<AudioMetadata> GetMetadata(NamedVideoDownload download, CancellationToken token = default)
+    {
+        return new AudioMetadata(download.Title, download.Author);
     }
 }

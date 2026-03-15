@@ -145,7 +145,7 @@ public abstract partial class YoutubeDownloaderBase(
         var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
         var fileName = downloadService.GetFileName(named);
-        var metadata = new AudioMetadata(named.Title, named.Author);
+        var metadata = await downloadService.GetMetadata(named, token);
         await using var mediaStream = await downloadService.GetStream(info, token);
         await converter.Convert(mediaStream, fileName, context, metadata, token)
             .ConfigureAwait(false);
