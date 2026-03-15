@@ -14,7 +14,7 @@ public sealed class VideoDownloadService(HttpClient http, YoutubeClient client, 
         var video = await client.Videos.GetAsync(download.Url, token)
             .ConfigureAwait(false);
 
-        var thumbnail = video.Thumbnails[0].Url;
+        var thumbnail = video.Thumbnails[^1].Url;
         var name = video.Title.ReplaceIllegalFileNameCharacters();
         var author = video.Author.ChannelTitle.ReplaceIllegalFileNameCharacters();
         return new NamedVideoDownload(download, name, author, thumbnail);
@@ -43,6 +43,8 @@ public sealed class VideoDownloadService(HttpClient http, YoutubeClient client, 
 
     public async Task<AudioMetadata> GetMetadata(NamedVideoDownload download, CancellationToken token = default)
     {
-        return new AudioMetadata(download.Title, download.Author);
+        var thumbnail = await http.GetByteArrayAsync(download.ThumbnailUrl, token)
+            .ConfigureAwait(false);
+        return new AudioMetadata(download.Title, download.Author, thumbnail);
     }
 }
