@@ -6,8 +6,6 @@ namespace YoutubeDownloader.Core.Services.Converter;
 public sealed class FfmpegAudioConversion
     : Stream
 {
-    private readonly string _tempFile = Path.GetTempFileName();
-
     private readonly Lazy<Process> _ffmpegProcess;
 
     private Stream Input => _ffmpegProcess.Value.StandardInput.BaseStream;
@@ -18,15 +16,14 @@ public sealed class FfmpegAudioConversion
         IMediaContainer target,
         AudioMetadata metadata)
     {
-        File.WriteAllBytes(_tempFile, metadata.Thumbnail);
         _ffmpegProcess
-            = new Lazy<Process>(() => CreateProcess(ffmpegAbsolutePath, outPath, metadata, target, _tempFile));
+            = new Lazy<Process>(() => CreateProcess(ffmpegAbsolutePath, outPath, metadata, target));
     }
 
     private static Process CreateProcess(string ffmpegAbsolutePath, string outPath, AudioMetadata metadata,
-        IMediaContainer target, string thumbnailPath)
+        IMediaContainer target)
     {
-        var args = Args(outPath, metadata, target, thumbnailPath);
+        var args = Args(outPath, metadata, target);
         var info = new ProcessStartInfo(ffmpegAbsolutePath, args)
         {
             UseShellExecute = false,
@@ -36,26 +33,25 @@ public sealed class FfmpegAudioConversion
         return Process.Start(info)!;
     }
 
-    private static ICollection<string> Args(string outPath, AudioMetadata metadata, IMediaContainer target,
-        string thumbnailPath) =>
+    private static ICollection<string> Args(string outPath, AudioMetadata metadata, IMediaContainer target) =>
     [
         "-nostdin",
         "-hide_banner",
         "-loglevel", "error",
         "-i", "pipe:0",
-        "-i", thumbnailPath,
+        "-i", metadata.ThumbnailPath,
 
 
         "-c:a", target.FfmpegCodec.FfmpegCodec,
         ..target.FfmpegCodecFlags.Format(),
 
         "-c:v", "mjpeg",
-        
+
         "-map", "0:a:0",
         "-map", "1:v:0",
-        
+
         "-disposition:v", "attached_pic",
-        
+
         "-map_metadata", "-1",
         "-metadata", $"title={metadata.Name}",
         "-metadata", $"artist={metadata.Author}",
@@ -104,7 +100,6 @@ public sealed class FfmpegAudioConversion
         Input.Close();
         p.WaitForExit();
         p.Dispose();
-        if (File.Exists(_tempFile)) File.Delete(_tempFile);
         _disposedValue = true;
     }
 
@@ -125,7 +120,6 @@ public sealed class FfmpegAudioConversion
             .ConfigureAwait(false);
 
         p.Dispose();
-        if (File.Exists(_tempFile)) File.Delete(_tempFile);
         _disposedValue = true;
     }
 }
