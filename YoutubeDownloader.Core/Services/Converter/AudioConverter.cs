@@ -5,11 +5,10 @@ namespace YoutubeDownloader.Core.Services.Converter;
 
 public sealed class AudioConverter(string ffmpegPath, IMediaContainer target)
 {
-    public async Task Convert(Stream data, string outPath, IAudioConversionContext context,
-        CancellationToken token = default)
+    public async Task Convert(Stream data, string outPath, IAudioConversionContext context, AudioMetadata metadata,
+    CancellationToken token = default)
     {
         var audioPath = $"{outPath}.{target.Extension.Extension}";
-        var metadata = new AudioMetadata(context.Name);
         await using var conversion = new FfmpegAudioConversion(ffmpegPath, audioPath, target, metadata)
             .WithProgress(context.GetProgress());
         await data.CopyToAsync(conversion, token)

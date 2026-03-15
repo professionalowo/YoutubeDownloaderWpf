@@ -13,12 +13,13 @@ public sealed class VideoDownloadService(YoutubeClient client, IDirectory downlo
         var video = await client.Videos.GetAsync(download.Url, token)
             .ConfigureAwait(false);
         var name = video.Title.ReplaceIllegalFileNameCharacters();
-        return new NamedVideoDownload(download, name);
+        var author = video.Author.ChannelTitle.ReplaceIllegalFileNameCharacters();
+        return new NamedVideoDownload(download, name, author);
     }
 
     public string GetFileName(NamedVideoDownload named)
     {
-        var (download, title) = named;
+        var (download, title, _) = named;
         var formatted = download.FormatName(title);
         return downloads.ChildFileName(formatted);
     }

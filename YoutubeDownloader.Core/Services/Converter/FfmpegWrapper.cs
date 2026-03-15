@@ -43,6 +43,7 @@ public sealed class FfmpegAudioConversion(
         "-map", "0:a:0?",
         "-map_metadata", "-1",
         "-metadata", $"title={metadata.Name}",
+        "-metadata", $"artist={metadata.Author}",
 
         "-y",
         outPath

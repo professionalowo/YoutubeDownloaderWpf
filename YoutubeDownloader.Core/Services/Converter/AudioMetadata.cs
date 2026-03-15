@@ -1,3 +1,3 @@
 ﻿namespace YoutubeDownloader.Core.Services.Converter;
 
-public readonly record struct AudioMetadata(string Name);
+public readonly record struct AudioMetadata(string Name, string Author);
