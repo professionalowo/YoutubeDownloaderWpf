@@ -24,7 +24,7 @@ public sealed class DownloadFactory(YoutubeClient client, IDirectory downloads)
     public IAsyncEnumerable<IVideoDownload> Get([StringSyntax(StringSyntaxAttribute.Uri)] string url,
         CancellationToken token = default)
         => IsVideo(url)
-            ? AsyncEnumerable.FromSingle(new SingleVideoDownload(url), token)
+            ? AsyncEnumerable.FromSingle(new SingleVideoDownload(url))
             : GetPlaylist(url, token);
 
 
