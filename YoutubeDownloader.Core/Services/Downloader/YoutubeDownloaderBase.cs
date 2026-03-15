@@ -140,13 +140,17 @@ public abstract partial class YoutubeDownloaderBase(
     private async ValueTask ProcessDownload(AudioConverter converter, IVideoDownload download,
         CancellationToken token = default)
     {
-        var named = await downloadService.GetName(download, token);
-        var info = await downloadService.GetStreamInfo(named.Download, token);
+        var named = await downloadService.GetName(download, token)
+            .ConfigureAwait(false);
+        var info = await downloadService.GetStreamInfo(named.Download, token)
+            .ConfigureAwait(false);
         var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
         var fileName = downloadService.GetFileName(named);
-        var metadata = await downloadService.GetMetadata(named, token);
-        await using var mediaStream = await downloadService.GetStream(info, token);
+        var metadata = await downloadService.GetMetadata(named, token)
+            .ConfigureAwait(false);
+        await using var mediaStream = await downloadService.GetStream(info, token)
+            .ConfigureAwait(false);
         await converter.Convert(mediaStream, fileName, context, metadata, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);
