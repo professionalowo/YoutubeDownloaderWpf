@@ -142,24 +142,25 @@ public abstract partial class YoutubeDownloaderBase(
     {
         var named = await downloadService.GetName(download, token)
             .ConfigureAwait(false);
+
+        var thumbnailTask = downloadService.GetThumbnail(named, token);
+
         var info = await downloadService.GetStreamInfo(named.Download, token)
             .ConfigureAwait(false);
-
+        var mediaTask = downloadService.GetStream(info, token);
         var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
 
-        var thumbnail = await downloadService.GetThumbnail(named, token)
-            .ConfigureAwait(false);
+        var thumbnail = await thumbnailTask.ConfigureAwait(false);
 
         using var tempFile = TempFile.Create();
-        await tempFile.WriteAllBytesAsync(thumbnail, token)
-            .ConfigureAwait(false);
+        var writeTask = tempFile.WriteAllBytesAsync(thumbnail, token);
 
         var fileName = downloadService.GetFileName(named);
         var metadata = new AudioMetadata(named.Title, named.Author, tempFile.FilePath);
 
-        await using var mediaStream = await downloadService.GetStream(info, token)
-            .ConfigureAwait(false);
+        await using var mediaStream = await mediaTask.ConfigureAwait(false);
+        await writeTask.ConfigureAwait(false);
         await converter.Convert(mediaStream, fileName, context.GetProgress(), metadata, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);
