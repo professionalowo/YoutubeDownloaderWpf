@@ -144,9 +144,10 @@ public abstract partial class YoutubeDownloaderBase(
             .ConfigureAwait(false);
         var info = await downloadService.GetStreamInfo(named.Download, token)
             .ConfigureAwait(false);
+
         var context = ContextFactory(named.Title, info.SizeInMb);
         var uiTask = AddDownloadStatus(context, token);
-        var fileName = downloadService.GetFileName(named);
+
         var thumbnail = await downloadService.GetThumbnail(named, token)
             .ConfigureAwait(false);
 
@@ -154,12 +155,15 @@ public abstract partial class YoutubeDownloaderBase(
         await tempFile.WriteAllBytesAsync(thumbnail, token)
             .ConfigureAwait(false);
 
+        var fileName = downloadService.GetFileName(named);
         var metadata = new AudioMetadata(named.Title, named.Author, tempFile.FilePath);
+
         await using var mediaStream = await downloadService.GetStream(info, token)
             .ConfigureAwait(false);
         await converter.Convert(mediaStream, fileName, context.GetProgress(), metadata, token)
             .ConfigureAwait(false);
         await uiTask.ConfigureAwait(false);
+
         context.InvokeDownloadFinished(this, true);
     }
 
