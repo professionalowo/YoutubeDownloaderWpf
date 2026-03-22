@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
@@ -17,9 +18,10 @@ public static class ServiceCollectionExtensions
             where TYoutubeDownloader : YoutubeDownloaderBase
         {
             serviceCollection.AddSingleton<TYoutubeDownloader>();
-            serviceCollection.AddSingleton<IDirectory>(_ =>
+            serviceCollection.AddSingleton<IDirectory>(p =>
             {
-                var dir = root.ChildDirectory("Downloads");
+                var config = p.GetRequiredService<IOptions<AppConfiguration>>();
+                var dir = root.ChildDirectory(config.Value.DownloadPath);
                 dir.Init();
                 return dir;
             });
