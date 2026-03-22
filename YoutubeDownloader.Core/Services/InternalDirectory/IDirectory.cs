@@ -31,4 +31,6 @@ public interface IDirectory
 
     IEnumerable<string> GetFiles(string searchPattern = "*") =>
         Directory.EnumerateFiles(FullPath, searchPattern, SearchOption.AllDirectories);
+
+    IDirectory ChildDirectory(string name) => new ChildDirectory(this, name);
 }
