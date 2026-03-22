@@ -6,7 +6,7 @@ using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeExplode;
 
-namespace Services;
+namespace YoutubeDownloader.Setup;
 
 public static class ServiceCollectionExtensions
 {

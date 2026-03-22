@@ -1,21 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
-using Services;
+using YoutubeDownloader.Setup;
 using Velopack;
 using Velopack.Sources;
 using YoutubeDownloader.Core.Services.AutoUpdater;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Services.Downloader;
-using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
 using YoutubeDownloader.Wpf.Services;
 using YoutubeDownloader.Wpf.View;
-using YoutubeExplode;
 
 namespace YoutubeDownloader.Wpf;
 

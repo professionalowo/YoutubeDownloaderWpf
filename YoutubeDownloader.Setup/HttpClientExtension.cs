@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Services;
+namespace YoutubeDownloader.Setup;
 
 public static class HttpClientExtension
 {
