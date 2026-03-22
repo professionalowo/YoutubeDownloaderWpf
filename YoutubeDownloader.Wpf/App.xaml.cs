@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Services;
 using Velopack;
 using Velopack.Sources;
 using YoutubeDownloader.Core.Services.AutoUpdater;
@@ -88,38 +89,6 @@ public partial class App : Application
 
 internal static class ServiceCollectionExtensions
 {
-    extension(IHttpClientBuilder builder)
-    {
-        private IHttpClientBuilder UseDefaultHttpConfig(
-        )
-        {
-            return builder
-                .ConfigurePrimaryHttpMessageHandler(() =>
-                    new SocketsHttpHandler
-                    {
-                        MaxConnectionsPerServer = 10,
-                        EnableMultipleHttp2Connections = true,
-                        EnableMultipleHttp3Connections = true,
-
-                        AutomaticDecompression = DecompressionMethods.All,
-                        InitialHttp2StreamWindowSize = 1024 * 1024,
-
-                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-                        ConnectTimeout = TimeSpan.FromSeconds(10),
-
-                        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-                        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                        KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always
-                    })
-                .ConfigureHttpClient(client =>
-                {
-                    client.DefaultRequestVersion = HttpVersion.Version30;
-                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
-                    client.Timeout = Timeout.InfiniteTimeSpan;
-                });
-        }
-    }
-
     extension(IServiceCollection serviceCollection)
     {
         public IServiceCollection AddDownloadServices()
