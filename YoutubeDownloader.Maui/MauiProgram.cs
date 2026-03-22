@@ -39,8 +39,7 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         builder.Services
-            .AddDownloadServices(BaseDirectory.Value)
-            .AddTransient<Services.YoutubeDownloader>()
+            .AddDownloadServices<Services.YoutubeDownloader>(BaseDirectory.Value)
             .AddScoped<Mp3Player>();
         return builder.Build();
     }

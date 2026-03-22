@@ -52,8 +52,7 @@ public partial class App : Application
 
         serviceCollection.AddTransient<UpdateManager>(_ => manager);
         serviceCollection.AddTransient<VelopackService>();
-        serviceCollection.AddDownloadServices(root);
-        serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
+        serviceCollection.AddDownloadServices<Services.Downloader.YoutubeDownloader>(root);
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddLogging(builder =>
             builder.AddProvider(new FileLoggerProvider("logs.txt"))

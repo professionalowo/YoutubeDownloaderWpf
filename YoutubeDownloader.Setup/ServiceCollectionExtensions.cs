@@ -12,8 +12,10 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection serviceCollection)
     {
-        public IServiceCollection AddDownloadServices(IDirectory root)
+        public IServiceCollection AddDownloadServices<TYoutubeDownloader>(IDirectory root)
+            where TYoutubeDownloader : YoutubeDownloaderBase
         {
+            serviceCollection.AddSingleton<TYoutubeDownloader>();
             serviceCollection.AddSingleton<IDirectory>(_ =>
             {
                 IDirectory dir = new ChildDirectory(root, "Downloads");
@@ -35,7 +37,7 @@ public static class ServiceCollectionExtensions
                 .UseDefaultHttpConfig()
                 .AddHttpMessageHandler<YoutubeHttpHandler>();
             serviceCollection.AddSingleton<ConverterFactory>();
-            serviceCollection.AddSingleton(p =>
+            serviceCollection.AddSingleton(_ =>
             {
                 var ffmpegFolder = new ChildDirectory(root, "ffmpeg");
                 var ffmpegConfig = new FfmpegConfig(ffmpegFolder, FfmpegConfig.SourceUri);
