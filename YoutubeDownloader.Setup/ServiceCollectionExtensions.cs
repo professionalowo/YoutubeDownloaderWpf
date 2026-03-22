@@ -38,13 +38,7 @@ public static class ServiceCollectionExtensions
                 .UseDefaultHttpConfig()
                 .AddHttpMessageHandler<YoutubeHttpHandler>();
             serviceCollection.AddSingleton<ConverterFactory>();
-            serviceCollection.AddSingleton(_ =>
-            {
-                var ffmpegFolder = root.ChildDirectory("ffmpeg");
-                var ffmpegConfig = new FfmpegConfig(ffmpegFolder, FfmpegConfig.SourceUri);
-                var ffmpegFactory = new FfmpegConfigFactory(ffmpegConfig);
-                return ffmpegFactory.ResolveConfig();
-            });
+            serviceCollection.AddFfmpeg(root);
             serviceCollection.AddHttpClient<FfmpegDownloader>()
                 .UseDefaultHttpConfig();
 
@@ -59,6 +53,15 @@ public static class ServiceCollectionExtensions
                 .Build();
 
             return serviceCollection.Configure<AppConfiguration>(config);
+        }
+
+        private IServiceCollection AddFfmpeg(IDirectory root)
+        {
+            var ffmpegFolder = root.ChildDirectory("ffmpeg");
+            var ffmpegConfig = new FfmpegConfig(ffmpegFolder, FfmpegConfig.SourceUri);
+            var ffmpegFactory = new FfmpegConfigFactory(ffmpegConfig);
+            var config = ffmpegFactory.ResolveConfig();
+            return serviceCollection.AddSingleton(config);
         }
     }
 }
