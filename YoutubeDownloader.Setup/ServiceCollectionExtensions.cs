@@ -58,7 +58,7 @@ public static class ServiceCollectionExtensions
                 .AddJsonFile("settings.json", true, true)
                 .Build();
 
-            return serviceCollection.AddSingleton(config);
+            return serviceCollection.Configure<AppConfiguration>(config);
         }
     }
 }
