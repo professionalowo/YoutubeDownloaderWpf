@@ -45,10 +45,11 @@ public partial class App : Application
             ? new AbsoluteDirectory(path)
             : new CwdDirectory(".");
 
-        serviceCollection.AddTransient<UpdateManager>(_ => manager);
-        serviceCollection.AddTransient<VelopackService>();
-        serviceCollection.AddDownloadServices<Services.Downloader.YoutubeDownloader>(root);
-        serviceCollection.AddTransient<MainWindow>();
+        serviceCollection.AddTransient<UpdateManager>(_ => manager)
+            .AddTransient<VelopackService>()
+            .AddConfig(root)
+            .AddDownloadServices<Services.Downloader.YoutubeDownloader>(root)
+            .AddTransient<MainWindow>();
         serviceCollection.AddLogging(builder =>
             builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)

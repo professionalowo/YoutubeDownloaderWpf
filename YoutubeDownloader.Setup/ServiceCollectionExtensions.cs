@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
@@ -48,6 +49,16 @@ public static class ServiceCollectionExtensions
                 .UseDefaultHttpConfig();
 
             return serviceCollection;
+        }
+
+        public IServiceCollection AddConfig(IDirectory root)
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(root.FullPath)
+                .AddJsonFile("settings.json", true, true)
+                .Build();
+
+            return serviceCollection.AddSingleton(config);
         }
     }
 }

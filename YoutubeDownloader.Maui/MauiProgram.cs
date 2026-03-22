@@ -29,6 +29,7 @@ public static class MauiProgram
         var root = new AbsoluteDirectory(path);
 
         builder.Services
+            .AddConfig(root)
             .AddDownloadServices<Services.YoutubeDownloader>(root)
             .AddScoped<Mp3Player>();
         return builder.Build();
