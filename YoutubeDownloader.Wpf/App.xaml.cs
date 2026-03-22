@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Services;
@@ -96,7 +93,7 @@ internal static class ServiceCollectionExtensions
             var manager =
                 new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
 
-            IDirectory root = manager.GetBasePath() is string path
+            IDirectory root = manager.GetBasePath() is { } path
                 ? new AbsoluteDirectory(path)
                 : new CwdDirectory(".");
 

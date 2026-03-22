@@ -1,5 +1,4 @@
-﻿using System.Net;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Services;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
