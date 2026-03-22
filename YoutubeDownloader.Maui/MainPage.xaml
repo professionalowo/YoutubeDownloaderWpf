@@ -40,8 +40,10 @@
             <Label Grid.Column="3"
                    Text="Container:"
                    VerticalOptions="Center" />
-            <Picker Grid.Column="4" ItemsSource="{Binding AvailableContainers}" 
-                      SelectedItem="{Binding SelectedContainer}" />
+            <Picker Grid.Column="4"
+                    ItemsSource="{Binding AvailableContainers}"
+                    ItemDisplayBinding="{Binding .}"
+                    SelectedItem="{Binding SelectedContainer, Mode=TwoWay}" />
         </Grid>
         <CollectionView Grid.Row="1"
                   VerticalOptions="Fill"
