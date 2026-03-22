@@ -43,7 +43,17 @@ public partial class App : Application
     private static ServiceProvider InitializeServices()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddDownloadServices();
+        var manager =
+            new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
+
+        IDirectory root = manager.GetBasePath() is { } path
+            ? new AbsoluteDirectory(path)
+            : new CwdDirectory(".");
+
+        serviceCollection.AddTransient<UpdateManager>(_ => manager);
+        serviceCollection.AddTransient<VelopackService>();
+        serviceCollection.AddDownloadServices(root);
+        serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddLogging(builder =>
             builder.AddProvider(new FileLoggerProvider("logs.txt"))
@@ -81,52 +91,5 @@ public partial class App : Application
         }
 
         _mainWindow?.Show();
-    }
-}
-
-internal static class ServiceCollectionExtensions
-{
-    extension(IServiceCollection serviceCollection)
-    {
-        public IServiceCollection AddDownloadServices()
-        {
-            var manager =
-                new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
-
-            IDirectory root = manager.GetBasePath() is { } path
-                ? new AbsoluteDirectory(path)
-                : new CwdDirectory(".");
-
-            serviceCollection.AddTransient<UpdateManager>(_ => manager);
-            serviceCollection.AddTransient<VelopackService>();
-            serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
-            serviceCollection.AddSingleton<IDirectory>(_ =>
-            {
-                IDirectory dir = new ChildDirectory(root, "Downloads");
-                dir.Init();
-                return dir;
-            });
-            serviceCollection.AddTransient<YoutubeHttpHandler>();
-            serviceCollection.AddHttpClient<YoutubeClient>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            serviceCollection.AddTransient<YoutubeClient>(s =>
-            {
-                var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
-                return new YoutubeClient(httpClient);
-            });
-            serviceCollection.AddTransient<DownloadFactory>();
-            serviceCollection.AddHttpClient<VideoDownloadService>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            serviceCollection.AddSingleton<ConverterFactory>();
-            serviceCollection.AddSingleton(
-                new FfmpegConfigFactory(new FfmpegConfig(new ChildDirectory(root, "ffmpeg"), FfmpegConfig.SourceUri))
-                    .ResolveConfig);
-            serviceCollection.AddHttpClient<FfmpegDownloader>()
-                .UseDefaultHttpConfig();
-
-            return serviceCollection;
-        }
     }
 }

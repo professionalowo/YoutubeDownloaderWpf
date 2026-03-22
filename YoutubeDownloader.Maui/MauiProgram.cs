@@ -15,6 +15,13 @@ namespace YoutubeDownloader.Maui;
 
 public static class MauiProgram
 {
+    private static readonly Lazy<IDirectory> BaseDirectory = new(() =>
+    {
+        var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "YoutubeDownloader");
+        return new AbsoluteDirectory(path);
+    });
+
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
@@ -32,60 +39,9 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         builder.Services
-            .AddDownloadServices()
-            .AddUpdaters()
+            .AddDownloadServices(BaseDirectory.Value)
+            .AddTransient<Services.YoutubeDownloader>()
             .AddScoped<Mp3Player>();
         return builder.Build();
-    }
-}
-
-internal static class ServicesExtensions
-{
-    private static readonly Lazy<IDirectory> BaseDirectory = new(() =>
-    {
-        var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "YoutubeDownloader");
-        return new AbsoluteDirectory(path);
-    });
-
-    private static IDirectory CreateDownloadDirectory(IServiceProvider _)
-    {
-        IDirectory child = new ChildDirectory(BaseDirectory.Value, "Downloads");
-        child.Init();
-        return child;
-    }
-
-
-    extension(IServiceCollection serviceCollection)
-    {
-        public IServiceCollection AddDownloadServices()
-        {
-            serviceCollection.AddTransient<YoutubeHttpHandler>();
-            serviceCollection.AddHttpClient<YoutubeClient>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            serviceCollection.AddTransient<YoutubeClient>(s =>
-            {
-                var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
-                return new YoutubeClient(httpClient);
-            });
-            serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
-                .AddTransient<Services.YoutubeDownloader>()
-                .AddSingleton(CreateDownloadDirectory)
-                .AddTransient<DownloadFactory>()
-                .AddSingleton<ConverterFactory>();
-            serviceCollection.AddHttpClient<VideoDownloadService>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            return serviceCollection;
-        }
-
-
-        public IServiceCollection AddUpdaters()
-        {
-            serviceCollection.AddHttpClient<FfmpegDownloader>()
-                .UseDefaultHttpConfig();
-            return serviceCollection;
-        }
     }
 }
