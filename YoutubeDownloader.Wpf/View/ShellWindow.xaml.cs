@@ -16,15 +16,27 @@ namespace YoutubeDownloader.Wpf.View
             MainFrame.Navigate(_mainWindow);
         }
 
-        private void NavigateToDownload_Click(object sender, RoutedEventArgs e)
+        private void ToggleNavButton_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(_mainWindow);
+            NavPanel.Visibility = NavPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        private void NavigateToSettings_Click(object sender, RoutedEventArgs e)
+        private void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MainFrame.Navigate(_settingsWindow);
+            if (e.AddedItems.Count > 0 && e.AddedItems[0] is ListBoxItem selectedItem)
+            {
+                if (selectedItem.Content.ToString() == "Download")
+                {
+                    MainFrame.Navigate(_mainWindow);
+                }
+                else if (selectedItem.Content.ToString() == "Settings")
+                {
+                    MainFrame.Navigate(_settingsWindow);
+                }
+
+                NavPanel.Visibility = Visibility.Collapsed;
+                ((ListBox)sender).SelectedItem = null; // Deselect item
+            }
         }
     }
 }
-

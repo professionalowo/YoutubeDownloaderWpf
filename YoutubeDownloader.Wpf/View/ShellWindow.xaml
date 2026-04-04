@@ -5,20 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Youtube Downloader" Height="600" Width="900">
+    <Window.Resources>
+        <Style x:Key="NavButtonStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#e0e0e0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="#f0f0f0" BorderBrush="#dcdcdc" BorderThickness="0,0,1,0">
-            <StackPanel>
-                <Button Content="Download" Click="NavigateToDownload_Click" Margin="10" Padding="10,5"/>
-                <Button Content="Settings" Click="NavigateToSettings_Click" Margin="10,0,10,10" Padding="10,5"/>
-            </StackPanel>
+        <Button Grid.Column="0" Panel.ZIndex="1" Content="☰" Click="ToggleNavButton_Click" Width="40" Height="40" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+
+        <Border x:Name="NavPanel" Grid.Column="0" Background="#f0f0f0" BorderBrush="#dcdcdc" BorderThickness="0,0,1,0" Width="200" Visibility="Collapsed">
+            <ListBox SelectionChanged="NavListBox_SelectionChanged" Background="Transparent" BorderThickness="0">
+                <ListBoxItem Style="{StaticResource NavButtonStyle}">Download</ListBoxItem>
+                <ListBoxItem Style="{StaticResource NavButtonStyle}">Settings</ListBoxItem>
+            </ListBox>
         </Border>
 
         <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>
-
