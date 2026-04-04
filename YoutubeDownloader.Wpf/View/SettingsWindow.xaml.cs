@@ -30,6 +30,7 @@ namespace YoutubeDownloader.Wpf.View
             _settingsService = settingsService;
             DataContext = this;
             Loaded += async (s, e) => await LoadSettingsAsync();
+            Unloaded += async (s, e) => await SaveSettingsAsync();
         }
 
         private async Task LoadSettingsAsync()
@@ -37,13 +38,12 @@ namespace YoutubeDownloader.Wpf.View
             Settings = await _settingsService.LoadSettingsAsync();
         }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async Task SaveSettingsAsync()
         {
             if (Settings is not null)
             {
                 await _settingsService.SaveSettingsAsync(Settings);
             }
-
 
         }
 

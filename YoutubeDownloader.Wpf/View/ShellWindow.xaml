@@ -26,6 +26,25 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="HamburgerButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#e0e0e0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -33,14 +52,14 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button Grid.Column="0" Panel.ZIndex="1" Content="☰" Click="ToggleNavButton_Click" Width="40" Height="40" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-
         <Border x:Name="NavPanel" Grid.Column="0" Background="#f0f0f0" BorderBrush="#dcdcdc" BorderThickness="0,0,1,0" Width="200" Visibility="Collapsed">
-            <ListBox SelectionChanged="NavListBox_SelectionChanged" Background="Transparent" BorderThickness="0">
+            <ListBox SelectionChanged="NavListBox_SelectionChanged" Background="Transparent" BorderThickness="0" Margin="0,50,0,0">
                 <ListBoxItem Style="{StaticResource NavButtonStyle}">Download</ListBoxItem>
                 <ListBoxItem Style="{StaticResource NavButtonStyle}">Settings</ListBoxItem>
             </ListBox>
         </Border>
+
+        <Button Grid.Column="0" Panel.ZIndex="1" Content="☰" Click="ToggleNavButton_Click" Width="40" Height="40" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource HamburgerButtonStyle}"/>
 
         <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" />
     </Grid>
