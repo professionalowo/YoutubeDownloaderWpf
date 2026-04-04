@@ -47,20 +47,29 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" />
 
-        <Border x:Name="NavPanel" Grid.Column="0" Background="#f0f0f0" BorderBrush="#dcdcdc" BorderThickness="0,0,1,0" Width="200" Visibility="Collapsed">
+        <Border x:Name="NavPanel" 
+                Background="#f0f0f0" 
+                BorderBrush="#dcdcdc" 
+                BorderThickness="0,0,1,0" 
+                Width="200" 
+                Visibility="Collapsed" 
+                HorizontalAlignment="Left">
             <ListBox SelectionChanged="NavListBox_SelectionChanged" Background="Transparent" BorderThickness="0" Margin="0,50,0,0">
                 <ListBoxItem Style="{StaticResource NavButtonStyle}">Download</ListBoxItem>
                 <ListBoxItem Style="{StaticResource NavButtonStyle}">Settings</ListBoxItem>
             </ListBox>
         </Border>
 
-        <Button Grid.Column="0" Panel.ZIndex="1" Content="☰" Click="ToggleNavButton_Click" Width="40" Height="40" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource HamburgerButtonStyle}"/>
-
-        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" />
+        <Button Panel.ZIndex="1" 
+                Content="☰" 
+                Click="ToggleNavButton_Click" 
+                Width="40" 
+                Height="40" 
+                Margin="5" 
+                VerticalAlignment="Top" 
+                HorizontalAlignment="Left" 
+                Style="{StaticResource HamburgerButtonStyle}"/>
     </Grid>
 </Window>
