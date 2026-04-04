@@ -73,7 +73,6 @@
 
     <ItemGroup>
       <Folder Include="Platforms\MacCatalyst\Resources\" />
-      <Folder Include="Resources\Images\" />
     </ItemGroup>
 
     <ItemGroup>
