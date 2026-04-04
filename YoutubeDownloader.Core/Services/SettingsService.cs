@@ -8,9 +8,9 @@ namespace YoutubeDownloader.Core.Services
     {
         private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
-        private const string SettingsFileName = "settings.json";
+        public const string settingsFileName = "settings.json";
 
-        private string FullPath => Path.Combine(root.FullPath, SettingsFileName);
+        private string FullPath => Path.Combine(root.FullPath, settingsFileName);
 
         public ValueTask<AppConfiguration> LoadSettingsAsync()
             => !File.Exists(FullPath)

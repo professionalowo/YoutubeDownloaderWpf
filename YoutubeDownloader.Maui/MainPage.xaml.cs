@@ -9,13 +9,11 @@ public partial class MainPage : ContentPage
 {
     private readonly Services.YoutubeDownloader _downloader;
     private readonly IDownloadDirectoryFactory _downloadDirectoryFactory;
-    private readonly ISettingsService _settingsService;
 
-    public MainPage(Services.YoutubeDownloader downloader, IDownloadDirectoryFactory downloadDirectoryFactory, ISettingsService settingsService)
+    public MainPage(Services.YoutubeDownloader downloader, IDownloadDirectoryFactory downloadDirectoryFactory)
     {
         _downloader = downloader;
         _downloadDirectoryFactory = downloadDirectoryFactory;
-        _settingsService = settingsService;
         BindingContext = downloader;
         InitializeComponent();
     }
@@ -30,6 +28,4 @@ public partial class MainPage : ContentPage
     {
         _downloadDirectoryFactory.Create().Open();
     }
-
-
 }

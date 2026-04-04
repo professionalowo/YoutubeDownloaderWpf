@@ -50,7 +50,7 @@ public static class ServiceCollectionExtensions
             serviceCollection.AddSingleton<ISettingsService, SettingsService>();
             var config = new ConfigurationBuilder()
                 .SetBasePath(root.FullPath)
-                .AddJsonFile("settings.json", true, true)
+                .AddJsonFile(SettingsService.settingsFileName, true, true)
                 .Build();
 
             return serviceCollection.Configure<AppConfiguration>(config);
