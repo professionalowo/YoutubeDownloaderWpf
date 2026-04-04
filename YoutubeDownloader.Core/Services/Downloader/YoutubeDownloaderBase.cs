@@ -32,7 +32,7 @@ public abstract partial class YoutubeDownloaderBase(
         }
     } = string.Empty;
 
-    public static IReadOnlyList<IMediaContainer> AvailableContainers => IMediaContainer.All;
+    public IReadOnlyList<IMediaContainer> AvailableContainers { get; } = IMediaContainer.All;
 
     public IMediaContainer SelectedContainer
     {

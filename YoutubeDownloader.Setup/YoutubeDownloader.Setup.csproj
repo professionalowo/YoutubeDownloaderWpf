@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>YoutubeDownloader.Setup</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\YoutubeDownloader.Core\YoutubeDownloader.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+    </ItemGroup>
+
+</Project>

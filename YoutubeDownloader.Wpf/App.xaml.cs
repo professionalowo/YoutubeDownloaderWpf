@@ -1,23 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using YoutubeDownloader.Setup;
 using Velopack;
 using Velopack.Sources;
 using YoutubeDownloader.Core.Services.AutoUpdater;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Services.Downloader;
-using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services.Logging;
 using YoutubeDownloader.Wpf.Services;
 using YoutubeDownloader.Wpf.View;
-using YoutubeExplode;
 
 namespace YoutubeDownloader.Wpf;
 
@@ -26,7 +20,7 @@ namespace YoutubeDownloader.Wpf;
 /// </summary>
 public partial class App : Application
 {
-    private MainWindow? _mainWindow;
+    private ShellWindow? _shellWindow;
     private readonly ServiceProvider services;
 
     public App()
@@ -45,8 +39,20 @@ public partial class App : Application
     private static ServiceProvider InitializeServices()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddDownloadServices();
-        serviceCollection.AddTransient<MainWindow>();
+        var manager =
+            new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
+
+        IRootDirectory root = manager.GetBasePath() is { } path
+            ? new RootDirectory(path)
+            : new RootDirectory(AppContext.BaseDirectory);
+
+        serviceCollection.AddTransient<UpdateManager>(_ => manager)
+            .AddTransient<VelopackService>()
+            .AddConfig(root)
+            .AddDownloadServices<Services.Downloader.YoutubeDownloader>(root)
+            .AddTransient<MainWindow>()
+            .AddTransient<SettingsWindow>()
+            .AddTransient<ShellWindow>();
         serviceCollection.AddLogging(builder =>
             builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)
@@ -60,7 +66,7 @@ public partial class App : Application
         await updater.CheckForAppUpdates();
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
 
-        _mainWindow = services.GetService<MainWindow>();
+        _shellWindow = services.GetService<ShellWindow>();
 
         if (!ffmpeg.DoesFfmpegExist())
         {
@@ -82,85 +88,6 @@ public partial class App : Application
             }
         }
 
-        _mainWindow?.Show();
-    }
-}
-
-internal static class ServiceCollectionExtensions
-{
-    extension(IHttpClientBuilder builder)
-    {
-        private IHttpClientBuilder UseDefaultHttpConfig(
-        )
-        {
-            return builder
-                .ConfigurePrimaryHttpMessageHandler(() =>
-                    new SocketsHttpHandler
-                    {
-                        MaxConnectionsPerServer = 10,
-                        EnableMultipleHttp2Connections = true,
-                        EnableMultipleHttp3Connections = true,
-
-                        AutomaticDecompression = DecompressionMethods.All,
-                        InitialHttp2StreamWindowSize = 1024 * 1024,
-
-                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-                        ConnectTimeout = TimeSpan.FromSeconds(10),
-
-                        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-                        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                        KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always
-                    })
-                .ConfigureHttpClient(client =>
-                {
-                    client.DefaultRequestVersion = HttpVersion.Version30;
-                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
-                    client.Timeout = Timeout.InfiniteTimeSpan;
-                });
-        }
-    }
-
-    extension(IServiceCollection serviceCollection)
-    {
-        public IServiceCollection AddDownloadServices()
-        {
-            var manager =
-                new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
-
-            IDirectory root = manager.GetBasePath() is string path
-                ? new AbsoluteDirectory(path)
-                : new CwdDirectory(".");
-
-            serviceCollection.AddTransient<UpdateManager>(_ => manager);
-            serviceCollection.AddTransient<VelopackService>();
-            serviceCollection.AddTransient<Services.Downloader.YoutubeDownloader>();
-            serviceCollection.AddSingleton<IDirectory>(_ =>
-            {
-                IDirectory dir = new ChildDirectory(root, "Downloads");
-                dir.Init();
-                return dir;
-            });
-            serviceCollection.AddTransient<YoutubeHttpHandler>();
-            serviceCollection.AddHttpClient<YoutubeClient>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            serviceCollection.AddTransient<YoutubeClient>(s =>
-            {
-                var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
-                return new YoutubeClient(httpClient);
-            });
-            serviceCollection.AddTransient<DownloadFactory>();
-            serviceCollection.AddHttpClient<VideoDownloadService>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            serviceCollection.AddSingleton<ConverterFactory>();
-            serviceCollection.AddSingleton(
-                new FfmpegConfigFactory(new FfmpegConfig(new ChildDirectory(root, "ffmpeg"), FfmpegConfig.SourceUri))
-                    .ResolveConfig);
-            serviceCollection.AddHttpClient<FfmpegDownloader>()
-                .UseDefaultHttpConfig();
-
-            return serviceCollection;
-        }
+        _shellWindow?.Show();
     }
 }

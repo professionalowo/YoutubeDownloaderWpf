@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:YoutubeDownloader.Maui"
     Title="YoutubeDownloader"
     FlyoutBehavior="Flyout">
-
+    
     <FlyoutItem Title="Download">
         <ShellContent
             ContentTemplate="{DataTemplate local:MainPage}"
@@ -18,5 +18,11 @@
         <ShellContent
             ContentTemplate="{DataTemplate local:PlayerPage}"
             Route="Player" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Settings">
+        <ShellContent
+            ContentTemplate="{DataTemplate local:SettingsPage}"
+            Route="Settings" />
     </FlyoutItem>
 </Shell>

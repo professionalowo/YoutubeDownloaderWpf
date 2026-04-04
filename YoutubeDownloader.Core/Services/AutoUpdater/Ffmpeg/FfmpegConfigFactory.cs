@@ -5,7 +5,7 @@ namespace YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 
 public class FfmpegConfigFactory(FfmpegConfig defaultConfig)
 {
-    public FfmpegConfig ResolveConfig(IServiceProvider _)
+    public FfmpegConfig ResolveConfig()
         => GetConfigFromSystemPath(FfmpegConfig.FfmpegName) ?? defaultConfig;
 
     private static FfmpegConfig? GetConfigFromSystemPath(string exe)

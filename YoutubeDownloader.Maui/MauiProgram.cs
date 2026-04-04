@@ -1,15 +1,8 @@
-﻿using System.Net;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
-using YoutubeDownloader.Core.Services.Converter;
-using YoutubeDownloader.Core.Services.Downloader;
-using YoutubeDownloader.Core.Services.Downloader.Download;
+using YoutubeDownloader.Setup;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Maui.Services.Mp3Player;
-using YoutubeDownloader.Maui.Util;
-using YoutubeExplode;
-
 
 namespace YoutubeDownloader.Maui;
 
@@ -20,103 +13,26 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiCommunityToolkit(options => { options.SetShouldEnableSnackbarOnWindows(true); })
+            .UseMauiCommunityToolkit()
             .UseMauiCommunityToolkitMediaElement(true)
             .ConfigureFonts(fonts =>
             {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular")
+                    .AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services
-            .AddDownloadServices()
-            .AddUpdaters()
-            .AddScoped<Mp3Player>();
-        return builder.Build();
-    }
-}
-
-internal static class ServicesExtensions
-{
-    private static readonly Lazy<IDirectory> BaseDirectory = new(() =>
-    {
         var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "YoutubeDownloader");
-        return new AbsoluteDirectory(path);
-    });
+        var root = new RootDirectory(path);
 
-    private static IDirectory CreateDownloadDirectory(IServiceProvider _)
-    {
-        IDirectory child = new ChildDirectory(BaseDirectory.Value, "Downloads");
-        child.Init();
-        return child;
-    }
-
-    extension(IHttpClientBuilder builder)
-    {
-        private IHttpClientBuilder UseDefaultHttpConfig(
-        )
-        {
-            return builder
-                .ConfigurePrimaryHttpMessageHandler(() =>
-                    new SocketsHttpHandler
-                    {
-                        MaxConnectionsPerServer = 10,
-                        EnableMultipleHttp2Connections = true,
-                        EnableMultipleHttp3Connections = true,
-
-                        AutomaticDecompression = DecompressionMethods.All,
-                        InitialHttp2StreamWindowSize = 1024 * 1024,
-
-                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-                        ConnectTimeout = TimeSpan.FromSeconds(10),
-
-                        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-                        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                        KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always
-                    })
-                .ConfigureHttpClient(client =>
-                {
-                    client.DefaultRequestVersion = HttpVersion.Version30;
-                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
-                    client.Timeout = Timeout.InfiniteTimeSpan;
-                });
-        }
-    }
-
-    extension(IServiceCollection serviceCollection)
-    {
-        public IServiceCollection AddDownloadServices()
-        {
-            serviceCollection.AddTransient<YoutubeHttpHandler>();
-            serviceCollection.AddHttpClient<YoutubeClient>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            serviceCollection.AddTransient<YoutubeClient>(s =>
-            {
-                var httpClient = s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(YoutubeClient));
-                return new YoutubeClient(httpClient);
-            });
-            serviceCollection.AddFfmpeg(new ChildDirectory(BaseDirectory.Value, "ffmpeg"))
-                .AddTransient<Services.YoutubeDownloader>()
-                .AddSingleton(CreateDownloadDirectory)
-                .AddTransient<DownloadFactory>()
-                .AddSingleton<ConverterFactory>();
-            serviceCollection.AddHttpClient<VideoDownloadService>()
-                .UseDefaultHttpConfig()
-                .AddHttpMessageHandler<YoutubeHttpHandler>();
-            return serviceCollection;
-        }
-
-
-        public IServiceCollection AddUpdaters()
-        {
-            serviceCollection.AddHttpClient<FfmpegDownloader>()
-                .UseDefaultHttpConfig();
-            return serviceCollection;
-        }
+        builder.Services
+            .AddConfig(root)
+            .AddDownloadServices<Services.YoutubeDownloader>(root)
+            .AddScoped<Mp3Player>()
+            .AddTransient<SettingsPage>();
+        return builder.Build();
     }
 }

@@ -4,10 +4,10 @@ using YoutubeDownloader.Core.Services.InternalDirectory;
 
 namespace YoutubeDownloader.Maui.Services.Mp3Player;
 
-public sealed partial class Mp3Player(IDirectory downloads) : INotifyPropertyChanged
+public sealed partial class Mp3Player(IDownloadDirectoryFactory downloads) : INotifyPropertyChanged
 {
     private const string searchFilter = "*.mp3";
-    
+
     public Mp3File? SelectedFile
     {
         get;
@@ -20,7 +20,7 @@ public sealed partial class Mp3Player(IDirectory downloads) : INotifyPropertyCha
 
     public ICollection<Mp3File> Files =>
     [
-        ..downloads.GetFiles(searchFilter)
+        ..downloads.Create().GetFiles(searchFilter)
             .Select(p => new Mp3File(p))
     ];
 

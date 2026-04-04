@@ -1,4 +1,5 @@
 ﻿using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Services;
 
 namespace YoutubeDownloader.Maui;
 
@@ -7,12 +8,12 @@ using Microsoft.Maui.Controls;
 public partial class MainPage : ContentPage
 {
     private readonly Services.YoutubeDownloader _downloader;
-    private readonly IDirectory _downloads;
+    private readonly IDownloadDirectoryFactory _downloadDirectoryFactory;
 
-    public MainPage(Services.YoutubeDownloader downloader, IDirectory downloads)
+    public MainPage(Services.YoutubeDownloader downloader, IDownloadDirectoryFactory downloadDirectoryFactory)
     {
         _downloader = downloader;
-        _downloads = downloads;
+        _downloadDirectoryFactory = downloadDirectoryFactory;
         BindingContext = downloader;
         InitializeComponent();
     }
@@ -25,6 +26,6 @@ public partial class MainPage : ContentPage
 
     private void Open_OnClicked(object? sender, EventArgs e)
     {
-        _downloads.Open();
+        _downloadDirectoryFactory.Create().Open();
     }
 }
