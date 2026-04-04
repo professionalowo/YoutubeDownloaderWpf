@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.Converter;
 using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
+using YoutubeDownloader.Core.Services;
 using YoutubeExplode;
 
 namespace YoutubeDownloader.Setup;
@@ -14,7 +16,7 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection serviceCollection)
     {
-        public IServiceCollection AddDownloadServices<TYoutubeDownloader>(IDirectory root)
+        public IServiceCollection AddDownloadServices<TYoutubeDownloader>(IRootDirectory root)
             where TYoutubeDownloader : YoutubeDownloaderBase
         {
             serviceCollection.AddSingleton<TYoutubeDownloader>();
@@ -47,8 +49,10 @@ public static class ServiceCollectionExtensions
             return serviceCollection;
         }
 
-        public IServiceCollection AddConfig(IDirectory root)
+        public IServiceCollection AddConfig(IRootDirectory root)
         {
+            serviceCollection.AddSingleton<IRootDirectory>(root);
+            serviceCollection.AddSingleton<ISettingsService, SettingsService>();
             var config = new ConfigurationBuilder()
                 .SetBasePath(root.FullPath)
                 .AddJsonFile("settings.json", true, true)
@@ -57,7 +61,7 @@ public static class ServiceCollectionExtensions
             return serviceCollection.Configure<AppConfiguration>(config);
         }
 
-        private IServiceCollection AddFfmpeg(IDirectory root)
+        private IServiceCollection AddFfmpeg(IRootDirectory root)
         {
             var ffmpegFolder = root.ChildDirectory("ffmpeg");
             var ffmpegConfig = new FfmpegConfig(ffmpegFolder, FfmpegConfig.SourceUri);

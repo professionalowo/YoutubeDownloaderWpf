@@ -41,15 +41,16 @@ public partial class App : Application
         var manager =
             new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
 
-        IDirectory root = manager.GetBasePath() is { } path
-            ? new AbsoluteDirectory(path)
-            : new CwdDirectory(".");
+        IRootDirectory root = manager.GetBasePath() is { } path
+            ? new RootDirectory(path)
+            : new RootDirectory(".");
 
         serviceCollection.AddTransient<UpdateManager>(_ => manager)
             .AddTransient<VelopackService>()
             .AddConfig(root)
             .AddDownloadServices<Services.Downloader.YoutubeDownloader>(root)
-            .AddTransient<MainWindow>();
+            .AddTransient<MainWindow>()
+            .AddTransient<SettingsWindow>();
         serviceCollection.AddLogging(builder =>
             builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)

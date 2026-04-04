@@ -1,4 +1,4 @@
-﻿namespace YoutubeDownloader.Setup;
+﻿namespace YoutubeDownloader.Core.Data;
 
 public class AppConfiguration
 {

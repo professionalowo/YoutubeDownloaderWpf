@@ -26,12 +26,13 @@ public static class MauiProgram
 #endif
         var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "YoutubeDownloader");
-        var root = new AbsoluteDirectory(path);
+        var root = new RootDirectory(path);
 
         builder.Services
             .AddConfig(root)
             .AddDownloadServices<Services.YoutubeDownloader>(root)
-            .AddScoped<Mp3Player>();
+            .AddScoped<Mp3Player>()
+            .AddTransient<SettingsPage>();
         return builder.Build();
     }
 }
