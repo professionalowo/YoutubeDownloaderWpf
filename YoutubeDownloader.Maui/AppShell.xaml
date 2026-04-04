@@ -20,7 +20,7 @@
             Route="Player" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Settings" Icon="settings_icon.svg">
+    <FlyoutItem Title="Settings">
         <ShellContent
             ContentTemplate="{DataTemplate local:SettingsPage}"
             Route="Settings" />

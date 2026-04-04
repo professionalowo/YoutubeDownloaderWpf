@@ -33,9 +33,7 @@
 		<Resource Include="View\folder.jpg">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
-		<Content Include="Resources\Images\settings_icon.svg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+
 	</ItemGroup>
 
 	<ItemGroup>

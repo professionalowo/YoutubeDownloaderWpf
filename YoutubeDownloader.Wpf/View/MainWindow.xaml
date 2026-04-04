@@ -59,9 +59,7 @@
             <Label VerticalContentAlignment="Center">Container:</Label>
             <ComboBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ItemsSource="{Binding AvailableContainers}" 
                        SelectedItem="{Binding SelectedContainer}" />
-            <Button Click="SettingsButton_Click">
-                <Image Source="/Resources/Images/settings_icon.svg" />
-            </Button>
+            <Button Click="SettingsButton_Click" Content="Settings" />
         </DockPanel>
         <Grid Grid.Row="1" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
