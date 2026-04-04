@@ -45,9 +45,7 @@
                     ItemsSource="{Binding AvailableContainers}"
                     ItemDisplayBinding="{Binding .}"
                     SelectedItem="{Binding SelectedContainer, Mode=TwoWay}" />
-            <Button Grid.Column="5"
-                    Text="Settings"
-                    Clicked="Settings_OnClicked" />
+
         </Grid>
         <CollectionView Grid.Row="1"
                   VerticalOptions="Fill"

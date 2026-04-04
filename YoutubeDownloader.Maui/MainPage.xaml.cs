@@ -31,8 +31,5 @@ public partial class MainPage : ContentPage
         _downloadDirectoryFactory.Create().Open();
     }
 
-    private async void Settings_OnClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new SettingsPage(_settingsService));
-    }
+
 }

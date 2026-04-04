@@ -34,19 +34,18 @@ namespace YoutubeDownloader.Maui
             await LoadSettingsAsync();
         }
 
-        private async Task LoadSettingsAsync()
+        protected override async void OnDisappearing()
         {
-            Settings = await _settingsService.LoadSettingsAsync();
-        }
-
-        private async void SaveButton_Clicked(object sender, System.EventArgs e)
-        {
+            base.OnDisappearing();
             if (Settings is not null)
             {
                 await _settingsService.SaveSettingsAsync(Settings);
             }
+        }
 
-            await Navigation.PopAsync();
+        private async Task LoadSettingsAsync()
+        {
+            Settings = await _settingsService.LoadSettingsAsync();
         }
 
         private async void BrowseButton_Clicked(object sender, System.EventArgs e)
