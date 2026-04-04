@@ -14,11 +14,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Content="Download Path:" VerticalAlignment="Center" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.DownloadPath, Mode=TwoWay}" VerticalAlignment="Center" Margin="5" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.DownloadPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="5" />
+        <Button Grid.Row="0" Grid.Column="2" Content="Browse..." Click="BrowseButton_Click" VerticalAlignment="Center" Margin="5,0,0,0" Padding="5,2"/>
 
-        <Button Grid.Row="1" Grid.Column="1" Content="Save" Click="SaveButton_Click" HorizontalAlignment="Right" Margin="5" Padding="10,5" />
+        <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="Save" Click="SaveButton_Click" HorizontalAlignment="Right" Margin="5" Padding="10,5" />
     </Grid>
 </Window>

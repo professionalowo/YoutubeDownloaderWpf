@@ -1,26 +1,39 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services;
 
 namespace YoutubeDownloader.Wpf.View
 {
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : Window, INotifyPropertyChanged
     {
         private readonly ISettingsService _settingsService;
-        public AppConfiguration? Settings { get; set; }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public AppConfiguration? Settings
+        {
+            get;
+            set
+            {
+                field = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
+            }
+        }
+
 
         public SettingsWindow(ISettingsService settingsService)
         {
             InitializeComponent();
             _settingsService = settingsService;
+            DataContext = this;
             Loaded += async (s, e) => await LoadSettingsAsync();
         }
 
         private async Task LoadSettingsAsync()
         {
             Settings = await _settingsService.LoadSettingsAsync();
-            DataContext = this;
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -29,7 +42,20 @@ namespace YoutubeDownloader.Wpf.View
             {
                 await _settingsService.SaveSettingsAsync(Settings);
             }
+
             Close();
+        }
+
+        private void BrowseButton_Click(object sender, RoutedEventArgs e)
+        {
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (Settings is not null && !string.IsNullOrWhiteSpace(Settings.DownloadPath))
+            {
+                dialog.SelectedPath = Settings.DownloadPath;
+            }
+
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+            Settings?.DownloadPath = dialog.SelectedPath;
         }
     }
 }

@@ -9,6 +9,7 @@
 		<DebugSymbols>false</DebugSymbols>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<LangVersion>preview</LangVersion>

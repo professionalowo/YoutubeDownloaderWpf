@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
+using CommunityToolkit.Maui.Storage;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services;
 
@@ -7,12 +9,23 @@ namespace YoutubeDownloader.Maui
     public partial class SettingsPage : ContentPage
     {
         private readonly ISettingsService _settingsService;
-        public AppConfiguration? Settings { get; set; }
+
+        public AppConfiguration? Settings
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                field = value;
+                OnPropertyChanged();
+            }
+        }
 
         public SettingsPage(ISettingsService settingsService)
         {
             InitializeComponent();
             _settingsService = settingsService;
+            BindingContext = this;
         }
 
         protected override async void OnAppearing()
@@ -24,7 +37,6 @@ namespace YoutubeDownloader.Maui
         private async Task LoadSettingsAsync()
         {
             Settings = await _settingsService.LoadSettingsAsync();
-            BindingContext = this;
         }
 
         private async void SaveButton_Clicked(object sender, System.EventArgs e)
@@ -33,7 +45,17 @@ namespace YoutubeDownloader.Maui
             {
                 await _settingsService.SaveSettingsAsync(Settings);
             }
+
             await Navigation.PopAsync();
+        }
+
+        private async void BrowseButton_Clicked(object sender, System.EventArgs e)
+        {
+            var cancellationToken = CancellationToken.None;
+            var result = await FolderPicker.Default.PickAsync(cancellationToken);
+            if (!result.IsSuccessful || Settings is null) return;
+            Settings.DownloadPath = result.Folder.Path;
+            OnPropertyChanged(nameof(Settings));
         }
     }
 }
