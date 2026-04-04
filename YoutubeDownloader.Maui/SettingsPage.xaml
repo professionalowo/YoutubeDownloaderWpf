@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Text="Download Path:" VerticalOptions="Center" />
-        <Entry Grid.Row="0" Grid.Column="1" x:Name="DownloadPathEntry" VerticalOptions="Center" Margin="5" />
+        <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Settings.DownloadPath, Mode=TwoWay}" VerticalOptions="Center" Margin="5" />
 
         <Button Grid.Row="1" Grid.Column="1" Text="Save" Clicked="SaveButton_Clicked" HorizontalOptions="End" Margin="5" />
     </Grid>

@@ -20,13 +20,8 @@ public static class ServiceCollectionExtensions
             where TYoutubeDownloader : YoutubeDownloaderBase
         {
             serviceCollection.AddSingleton<TYoutubeDownloader>();
-            serviceCollection.AddSingleton<IDirectory>(p =>
-            {
-                var config = p.GetRequiredService<IOptions<AppConfiguration>>();
-                var dir = root.ChildDirectory(config.Value.DownloadPath);
-                dir.Init();
-                return dir;
-            });
+            serviceCollection.AddSingleton<IDownloadDirectoryFactory, DownloadDirectoryFactory>();
+            serviceCollection.AddScoped<IDirectory>(p => p.GetRequiredService<IDownloadDirectoryFactory>().Create());
             serviceCollection.AddTransient<YoutubeHttpHandler>();
             serviceCollection.AddHttpClient<YoutubeClient>()
                 .UseDefaultHttpConfig()

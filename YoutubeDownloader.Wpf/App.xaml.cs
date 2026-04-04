@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Windows;
 using System.Windows.Threading;
@@ -43,7 +44,7 @@ public partial class App : Application
 
         IRootDirectory root = manager.GetBasePath() is { } path
             ? new RootDirectory(path)
-            : new RootDirectory(".");
+            : new RootDirectory(AppContext.BaseDirectory);
 
         serviceCollection.AddTransient<UpdateManager>(_ => manager)
             .AddTransient<VelopackService>()

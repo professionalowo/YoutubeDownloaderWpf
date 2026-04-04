@@ -1,30 +1,30 @@
 ﻿using System.Text.Json;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.InternalDirectory;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace YoutubeDownloader.Core.Services
 {
     public class SettingsService(IRootDirectory root) : ISettingsService
     {
+        private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
         private const string SettingsFileName = "settings.json";
-        private AppConfiguration? _currentSettings;
 
-        public AppConfiguration CurrentSettings => _currentSettings ??= LoadSettingsAsync().Result;
+        private string FullPath => Path.Combine(root.FullPath, SettingsFileName);
 
-        public async Task<AppConfiguration> LoadSettingsAsync()
+        public ValueTask<AppConfiguration> LoadSettingsAsync()
+            => !File.Exists(FullPath)
+                ? ValueTask.FromResult(new AppConfiguration())
+                : LoadSettingsFileAsync(FullPath);
+
+
+        private static async ValueTask<AppConfiguration> LoadSettingsFileAsync(string settingsFilePath)
         {
-            var settingsFilePath = Path.Combine(root.FullPath, SettingsFileName);
-            if (!File.Exists(settingsFilePath))
-            {
-                return new AppConfiguration();
-            }
-
             try
             {
-                var json = await File.ReadAllTextAsync(settingsFilePath);
-                return JsonSerializer.Deserialize<AppConfiguration>(json) ?? new AppConfiguration();
+                await using var settingsStream = File.OpenRead(settingsFilePath);
+                return await JsonSerializer.DeserializeAsync<AppConfiguration>(settingsStream, JsonOptions) ??
+                       new AppConfiguration();
             }
             catch
             {
@@ -34,11 +34,8 @@ namespace YoutubeDownloader.Core.Services
 
         public async Task SaveSettingsAsync(AppConfiguration settings)
         {
-            var settingsFilePath = Path.Combine(root.FullPath, SettingsFileName);
-            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(settingsFilePath, json);
-            _currentSettings = settings;
+            await using var settingsStream = File.OpenRead(FullPath);
+            await JsonSerializer.SerializeAsync(settingsStream, JsonOptions);
         }
     }
 }
-

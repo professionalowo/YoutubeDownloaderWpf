@@ -8,13 +8,13 @@ using Microsoft.Maui.Controls;
 public partial class MainPage : ContentPage
 {
     private readonly Services.YoutubeDownloader _downloader;
-    private readonly IDirectory _downloads;
+    private readonly IDownloadDirectoryFactory _downloadDirectoryFactory;
     private readonly ISettingsService _settingsService;
 
-    public MainPage(Services.YoutubeDownloader downloader, IDirectory downloads, ISettingsService settingsService)
+    public MainPage(Services.YoutubeDownloader downloader, IDownloadDirectoryFactory downloadDirectoryFactory, ISettingsService settingsService)
     {
         _downloader = downloader;
-        _downloads = downloads;
+        _downloadDirectoryFactory = downloadDirectoryFactory;
         _settingsService = settingsService;
         BindingContext = downloader;
         InitializeComponent();
@@ -28,7 +28,7 @@ public partial class MainPage : ContentPage
 
     private void Open_OnClicked(object? sender, EventArgs e)
     {
-        _downloads.Open();
+        _downloadDirectoryFactory.Create().Open();
     }
 
     private async void Settings_OnClicked(object sender, EventArgs e)

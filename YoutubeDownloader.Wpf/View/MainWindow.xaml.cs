@@ -11,12 +11,12 @@ namespace YoutubeDownloader.Wpf;
 public partial class MainWindow : Window
 {
     public Services.Downloader.YoutubeDownloader Downloader { get; private set; }
-    private readonly IDirectory _downloads;
+    private readonly IDownloadDirectoryFactory _downloadDirectoryFactory;
     private readonly ISettingsService _settingsService;
 
-    public MainWindow(Services.Downloader.YoutubeDownloader downloader, IDirectory downloads, ISettingsService settingsService)
+    public MainWindow(Services.Downloader.YoutubeDownloader downloader, IDownloadDirectoryFactory downloadDirectoryFactory, ISettingsService settingsService)
     {
-        _downloads = downloads;
+        _downloadDirectoryFactory = downloadDirectoryFactory;
         Downloader = downloader;
         _settingsService = settingsService;
         DataContext = Downloader;
@@ -25,7 +25,7 @@ public partial class MainWindow : Window
 
     private async void Button_Click(object sender, RoutedEventArgs e) => await Downloader.Download();
 
-    private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => _downloads.Open();
+    private void Button_Click_Open_Downloads(object sender, RoutedEventArgs e) => _downloadDirectoryFactory.Create().Open();
 
     private async void Button_Click_1(object sender, RoutedEventArgs e)
         => await Downloader.Cancel();
