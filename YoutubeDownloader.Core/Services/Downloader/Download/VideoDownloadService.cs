@@ -6,7 +6,7 @@ using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader.Core.Services.Downloader.Download;
 
-public sealed class VideoDownloadService(HttpClient http, YoutubeClient client, IDirectory downloads)
+public sealed class VideoDownloadService(HttpClient http, YoutubeClient client, IDownloadDirectoryFactory downloads)
 {
     public async Task<NamedVideoDownload> GetName(IVideoDownload download, CancellationToken token = default)
     {
@@ -23,7 +23,7 @@ public sealed class VideoDownloadService(HttpClient http, YoutubeClient client, 
     {
         var (download, title, _, _) = named;
         var formatted = download.FormatName(title);
-        return downloads.ChildFileName(formatted);
+        return downloads.Create().ChildFileName(formatted);
     }
 
     public async Task<Stream> GetStream(StreamVideoDownload download, CancellationToken token = default)

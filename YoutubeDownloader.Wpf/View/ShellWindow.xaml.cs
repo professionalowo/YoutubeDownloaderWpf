@@ -23,20 +23,19 @@ namespace YoutubeDownloader.Wpf.View
 
         private void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count > 0 && e.AddedItems[0] is ListBoxItem selectedItem)
+            if (e.AddedItems.Count <= 0 || e.AddedItems[0] is not ListBoxItem selectedItem) return;
+            switch (selectedItem.Content.ToString())
             {
-                if (selectedItem.Content.ToString() == "Download")
-                {
+                case "Download":
                     MainFrame.Navigate(_mainWindow);
-                }
-                else if (selectedItem.Content.ToString() == "Settings")
-                {
+                    break;
+                case "Settings":
                     MainFrame.Navigate(_settingsWindow);
-                }
-
-                NavPanel.Visibility = Visibility.Collapsed;
-                ((ListBox)sender).SelectedItem = null; // Deselect item
+                    break;
             }
+
+            NavPanel.Visibility = Visibility.Collapsed;
+            ((ListBox)sender).SelectedItem = null; // Deselect item
         }
     }
 }
