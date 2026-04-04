@@ -34,7 +34,7 @@ namespace YoutubeDownloader.Core.Services
 
         public async Task SaveSettingsAsync(AppConfiguration settings)
         {
-            await using var settingsStream = File.Open(FullPath, FileMode.OpenOrCreate, FileAccess.Write);
+            await using var settingsStream = File.Create(FullPath);
             await JsonSerializer.SerializeAsync(settingsStream, settings, JsonOptions);
         }
     }
