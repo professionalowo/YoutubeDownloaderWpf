@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services;
 using YoutubeDownloader.Wpf.View;
@@ -8,7 +9,7 @@ namespace YoutubeDownloader.Wpf;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow : Page
 {
     public Services.Downloader.YoutubeDownloader Downloader { get; private set; }
     private readonly IDownloadDirectoryFactory _downloadDirectoryFactory;
@@ -30,9 +31,5 @@ public partial class MainWindow : Window
     private async void Button_Click_1(object sender, RoutedEventArgs e)
         => await Downloader.Cancel();
 
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        var settingsWindow = new SettingsWindow(_settingsService);
-        settingsWindow.ShowDialog();
-    }
+
 }

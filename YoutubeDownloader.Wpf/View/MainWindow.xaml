@@ -1,4 +1,4 @@
-﻿<Window x:Class="YoutubeDownloader.Wpf.MainWindow"
+﻿<Page x:Class="YoutubeDownloader.Wpf.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,29 +8,7 @@
         xmlns:downloader="clr-namespace:YoutubeDownloader.Wpf.Services.Downloader"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=downloader:YoutubeDownloader, IsDesignTimeCreatable=True}"
-        Title="Downloader" Height="500" Width="850" MinHeight="200" MinWidth="550">
-    <Window.Resources>
-        <c:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <Style x:Key="SpinnerArcStyle" TargetType="Ellipse">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsPrefetching}" Value="True">
-                    <DataTrigger.EnterActions>
-                        <BeginStoryboard x:Name="SpinAnimation">
-                            <Storyboard RepeatBehavior="Forever">
-                                <DoubleAnimation
-                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                                    From="0" To="360" Duration="0:0:1" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                    <DataTrigger.ExitActions>
-                        <StopStoryboard BeginStoryboardName="SpinAnimation" />
-                    </DataTrigger.ExitActions>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
+>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -59,7 +37,6 @@
             <Label VerticalContentAlignment="Center">Container:</Label>
             <ComboBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ItemsSource="{Binding AvailableContainers}" 
                        SelectedItem="{Binding SelectedContainer}" />
-            <Button Click="SettingsButton_Click" Content="Settings" />
         </DockPanel>
         <Grid Grid.Row="1" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
@@ -121,4 +98,4 @@
             </TextBlock>
         </DockPanel>
     </Grid>
-</Window>
+</Page>

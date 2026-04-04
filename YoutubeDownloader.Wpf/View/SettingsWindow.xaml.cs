@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services;
 
 namespace YoutubeDownloader.Wpf.View
 {
-    public partial class SettingsWindow : Window, INotifyPropertyChanged
+    public partial class SettingsWindow : Page, INotifyPropertyChanged
     {
         private readonly ISettingsService _settingsService;
 
@@ -43,7 +44,7 @@ namespace YoutubeDownloader.Wpf.View
                 await _settingsService.SaveSettingsAsync(Settings);
             }
 
-            Close();
+
         }
 
         private void BrowseButton_Click(object sender, RoutedEventArgs e)

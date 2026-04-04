@@ -20,7 +20,7 @@ namespace YoutubeDownloader.Wpf;
 /// </summary>
 public partial class App : Application
 {
-    private MainWindow? _mainWindow;
+    private ShellWindow? _shellWindow;
     private readonly ServiceProvider services;
 
     public App()
@@ -51,7 +51,8 @@ public partial class App : Application
             .AddConfig(root)
             .AddDownloadServices<Services.Downloader.YoutubeDownloader>(root)
             .AddTransient<MainWindow>()
-            .AddTransient<SettingsWindow>();
+            .AddTransient<SettingsWindow>()
+            .AddTransient<ShellWindow>();
         serviceCollection.AddLogging(builder =>
             builder.AddProvider(new FileLoggerProvider("logs.txt"))
                 .SetMinimumLevel(LogLevel.Warning)
@@ -65,7 +66,7 @@ public partial class App : Application
         await updater.CheckForAppUpdates();
         var ffmpeg = services.GetService<FfmpegDownloader>()!;
 
-        _mainWindow = services.GetService<MainWindow>();
+        _shellWindow = services.GetService<ShellWindow>();
 
         if (!ffmpeg.DoesFfmpegExist())
         {
@@ -87,6 +88,6 @@ public partial class App : Application
             }
         }
 
-        _mainWindow?.Show();
+        _shellWindow?.Show();
     }
 }
