@@ -5,8 +5,7 @@ namespace YoutubeDownloader.Core.Services
 {
     public interface ISettingsService
     {
-        ValueTask<AppConfiguration> LoadSettingsAsync();
-        Task SaveSettingsAsync(AppConfiguration settings);
+        ValueTask<AppConfiguration> LoadSettingsAsync(CancellationToken cancellationToken = default);
+        Task SaveSettingsAsync(AppConfiguration settings, CancellationToken cancellationToken = default);
     }
 }
-

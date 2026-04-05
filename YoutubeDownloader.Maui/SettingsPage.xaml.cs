@@ -48,7 +48,7 @@ namespace YoutubeDownloader.Maui
             Settings = await _settingsService.LoadSettingsAsync();
         }
 
-        private async void BrowseButton_Clicked(object sender, System.EventArgs e)
+        private async void BrowseButton_Clicked(object sender, EventArgs e)
         {
             var cancellationToken = CancellationToken.None;
             var result = await FolderPicker.Default.PickAsync(cancellationToken);
