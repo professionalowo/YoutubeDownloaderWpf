@@ -21,4 +21,4 @@ jobs:
           dotnet-version: 10.0.x  # Update if using a different .NET version
 
       - name: Run Tests
-        run: dotnet test --configuration Release -p:IsTestProject=true
+        run: dotnet test YoutubeDownloader.Tests/YoutubeDownloader.Tests.csproj --configuration Release
