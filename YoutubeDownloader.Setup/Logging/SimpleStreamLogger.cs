@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace YoutubeDownloader.Core.Services.Logging;
+namespace YoutubeDownloader.Setup.Logging;
 
 public sealed class SimpleStreamLogger(string loggerName, Stream outStream) : ILogger, IDisposable
 {

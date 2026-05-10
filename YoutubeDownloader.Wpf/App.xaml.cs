@@ -9,7 +9,7 @@ using Velopack.Sources;
 using YoutubeDownloader.Core.Services.AutoUpdater;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
 using YoutubeDownloader.Core.Services.InternalDirectory;
-using YoutubeDownloader.Core.Services.Logging;
+using YoutubeDownloader.Setup.Logging;
 using YoutubeDownloader.Wpf.Services;
 using YoutubeDownloader.Wpf.View;
 
@@ -49,14 +49,11 @@ public partial class App : Application
         serviceCollection.AddTransient<UpdateManager>(_ => manager)
             .AddTransient<VelopackService>()
             .AddConfig(root)
+            .AddLogFile(root.ChildDirectory("logs"))
             .AddDownloadServices<Services.Downloader.YoutubeDownloader>(root)
             .AddTransient<MainWindow>()
             .AddTransient<SettingsWindow>()
             .AddTransient<ShellWindow>();
-        serviceCollection.AddLogging(builder =>
-            builder.AddProvider(new FileLoggerProvider("logs.txt"))
-                .SetMinimumLevel(LogLevel.Warning)
-        );
         return serviceCollection.BuildServiceProvider();
     }
 

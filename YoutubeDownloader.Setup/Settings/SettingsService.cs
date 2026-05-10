@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 
-namespace YoutubeDownloader.Core.Services
+namespace YoutubeDownloader.Setup.Settings
 {
     public class SettingsService(IRootDirectory root) : ISettingsService
     {

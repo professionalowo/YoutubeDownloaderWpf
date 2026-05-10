@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services;
+using YoutubeDownloader.Setup.Settings;
 
 namespace YoutubeDownloader.Wpf.View
 {

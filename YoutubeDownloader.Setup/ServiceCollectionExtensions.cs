@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services.AutoUpdater.Ffmpeg;
@@ -8,6 +9,8 @@ using YoutubeDownloader.Core.Services.Downloader;
 using YoutubeDownloader.Core.Services.Downloader.Download;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services;
+using YoutubeDownloader.Setup.Logging;
+using YoutubeDownloader.Setup.Settings;
 using YoutubeExplode;
 
 namespace YoutubeDownloader.Setup;
@@ -16,6 +19,12 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection serviceCollection)
     {
+        public IServiceCollection AddLogFile(IDirectory logsDir, LogLevel minLevel = LogLevel.Information)
+            => serviceCollection.AddLogging(builder =>
+                builder.AddProvider(new FileLoggerProvider(logsDir.ChildFileName("logs.txt")))
+                    .SetMinimumLevel(minLevel)
+            );
+
         public IServiceCollection AddDownloadServices<TYoutubeDownloader>(IRootDirectory root)
             where TYoutubeDownloader : YoutubeDownloaderBase
         {

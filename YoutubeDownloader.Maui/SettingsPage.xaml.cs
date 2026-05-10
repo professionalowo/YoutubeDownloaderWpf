@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Maui.Storage;
 using YoutubeDownloader.Core.Data;
 using YoutubeDownloader.Core.Services;
+using YoutubeDownloader.Setup.Settings;
 
 namespace YoutubeDownloader.Maui
 {

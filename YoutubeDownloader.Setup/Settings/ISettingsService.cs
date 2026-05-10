@@ -1,7 +1,6 @@
 ﻿using YoutubeDownloader.Core.Data;
-using System.Threading.Tasks;
 
-namespace YoutubeDownloader.Core.Services
+namespace YoutubeDownloader.Setup.Settings
 {
     public interface ISettingsService
     {

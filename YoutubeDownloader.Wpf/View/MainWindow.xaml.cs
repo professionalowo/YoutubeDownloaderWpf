@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using YoutubeDownloader.Core.Services.InternalDirectory;
 using YoutubeDownloader.Core.Services;
+using YoutubeDownloader.Setup.Settings;
 using YoutubeDownloader.Wpf.View;
 
 namespace YoutubeDownloader.Wpf;
