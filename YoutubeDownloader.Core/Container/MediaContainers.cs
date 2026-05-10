@@ -2,7 +2,7 @@
 
 public static class MediaContainers
 {
-    internal static IReadOnlyList<IMediaContainer> Containers { get; } =
+    private static IReadOnlyList<IMediaContainer> Containers { get; } =
     [
         new Mp3(),
         new Wav(),
