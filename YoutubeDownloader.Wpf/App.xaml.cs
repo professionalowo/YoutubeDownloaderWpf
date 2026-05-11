@@ -49,8 +49,7 @@ public partial class App : Application
         serviceCollection.AddTransient<UpdateManager>(_ => manager)
             .AddTransient<VelopackService>()
             .AddConfig(root)
-            .AddLogFile(root.ChildDirectory("logs"))
-            .AddDownloadServices<Services.Downloader.YoutubeDownloader>(root)
+            .AddAppServices<Services.Downloader.YoutubeDownloader>(root)
             .AddTransient<MainWindow>()
             .AddTransient<SettingsWindow>()
             .AddTransient<ShellWindow>();

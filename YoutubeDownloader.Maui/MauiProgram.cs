@@ -30,7 +30,7 @@ public static class MauiProgram
 
         builder.Services
             .AddConfig(root)
-            .AddDownloadServices<Services.YoutubeDownloader>(root)
+            .AddAppServices<Services.YoutubeDownloader>(root)
             .AddScoped<Mp3Player>()
             .AddTransient<SettingsPage>();
         return builder.Build();

@@ -19,13 +19,7 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection serviceCollection)
     {
-        public IServiceCollection AddLogFile(IDirectory logsDir, LogLevel minLevel = LogLevel.Information)
-            => serviceCollection.AddLogging(builder =>
-                builder.AddProvider(new FileLoggerProvider(logsDir.ChildFileName("logs.txt")))
-                    .SetMinimumLevel(minLevel)
-            );
-
-        public IServiceCollection AddDownloadServices<TYoutubeDownloader>(IRootDirectory root)
+        public IServiceCollection AddAppServices<TYoutubeDownloader>(IRootDirectory root)
             where TYoutubeDownloader : YoutubeDownloaderBase
         {
             serviceCollection.AddSingleton<TYoutubeDownloader>();
@@ -49,13 +43,15 @@ public static class ServiceCollectionExtensions
             serviceCollection.AddFfmpeg(root);
             serviceCollection.AddHttpClient<FfmpegDownloader>()
                 .UseDefaultHttpConfig();
+            serviceCollection.AddLogging(builder =>
+                builder.AddProvider(new FileLoggerProvider(root.ChildDirectory("logs").ChildFileName("logs.txt"))));
 
             return serviceCollection;
         }
 
         public IServiceCollection AddConfig(IRootDirectory root)
         {
-            serviceCollection.AddSingleton<IRootDirectory>(root);
+            serviceCollection.AddSingleton(root);
             serviceCollection.AddSingleton<ISettingsService, SettingsService>();
             var config = new ConfigurationBuilder()
                 .SetBasePath(root.FullPath)
