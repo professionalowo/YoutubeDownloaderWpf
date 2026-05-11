@@ -2,6 +2,8 @@
 
 internal sealed class Aac() : AbstractMediaContainer("AAC Audio (M4A)", "m4a", "aac")
 {
+    public override VideoStreamSupport VideoStreamSupport => VideoStreamSupport.AttachedPic;
+
     public override IMediaContainer.Codec.Flags FfmpegCodecFlags =>
     [
         IMediaContainer.Codec.Flag.Create("b:a", "192k")

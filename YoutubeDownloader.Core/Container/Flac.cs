@@ -2,6 +2,7 @@
 
 internal sealed class Flac() : AbstractMediaContainer("Flac Audio", "flac", "flac")
 {
+    public override VideoStreamSupport VideoStreamSupport => VideoStreamSupport.AttachedPic;
     public override IMediaContainer.Codec.Flags FfmpegCodecFlags =>
     [
         IMediaContainer.Codec.Flag.Create("compression_level", 5),

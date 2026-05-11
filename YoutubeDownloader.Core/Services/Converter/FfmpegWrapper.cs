@@ -33,32 +33,47 @@ public sealed class FfmpegAudioConversion
         return Process.Start(info)!;
     }
 
-    private static ICollection<string> Args(string outPath, AudioMetadata metadata, IMediaContainer target) =>
-    [
-        "-nostdin",
-        "-hide_banner",
-        "-loglevel", "error",
-        "-i", "pipe:0",
-        "-i", metadata.ThumbnailPath,
+    private static List<string> Args(string outPath, AudioMetadata metadata, IMediaContainer target)
+    {
+        var args = new List<string>
+        {
+            "-nostdin",
+            "-hide_banner",
+            "-loglevel", "error",
+            "-i", "pipe:0"
+        };
 
+        if (target.VideoStreamSupport is VideoStreamSupport.AttachedPic)
+        {
+            args.AddRange(
+            [
+                "-i", metadata.ThumbnailPath,
+                "-c:v", "mjpeg",
+                "-map", "1:v:0",
+                "-disposition:v", "attached_pic",
+            ]);
+        }
+        else
+        {
+            args.Add("-vn");
+        }
 
-        "-c:a", target.FfmpegCodec.FfmpegCodec,
-        ..target.FfmpegCodecFlags.Format(),
+        args.AddRange(
+        [
+            "-c:a", target.FfmpegCodec.FfmpegCodec,
+            ..target.FfmpegCodecFlags.Format(),
 
-        "-c:v", "mjpeg",
+            "-map", "0:a:0",
 
-        "-map", "0:a:0",
-        "-map", "1:v:0",
+            "-map_metadata", "-1",
+            "-metadata", $"title={metadata.Name}",
+            "-metadata", $"artist={metadata.Author}",
 
-        "-disposition:v", "attached_pic",
-
-        "-map_metadata", "-1",
-        "-metadata", $"title={metadata.Name}",
-        "-metadata", $"artist={metadata.Author}",
-
-        "-y",
-        outPath
-    ];
+            "-y",
+            outPath
+        ]);
+        return args;
+    }
 
     public override void Flush()
         => Input.Flush();

@@ -5,5 +5,7 @@ public abstract class AbstractMediaContainer(string display, string extension, s
     public override string ToString() => display;
     public IMediaContainer.FileExtension Extension { get; } = new(extension);
     public IMediaContainer.Codec FfmpegCodec { get; } = new(codec);
-    public virtual IMediaContainer.Codec.Flags FfmpegCodecFlags { get; } = [];
+    
+    public abstract VideoStreamSupport VideoStreamSupport { get; }
+    public abstract IMediaContainer.Codec.Flags FfmpegCodecFlags { get; }
 }

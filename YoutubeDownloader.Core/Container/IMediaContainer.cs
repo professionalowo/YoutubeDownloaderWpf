@@ -4,6 +4,7 @@ namespace YoutubeDownloader.Core.Container;
 
 public interface IMediaContainer
 {
+    VideoStreamSupport VideoStreamSupport { get; }
     FileExtension Extension { get; }
     Codec FfmpegCodec { get; }
     Codec.Flags FfmpegCodecFlags { get; }
@@ -56,4 +57,10 @@ public interface IMediaContainer
             internal IEnumerable<string> Format() => [$"-{Name}", Value];
         }
     }
+}
+
+public enum VideoStreamSupport
+{
+    None,
+    AttachedPic
 }

@@ -2,6 +2,7 @@
 
 internal sealed class Opus() : AbstractMediaContainer("Opus Audio", "opus", "libopus")
 {
+    public override VideoStreamSupport VideoStreamSupport => VideoStreamSupport.None;
     public override IMediaContainer.Codec.Flags FfmpegCodecFlags =>
     [
         IMediaContainer.Codec.Flag.Create("b:a", "128k"),
