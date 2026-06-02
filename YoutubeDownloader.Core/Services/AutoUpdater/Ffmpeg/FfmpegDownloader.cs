@@ -10,7 +10,7 @@ public sealed class FfmpegDownloader(
     ILogger<FfmpegDownloader> logger,
     FfmpegConfig config)
 {
-    public async ValueTask DownloadFfmpeg(IProgress<double> progress, CancellationToken token = default)
+    public async Task DownloadFfmpeg(IProgress<double> progress, CancellationToken token = default)
     {
         var ffmpegExeName = PlatformUtil.AsExecutablePath(config.FfmpegExeName);
 
