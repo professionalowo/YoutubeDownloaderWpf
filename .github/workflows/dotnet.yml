@@ -48,7 +48,7 @@ jobs:
           echo "CERT_THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV
 
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

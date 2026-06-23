@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest  # Change to windows-latest if needed
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
