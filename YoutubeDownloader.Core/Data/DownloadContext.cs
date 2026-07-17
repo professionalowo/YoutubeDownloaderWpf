@@ -16,7 +16,7 @@ public class DownloadContext : INotifyPropertyChanged, IAudioConversionContext
     public double ProgressValue
     {
         get;
-        protected set
+        private set
         {
             field = value;
             OnPropertyChanged();
