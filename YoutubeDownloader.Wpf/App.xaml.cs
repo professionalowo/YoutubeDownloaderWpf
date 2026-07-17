@@ -40,7 +40,7 @@ public partial class App : Application
     {
         var serviceCollection = new ServiceCollection();
         var manager =
-            new UpdateManager(new GithubSource(GitHubVersion.url, null, false));
+            new UpdateManager(new GithubSource(GitHubVersion.RepositoryUrl, null, false));
 
         IRootDirectory root = manager.GetBasePath() is { } path
             ? new RootDirectory(path)
