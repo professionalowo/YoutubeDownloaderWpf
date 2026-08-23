@@ -4,9 +4,9 @@ namespace YoutubeDownloader.Core.Extensions;
 
 public static class ChannelExtensions
 {
-    extension<T>(Channel<T> c)
+    extension<TWrite, TRead>(Channel<TWrite, TRead> c)
     {
-        public void Deconstruct(out ChannelReader<T> reader, out ChannelWriter<T> writer) =>
+        public void Deconstruct(out ChannelReader<TRead> reader, out ChannelWriter<TWrite> writer) =>
             (reader, writer) = (c.Reader, c.Writer);
     }
 }
