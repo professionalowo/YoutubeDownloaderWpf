@@ -8,14 +8,12 @@ public sealed class SimpleStreamLogger(string loggerName, Stream outStream) : IL
     private readonly StreamWriter _writer = new(outStream) { AutoFlush = true };
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-    {
-        return null;
-    }
+        => null;
+
 
     public void Dispose()
-    {
-        _writer.Dispose();
-    }
+        => _writer.Dispose();
+
 
     public bool IsEnabled(LogLevel logLevel)
         => true;
