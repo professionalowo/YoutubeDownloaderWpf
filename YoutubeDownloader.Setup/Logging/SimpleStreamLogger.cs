@@ -23,7 +23,7 @@ public sealed class SimpleStreamLogger(string loggerName, Stream outStream) : IL
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        var formatted = $"[{loggerName}]({logLevel}): {formatter(state, exception)}";
+        var formatted = $"[{loggerName}]({logLevel})[{DateTime.Now}]: {formatter(state, exception)}";
         lock (_writerLock)
         {
             _writer.WriteLine(formatted);
