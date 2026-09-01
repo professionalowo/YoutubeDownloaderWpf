@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SharpCompress.Archives;
 using YoutubeDownloader.Core.Util;
 using SharpCompress.Archives.SevenZip;
 using YoutubeDownloader.Core.Extensions;
@@ -19,8 +20,7 @@ public sealed class FfmpegDownloader(
 
         await using var archive = await SevenZipArchive.OpenAsyncArchive(memory, cancellationToken: token)
             .ConfigureAwait(false);
-        var entry = await archive.EntriesAsync.FirstOrDefaultAsync(e =>
-                e.Key?.EndsWith(ffmpegExeName, StringComparison.OrdinalIgnoreCase) ?? false, token)
+        var entry = await archive.EntriesAsync.FirstOrDefaultAsync(CreateArchiveEntryFilter(ffmpegExeName), token)
             .ConfigureAwait(false);
 
         if (entry is null)
@@ -39,6 +39,9 @@ public sealed class FfmpegDownloader(
 
         logger.LogInformation("ffmpeg downloaded successfully");
     }
+
+    private static Func<IArchiveEntry, bool> CreateArchiveEntryFilter(string key)
+        => entry => entry is { Key: { } name } && name.EndsWith(key, StringComparison.OrdinalIgnoreCase);
 
     private async Task<Stream> GetArchiveMemoryStream(IProgress<double> progress,
         CancellationToken token = default)
