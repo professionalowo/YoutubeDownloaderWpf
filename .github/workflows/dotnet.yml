@@ -12,20 +12,51 @@ jobs:
       contents: write  # Needed for GitHub Releases
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          cache: true # Automatically caches NuGet packages
+
+      - name: Cache .NET Global Tools (Velopack)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\.dotnet\tools
+          key: ${{ runner.os }}-dotnet-tools-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnet-tools-
+
+      - name: Install or Verify Velopack CLI
+        shell: pwsh
+        run: |
+          if (-not (Get-Command vpk -ErrorAction SilentlyContinue)) {
+              Write-Host "Installing Velopack CLI..."
+              dotnet tool install -g vpk
+          } else {
+              Write-Host "Velopack CLI (vpk) found in cache. Skipping installation."
+          }
+
       - name: Import Certificate to Windows OS
         shell: pwsh
         run: |
-          # 1. Decode the Base64 certificate
+          # 1. Decode the Base64 certificate into a temp path
           $certBase64 = "${{ secrets.CODE_SIGNING_CERT }}".Trim()
           $bytes = [System.Convert]::FromBase64String($certBase64)
-          [System.IO.File]::WriteAllBytes("cert.pfx", $bytes)
+          $certPath = Join-Path $env:TEMP "cert.pfx"
+          [System.IO.File]::WriteAllBytes($certPath, $bytes)
 
           # 2. Setup the password and flags
           $certPass = "${{ secrets.CERT_PASSWORD }}"
           $flags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
           
           # 3. Create the cert object
-          $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("cert.pfx", $certPass, $flags)
+          $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath, $certPass, $flags)
           
           # --- EXPIRATION CHECK ---
           Write-Host "Certificate is valid until: $($pfx.NotAfter)"
@@ -42,26 +73,16 @@ jobs:
           $store.Add($pfx)
           $store.Close()
 
-          # 5. Grab the Thumbprint and save it to GitHub Environment Variables
+          # 5. Clean up temp file
+          Remove-Item $certPath -ErrorAction SilentlyContinue
+
+          # 6. Grab the Thumbprint and save it to GitHub Environment Variables
           $thumbprint = $pfx.Thumbprint
           Write-Host "Certificate imported successfully! Thumbprint: $thumbprint"
           echo "CERT_THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV
 
-      - name: Checkout Repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: 10.0.x
-
       - name: Restore dependencies
         run: dotnet restore YoutubeDownloader.Wpf/YoutubeDownloader.Wpf.csproj
-
-      - name: Install Velopack CLI
-        run: dotnet tool install -g vpk
 
       - name: Publish
         run: dotnet publish YoutubeDownloader.Wpf/YoutubeDownloader.Wpf.csproj -c Release -r win-x64 -o publish /p:DebugType=None /p:DebugSymbols=false /p:UseMonoRuntime=false
@@ -71,8 +92,6 @@ jobs:
         run: |
           $version = "${{ github.ref_name }}".TrimStart('v')
           
-          # Notice we use /sha1 instead of /f and /p. 
-          # Signtool will pull the cert directly from the Windows OS, bypassing all path/password bugs.
           vpk pack -u YoutubeDownloader `
                    -v $version `
                    -p publish `
