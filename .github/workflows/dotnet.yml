@@ -22,6 +22,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
           cache: true # Automatically caches NuGet packages
+          cache-dependency-path: '**/*.csproj'
 
       - name: Cache .NET Global Tools (Velopack)
         uses: actions/cache@v6
