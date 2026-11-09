@@ -154,7 +154,7 @@ public abstract partial class YoutubeDownloaderBase(
         var thumbnail = await thumbnailTask.ConfigureAwait(false);
 
         using var tempFile = TempFile.Create();
-        var writeTask = tempFile.WriteAllBytesAsync(thumbnail, token);
+        var writeTask = tempFile.WriteAllBytesAsync(thumbnail.Data, token);
 
         var fileName = downloadService.GetFileName(named);
         var metadata = new AudioMetadata(named.Title, named.Author, tempFile.FilePath);
